@@ -1,0 +1,39 @@
+html, body, #root {
+    min-height: 100vh;
+    background-color: #FFFFFF !important;
+    min-width: 360px;
+    font-size: 16px;
+}
+
+#root {
+    display: flex;
+    flex-direction: column;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    font-family: Roboto, Helvetica, sans-serif;
+    box-sizing: border-box;
+}
+
+button:focus {
+    outline: none;
+}
+
+a {
+    text-decoration: none;
+    color: #0091EA;
+}
+
+ul {
+    list-style: none;
+}
+
+*::selection {
+    background: #E5F4FC;
+}
+
+input::-ms-clear {
+    display: none;
+}

@@ -6,6 +6,5 @@
 
 ## Usage
 - `npm ci`
-- `go mod download`
 - `./protocgen.sh`
 - `npm run start`

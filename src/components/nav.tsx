@@ -1,5 +1,5 @@
 import React from 'react'
-import { observer } from 'mobx-react'
+import { observer } from 'mobx-react-lite'
 import classNames from 'classnames'
 import { Routes } from '../routes'
 import { Link, useLocation } from 'react-router-dom'

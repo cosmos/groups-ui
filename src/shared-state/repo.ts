@@ -1,28 +1,22 @@
-import React from 'react'
+import React, { createContext } from 'react'
 import { GroupsStore } from './groups-store'
 import { ChainInfoStore } from './chain-info-store'
 
-let storesContext: React.Context<StoresRepository>
-export const useStores = () => React.useContext(storesContext)
+import { configure } from "mobx"
 
-export class StoresRepository {
-    static _instance: StoresRepository
-    static get instance(): StoresRepository {
-        const chainInfoStore = new ChainInfoStore()
-        const groupsStore = new GroupsStore()
+configure({
+    enforceActions: "always",
+    computedRequiresReaction: true,
+    reactionRequiresObservable: true,
+    observableRequiresReaction: true,
+    disableErrorBoundaries: true,
+    isolateGlobalState: false,
+})
 
-        StoresRepository._instance = new StoresRepository(
-            chainInfoStore,
-            groupsStore,
-        )
-        storesContext = React.createContext(StoresRepository._instance)
-        window['storesRepository'] = StoresRepository._instance // for debug
-
-        return StoresRepository._instance
-    }
-
-    constructor(
-        public chainInfoStore: ChainInfoStore,
-        public groupsStore: GroupsStore,
-    ) {}
+export const stores = {
+    chainInfoStore: new ChainInfoStore(),
+    groupsStore: new GroupsStore()
 }
+
+window['stores'] = stores // for debug
+export const useStores = () => React.useContext(createContext(stores))

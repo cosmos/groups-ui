@@ -17,7 +17,7 @@ export const App: React.FC = () => {
                 </Route>
                 <Route exact path={Routes.GROUPS}>
                     <Page>
-                        <Groups/>
+                        <Groups />
                     </Page>
                 </Route>
                 <Route exact path={Routes.GROUPS_CREATE}>

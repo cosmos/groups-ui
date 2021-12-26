@@ -6,6 +6,7 @@ set -eo pipefail
 [ -d protoc ] || mkdir protoc
 [ -f protoc/bin/protoc ] || (curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.17.3/protoc-3.17.3-linux-x86_64.zip && mv protoc-3.17.3-linux-x86_64.zip protoc && unzip -d protoc -o protoc/protoc-3.17.3-linux-x86_64.zip)
 
+go get github.com/regen-network/regen-ledger/v2
 proto_files=$(find $GOPATH/pkg/mod/github.com/regen-network/regen-ledger/v2@v2.1.0/proto/regen/group/v1alpha1 -path -prune -o -name '*.proto')
 
 for file_path in $proto_files; do

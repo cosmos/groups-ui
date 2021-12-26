@@ -3,25 +3,29 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.16.5",
+    "@babel/plugin-proposal-decorators": "^7.16.5",
+    "@cosmjs/launchpad": "^0.26.5",
+    "@cosmjs/proto-signing": "^0.26.5",
+    "@cosmjs/stargate": "^0.26.5",
+    "@keplr-wallet/stores": "^0.9.10",
+    "@keplr-wallet/types": "^0.9.10",
     "@material-ui/core": "4.5.0",
     "@material-ui/icons": "4.4.3",
-    "@types/react-big-calendar": "^0.36.2",
     "axios": "^0.19.0",
     "classnames": "^2.2.6",
     "lodash": "^4.17.15",
-    "mobx": "^5.15.1",
-    "mobx-react": "^6.1.4",
+    "mobx": "^6.3.10",
+    "mobx-react-lite": "^3.2.2",
     "moment": "^2.24.0",
-    "react": "^16.12.0",
-    "react-autosuggest": "^9.4.3",
-    "react-big-calendar": "^0.38.1",
+    "react": "16.12.0",
     "react-day-picker": "^7.4.0",
-    "react-dom": "^16.12.0",
-    "react-router-dom": "^5.1.2",
-    "react-scripts": "3.2.0",
+    "react-dom": "16.12.0",
+    "react-router-dom": "5.1.2",
+    "react-scripts": "4.0.3",
     "serve": "^13.0.2",
     "ts-proto": "^1.95.0",
-    "typescript": "3.7.2"
+    "typescript": "^4.5.4"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -29,6 +33,22 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "serve": "serve -s -p 3001 build/"
+  },
+  "babel": {
+    "presets": [
+      "react-app"
+    ],
+    "plugins": [
+      [
+        "@babel/plugin-proposal-class-properties",
+        {
+          "loose": true
+        }
+      ]
+    ],
+    "assumptions": {
+      "setPublicClassFields": false
+    }
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -47,11 +67,9 @@
   },
   "devDependencies": {
     "@types/classnames": "^2.2.9",
-    "@types/jest": "24.0.23",
     "@types/lodash": "^4.14.149",
     "@types/node": "12.12.14",
     "@types/react": "16.9.13",
-    "@types/react-autosuggest": "^9.3.13",
     "@types/react-dom": "16.9.4",
     "@types/react-router-dom": "^5.1.3"
   }

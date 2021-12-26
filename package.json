@@ -1,0 +1,58 @@
+{
+  "name": "group-ui",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@material-ui/core": "4.5.0",
+    "@material-ui/icons": "4.4.3",
+    "@types/react-big-calendar": "^0.36.2",
+    "axios": "^0.19.0",
+    "classnames": "^2.2.6",
+    "lodash": "^4.17.15",
+    "mobx": "^5.15.1",
+    "mobx-react": "^6.1.4",
+    "moment": "^2.24.0",
+    "react": "^16.12.0",
+    "react-autosuggest": "^9.4.3",
+    "react-big-calendar": "^0.38.1",
+    "react-day-picker": "^7.4.0",
+    "react-dom": "^16.12.0",
+    "react-router-dom": "^5.1.2",
+    "react-scripts": "3.2.0",
+    "serve": "^13.0.2",
+    "ts-proto": "^1.95.0",
+    "typescript": "3.7.2"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "serve": "serve -s -p 3001 build/"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@types/classnames": "^2.2.9",
+    "@types/jest": "24.0.23",
+    "@types/lodash": "^4.14.149",
+    "@types/node": "12.12.14",
+    "@types/react": "16.9.13",
+    "@types/react-autosuggest": "^9.3.13",
+    "@types/react-dom": "16.9.4",
+    "@types/react-router-dom": "^5.1.3"
+  }
+}

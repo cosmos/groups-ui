@@ -7,13 +7,13 @@ export const protobufPackage = "regen.group.v1alpha1";
 /** EventCreateGroup is an event emitted when a group is created. */
 export interface EventCreateGroup {
   /** group_id is the unique ID of the group. */
-  groupId: number;
+  group_id: number;
 }
 
 /** EventUpdateGroup is an event emitted when a group is updated. */
 export interface EventUpdateGroup {
   /** group_id is the unique ID of the group. */
-  groupId: number;
+  group_id: number;
 }
 
 /** EventCreateGroupAccount is an event emitted when a group account is created. */
@@ -31,30 +31,30 @@ export interface EventUpdateGroupAccount {
 /** EventCreateProposal is an event emitted when a proposal is created. */
 export interface EventCreateProposal {
   /** proposal_id is the unique ID of the proposal. */
-  proposalId: number;
+  proposal_id: number;
 }
 
 /** EventVote is an event emitted when a voter votes on a proposal. */
 export interface EventVote {
   /** proposal_id is the unique ID of the proposal. */
-  proposalId: number;
+  proposal_id: number;
 }
 
 /** EventExec is an event emitted when a proposal is executed. */
 export interface EventExec {
   /** proposal_id is the unique ID of the proposal. */
-  proposalId: number;
+  proposal_id: number;
 }
 
-const baseEventCreateGroup: object = { groupId: 0 };
+const baseEventCreateGroup: object = { group_id: 0 };
 
 export const EventCreateGroup = {
   encode(
     message: EventCreateGroup,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.groupId !== 0) {
-      writer.uint32(8).uint64(message.groupId);
+    if (message.group_id !== 0) {
+      writer.uint32(8).uint64(message.group_id);
     }
     return writer;
   },
@@ -67,7 +67,7 @@ export const EventCreateGroup = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.groupId = longToNumber(reader.uint64() as Long);
+          message.group_id = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -79,17 +79,17 @@ export const EventCreateGroup = {
 
   fromJSON(object: any): EventCreateGroup {
     const message = { ...baseEventCreateGroup } as EventCreateGroup;
-    message.groupId =
-      object.groupId !== undefined && object.groupId !== null
-        ? Number(object.groupId)
+    message.group_id =
+      object.group_id !== undefined && object.group_id !== null
+        ? Number(object.group_id)
         : 0;
     return message;
   },
 
   toJSON(message: EventCreateGroup): unknown {
     const obj: any = {};
-    message.groupId !== undefined &&
-      (obj.groupId = Math.round(message.groupId));
+    message.group_id !== undefined &&
+      (obj.group_id = Math.round(message.group_id));
     return obj;
   },
 
@@ -97,20 +97,20 @@ export const EventCreateGroup = {
     object: I
   ): EventCreateGroup {
     const message = { ...baseEventCreateGroup } as EventCreateGroup;
-    message.groupId = object.groupId ?? 0;
+    message.group_id = object.group_id ?? 0;
     return message;
   },
 };
 
-const baseEventUpdateGroup: object = { groupId: 0 };
+const baseEventUpdateGroup: object = { group_id: 0 };
 
 export const EventUpdateGroup = {
   encode(
     message: EventUpdateGroup,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.groupId !== 0) {
-      writer.uint32(8).uint64(message.groupId);
+    if (message.group_id !== 0) {
+      writer.uint32(8).uint64(message.group_id);
     }
     return writer;
   },
@@ -123,7 +123,7 @@ export const EventUpdateGroup = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.groupId = longToNumber(reader.uint64() as Long);
+          message.group_id = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -135,17 +135,17 @@ export const EventUpdateGroup = {
 
   fromJSON(object: any): EventUpdateGroup {
     const message = { ...baseEventUpdateGroup } as EventUpdateGroup;
-    message.groupId =
-      object.groupId !== undefined && object.groupId !== null
-        ? Number(object.groupId)
+    message.group_id =
+      object.group_id !== undefined && object.group_id !== null
+        ? Number(object.group_id)
         : 0;
     return message;
   },
 
   toJSON(message: EventUpdateGroup): unknown {
     const obj: any = {};
-    message.groupId !== undefined &&
-      (obj.groupId = Math.round(message.groupId));
+    message.group_id !== undefined &&
+      (obj.group_id = Math.round(message.group_id));
     return obj;
   },
 
@@ -153,7 +153,7 @@ export const EventUpdateGroup = {
     object: I
   ): EventUpdateGroup {
     const message = { ...baseEventUpdateGroup } as EventUpdateGroup;
-    message.groupId = object.groupId ?? 0;
+    message.group_id = object.group_id ?? 0;
     return message;
   },
 };
@@ -286,15 +286,15 @@ export const EventUpdateGroupAccount = {
   },
 };
 
-const baseEventCreateProposal: object = { proposalId: 0 };
+const baseEventCreateProposal: object = { proposal_id: 0 };
 
 export const EventCreateProposal = {
   encode(
     message: EventCreateProposal,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.proposalId !== 0) {
-      writer.uint32(8).uint64(message.proposalId);
+    if (message.proposal_id !== 0) {
+      writer.uint32(8).uint64(message.proposal_id);
     }
     return writer;
   },
@@ -307,7 +307,7 @@ export const EventCreateProposal = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.proposalId = longToNumber(reader.uint64() as Long);
+          message.proposal_id = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -319,17 +319,17 @@ export const EventCreateProposal = {
 
   fromJSON(object: any): EventCreateProposal {
     const message = { ...baseEventCreateProposal } as EventCreateProposal;
-    message.proposalId =
-      object.proposalId !== undefined && object.proposalId !== null
-        ? Number(object.proposalId)
+    message.proposal_id =
+      object.proposal_id !== undefined && object.proposal_id !== null
+        ? Number(object.proposal_id)
         : 0;
     return message;
   },
 
   toJSON(message: EventCreateProposal): unknown {
     const obj: any = {};
-    message.proposalId !== undefined &&
-      (obj.proposalId = Math.round(message.proposalId));
+    message.proposal_id !== undefined &&
+      (obj.proposal_id = Math.round(message.proposal_id));
     return obj;
   },
 
@@ -337,20 +337,20 @@ export const EventCreateProposal = {
     object: I
   ): EventCreateProposal {
     const message = { ...baseEventCreateProposal } as EventCreateProposal;
-    message.proposalId = object.proposalId ?? 0;
+    message.proposal_id = object.proposal_id ?? 0;
     return message;
   },
 };
 
-const baseEventVote: object = { proposalId: 0 };
+const baseEventVote: object = { proposal_id: 0 };
 
 export const EventVote = {
   encode(
     message: EventVote,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.proposalId !== 0) {
-      writer.uint32(8).uint64(message.proposalId);
+    if (message.proposal_id !== 0) {
+      writer.uint32(8).uint64(message.proposal_id);
     }
     return writer;
   },
@@ -363,7 +363,7 @@ export const EventVote = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.proposalId = longToNumber(reader.uint64() as Long);
+          message.proposal_id = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -375,17 +375,17 @@ export const EventVote = {
 
   fromJSON(object: any): EventVote {
     const message = { ...baseEventVote } as EventVote;
-    message.proposalId =
-      object.proposalId !== undefined && object.proposalId !== null
-        ? Number(object.proposalId)
+    message.proposal_id =
+      object.proposal_id !== undefined && object.proposal_id !== null
+        ? Number(object.proposal_id)
         : 0;
     return message;
   },
 
   toJSON(message: EventVote): unknown {
     const obj: any = {};
-    message.proposalId !== undefined &&
-      (obj.proposalId = Math.round(message.proposalId));
+    message.proposal_id !== undefined &&
+      (obj.proposal_id = Math.round(message.proposal_id));
     return obj;
   },
 
@@ -393,20 +393,20 @@ export const EventVote = {
     object: I
   ): EventVote {
     const message = { ...baseEventVote } as EventVote;
-    message.proposalId = object.proposalId ?? 0;
+    message.proposal_id = object.proposal_id ?? 0;
     return message;
   },
 };
 
-const baseEventExec: object = { proposalId: 0 };
+const baseEventExec: object = { proposal_id: 0 };
 
 export const EventExec = {
   encode(
     message: EventExec,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.proposalId !== 0) {
-      writer.uint32(8).uint64(message.proposalId);
+    if (message.proposal_id !== 0) {
+      writer.uint32(8).uint64(message.proposal_id);
     }
     return writer;
   },
@@ -419,7 +419,7 @@ export const EventExec = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.proposalId = longToNumber(reader.uint64() as Long);
+          message.proposal_id = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -431,17 +431,17 @@ export const EventExec = {
 
   fromJSON(object: any): EventExec {
     const message = { ...baseEventExec } as EventExec;
-    message.proposalId =
-      object.proposalId !== undefined && object.proposalId !== null
-        ? Number(object.proposalId)
+    message.proposal_id =
+      object.proposal_id !== undefined && object.proposal_id !== null
+        ? Number(object.proposal_id)
         : 0;
     return message;
   },
 
   toJSON(message: EventExec): unknown {
     const obj: any = {};
-    message.proposalId !== undefined &&
-      (obj.proposalId = Math.round(message.proposalId));
+    message.proposal_id !== undefined &&
+      (obj.proposal_id = Math.round(message.proposal_id));
     return obj;
   },
 
@@ -449,7 +449,7 @@ export const EventExec = {
     object: I
   ): EventExec {
     const message = { ...baseEventExec } as EventExec;
-    message.proposalId = object.proposalId ?? 0;
+    message.proposal_id = object.proposal_id ?? 0;
     return message;
   },
 };

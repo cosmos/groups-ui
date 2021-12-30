@@ -1,9 +1,15 @@
 import { getService, service } from './services'
 import { ChainInfo } from '@keplr-wallet/types'
-import { MsgCreateGroup } from '../generated/regen/group/v1alpha1/tx'
+import { MsgCreateGroup, MsgUpdateGroupMetadata, protobufPackage } from '../generated/regen/group/v1alpha1/tx'
 import { CosmosClient } from './cosmos-client'
-import { GroupInfo } from '../generated/regen/group/v1alpha1/types'
-import { QueryGroupsByAdminResponse } from '../generated/regen/group/v1alpha1/query'
+import { GroupAccountInfo, GroupInfo, GroupMember } from '../generated/regen/group/v1alpha1/types'
+import {
+    QueryGroupAccountInfoResponse,
+    QueryGroupAccountsByGroupResponse,
+    QueryGroupInfoResponse,
+    QueryGroupMembersResponse,
+    QueryGroupsByAdminResponse
+} from '../generated/regen/group/v1alpha1/query'
 
 @service
 export class GroupsService {
@@ -24,12 +30,44 @@ export class GroupsService {
             "/regen.group.v1alpha1.MsgCreateGroup",
             MsgCreateGroup
         );
+        this.cosmosClient.registry.register(
+            `/${protobufPackage}.MsgUpdateGroupMetadata`,
+            MsgUpdateGroupMetadata
+        );
     }
 
     groupsByAdmin = async (admin: string): Promise<GroupInfo[]> => {
-        const res = await this.cosmosClient.lcdClient.get(
+        const res = await this.cosmosClient.lcdClientGet(
             `/regen/group/v1alpha1/groups/admins/${admin}`
         ) as QueryGroupsByAdminResponse
         return res.groups
+    }
+
+    groupById = async (groupId: number): Promise<GroupInfo> => {
+        const res = await this.cosmosClient.lcdClientGet(
+            `/regen/group/v1alpha1/groups/${groupId}/info`
+        ) as QueryGroupInfoResponse
+        return res.info
+    }
+
+    groupAccounts = async (groupId: number): Promise<GroupAccountInfo[]> => {
+        const res = await this.cosmosClient.lcdClientGet(
+            `/regen/group/v1alpha1/groups/${groupId}/accounts`
+        ) as QueryGroupAccountsByGroupResponse
+        return res.group_accounts
+    }
+
+    groupMembers = async (groupId: number): Promise<GroupMember[]> => {
+        const res = await this.cosmosClient.lcdClientGet(
+            `/regen/group/v1alpha1/groups/${groupId}/members`
+        ) as QueryGroupMembersResponse
+        return res.members
+    }
+
+    groupInfoByGroupAddress = async (groupAddress: string): Promise<GroupAccountInfo> => {
+        const res = await this.cosmosClient.lcdClientGet(
+            `/regen/group/v1alpha1/groups/accounts/${groupAddress}`
+        ) as QueryGroupAccountInfoResponse
+        return res.info
     }
 }

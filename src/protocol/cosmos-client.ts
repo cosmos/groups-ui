@@ -1,6 +1,6 @@
 import { getKeplrFromWindow } from '@keplr-wallet/stores'
-import { ChainInfo } from '@keplr-wallet/types'
-import { Registry } from '@cosmjs/proto-signing'
+import { ChainInfo, Keplr } from '@keplr-wallet/types'
+import { EncodeObject, Registry } from '@cosmjs/proto-signing'
 import { defaultRegistryTypes, SigningStargateClient } from '@cosmjs/stargate'
 import {
     LcdClient,
@@ -14,6 +14,8 @@ import {
     // setupSupplyExtension
 } from "@cosmjs/launchpad"
 import { AuthExtension } from '@cosmjs/launchpad/build/lcdapi/auth'
+import { StdFee } from '@cosmjs/amino'
+import { BroadcastTxResponse } from '@cosmjs/stargate/build/stargateclient'
 
 export class CosmosClient {
     static _instance: CosmosClient = null
@@ -25,9 +27,27 @@ export class CosmosClient {
     }
 
     registry: Registry = null
-    stargateClient: SigningStargateClient = null
-    lcdClient: LcdClient
+    private stargateClient: SigningStargateClient = null
+    private lcdClient: LcdClient
         & AuthExtension = null
+    keplr: Keplr = null
+
+    lcdClientGet = async (path: string, params?: Record<string, any>): Promise<any> => {
+        try {
+            return this.lcdClient.get(path, params)
+        } catch (e) {
+            console.error(`error when lsdClient get`, e)
+        }
+    }
+
+    signAndBroadcast = (signerAddress: string, messages: readonly EncodeObject[], fee: StdFee, memo?: string): Promise<BroadcastTxResponse> => {
+        try {
+            return this.stargateClient.signAndBroadcast(signerAddress, messages, fee, memo)
+        } catch (e) {
+            console.error(`error when stargateClient signAndBroadcast`, e)
+        }
+
+    }
 
     applyChainInfo = async (chainInfo: ChainInfo): Promise<void> => {
         const keplr = await getKeplrFromWindow()
@@ -35,9 +55,10 @@ export class CosmosClient {
             alert("Keplr extension not found")
             return
         }
+        this.keplr = keplr
 
-        await keplr.experimentalSuggestChain(chainInfo);
-        await keplr.enable(chainInfo.chainId);
+        await this.keplr.experimentalSuggestChain(chainInfo);
+        await this.keplr.enable(chainInfo.chainId);
 
         this.registry = new Registry();
 
@@ -45,7 +66,7 @@ export class CosmosClient {
             this.registry.register(v[0], v[1]);
         });
 
-        const offlineSigner = keplr.getOfflineSigner(chainInfo.chainId);
+        const offlineSigner = this.keplr.getOfflineSigner(chainInfo.chainId);
 
         this.stargateClient = await SigningStargateClient.connectWithSigner(
             chainInfo.rpc,
@@ -54,6 +75,8 @@ export class CosmosClient {
                 registry: this.registry
             }
         );
+
+        this.stargateClient.getChainId()
 
         this.lcdClient = LcdClient.withExtensions(
             { apiUrl: chainInfo.rest },

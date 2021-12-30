@@ -96,7 +96,7 @@ export interface ThresholdDecisionPolicy {
 /** GroupInfo represents the high-level on-chain information for a group. */
 export interface GroupInfo {
   /** group_id is the unique ID of the group. */
-  groupId: number;
+  group_id: number;
   /** admin is the account address of the group's admin. */
   admin: string;
   /** metadata is any arbitrary metadata to attached to the group. */
@@ -109,13 +109,13 @@ export interface GroupInfo {
    */
   version: number;
   /** total_weight is the sum of the group members' weights. */
-  totalWeight: string;
+  total_weight: string;
 }
 
 /** GroupMember represents the relationship between a group and a member. */
 export interface GroupMember {
   /** group_id is the unique ID of the group. */
-  groupId: number;
+  group_id: number;
   /** member is the member data. */
   member: Member | undefined;
 }
@@ -125,7 +125,7 @@ export interface GroupAccountInfo {
   /** address is the group account address. */
   address: string;
   /** group_id is the unique ID of the group. */
-  groupId: number;
+  group_id: number;
   /** admin is the account address of the group admin. */
   admin: string;
   /** metadata is any arbitrary metadata to attached to the group account. */
@@ -136,12 +136,12 @@ export interface GroupAccountInfo {
    */
   version: number;
   /** decision_policy specifies the group account's decision policy. */
-  decisionPolicy: Any | undefined;
+  decision_policy: Any | undefined;
   /**
    * derivation_key is the "derivation" key of the group account,
    * which is needed to derive the group root module key and execute proposals.
    */
-  derivationKey: Uint8Array;
+  derivation_key: Uint8Array;
 }
 
 /**
@@ -152,7 +152,7 @@ export interface GroupAccountInfo {
  */
 export interface Proposal {
   /** proposal_id is the unique id of the proposal. */
-  proposalId: number;
+  proposal_id: number;
   /** address is the group account address. */
   address: string;
   /** metadata is any arbitrary metadata to attached to the proposal. */
@@ -160,17 +160,17 @@ export interface Proposal {
   /** proposers are the account addresses of the proposers. */
   proposers: string[];
   /** submitted_at is a timestamp specifying when a proposal was submitted. */
-  submittedAt: Date | undefined;
+  submitted_at: Date | undefined;
   /**
    * group_version tracks the version of the group that this proposal corresponds to.
    * When group membership is changed, existing proposals from previous group versions will become invalid.
    */
-  groupVersion: number;
+  group_version: number;
   /**
    * group_account_version tracks the version of the group account that this proposal corresponds to.
    * When a decision policy is changed, existing proposals from previous policy versions will become invalid.
    */
-  groupAccountVersion: number;
+  group_account_version: number;
   /** Status represents the high level position in the life cycle of the proposal. Initial value is Submitted. */
   status: Proposal_Status;
   /**
@@ -179,7 +179,7 @@ export interface Proposal {
    */
   result: Proposal_Result;
   /** vote_state contains the sums of all weighted votes for this proposal. */
-  voteState: Tally | undefined;
+  vote_state: Tally | undefined;
   /**
    * timeout is the timestamp of the block where the proposal execution times out. Header times of the votes and execution messages
    * must be before this end time to be included in the election. After the timeout timestamp the proposal can not be
@@ -187,7 +187,7 @@ export interface Proposal {
    */
   timeout: Date | undefined;
   /** executor_result is the final result based on the votes and election rule. Initial value is NotRun. */
-  executorResult: Proposal_ExecutorResult;
+  executor_result: Proposal_ExecutorResult;
   /** msgs is a list of Msgs that will be executed if the proposal passes. */
   msgs: Any[];
 }
@@ -346,19 +346,19 @@ export function proposal_ExecutorResultToJSON(
 /** Tally represents the sum of weighted votes. */
 export interface Tally {
   /** yes_count is the weighted sum of yes votes. */
-  yesCount: string;
+  yes_count: string;
   /** no_count is the weighted sum of no votes. */
-  noCount: string;
+  no_count: string;
   /** abstain_count is the weighted sum of abstainers */
-  abstainCount: string;
+  abstain_count: string;
   /** veto_count is the weighted sum of vetoes. */
-  vetoCount: string;
+  veto_count: string;
 }
 
 /** Vote represents a vote for a proposal. */
 export interface Vote {
   /** proposal is the unique ID of the proposal. */
-  proposalId: number;
+  proposal_id: number;
   /** voter is the account address of the voter. */
   voter: string;
   /** choice is the voter's choice on the proposal. */
@@ -366,7 +366,7 @@ export interface Vote {
   /** metadata is any arbitrary metadata to attached to the vote. */
   metadata: Uint8Array;
   /** submitted_at is the timestamp when the vote was submitted. */
-  submittedAt: Date | undefined;
+  submitted_at: Date | undefined;
 }
 
 const baseMember: object = { address: "", weight: "" };
@@ -592,10 +592,10 @@ export const ThresholdDecisionPolicy = {
 };
 
 const baseGroupInfo: object = {
-  groupId: 0,
+  group_id: 0,
   admin: "",
   version: 0,
-  totalWeight: "",
+  total_weight: "",
 };
 
 export const GroupInfo = {
@@ -603,8 +603,8 @@ export const GroupInfo = {
     message: GroupInfo,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.groupId !== 0) {
-      writer.uint32(8).uint64(message.groupId);
+    if (message.group_id !== 0) {
+      writer.uint32(8).uint64(message.group_id);
     }
     if (message.admin !== "") {
       writer.uint32(18).string(message.admin);
@@ -615,8 +615,8 @@ export const GroupInfo = {
     if (message.version !== 0) {
       writer.uint32(32).uint64(message.version);
     }
-    if (message.totalWeight !== "") {
-      writer.uint32(42).string(message.totalWeight);
+    if (message.total_weight !== "") {
+      writer.uint32(42).string(message.total_weight);
     }
     return writer;
   },
@@ -630,7 +630,7 @@ export const GroupInfo = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.groupId = longToNumber(reader.uint64() as Long);
+          message.group_id = longToNumber(reader.uint64() as Long);
           break;
         case 2:
           message.admin = reader.string();
@@ -642,7 +642,7 @@ export const GroupInfo = {
           message.version = longToNumber(reader.uint64() as Long);
           break;
         case 5:
-          message.totalWeight = reader.string();
+          message.total_weight = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -654,9 +654,9 @@ export const GroupInfo = {
 
   fromJSON(object: any): GroupInfo {
     const message = { ...baseGroupInfo } as GroupInfo;
-    message.groupId =
-      object.groupId !== undefined && object.groupId !== null
-        ? Number(object.groupId)
+    message.group_id =
+      object.group_id !== undefined && object.group_id !== null
+        ? Number(object.group_id)
         : 0;
     message.admin =
       object.admin !== undefined && object.admin !== null
@@ -670,17 +670,17 @@ export const GroupInfo = {
       object.version !== undefined && object.version !== null
         ? Number(object.version)
         : 0;
-    message.totalWeight =
-      object.totalWeight !== undefined && object.totalWeight !== null
-        ? String(object.totalWeight)
+    message.total_weight =
+      object.total_weight !== undefined && object.total_weight !== null
+        ? String(object.total_weight)
         : "";
     return message;
   },
 
   toJSON(message: GroupInfo): unknown {
     const obj: any = {};
-    message.groupId !== undefined &&
-      (obj.groupId = Math.round(message.groupId));
+    message.group_id !== undefined &&
+      (obj.group_id = Math.round(message.group_id));
     message.admin !== undefined && (obj.admin = message.admin);
     message.metadata !== undefined &&
       (obj.metadata = base64FromBytes(
@@ -688,8 +688,8 @@ export const GroupInfo = {
       ));
     message.version !== undefined &&
       (obj.version = Math.round(message.version));
-    message.totalWeight !== undefined &&
-      (obj.totalWeight = message.totalWeight);
+    message.total_weight !== undefined &&
+      (obj.total_weight = message.total_weight);
     return obj;
   },
 
@@ -697,24 +697,24 @@ export const GroupInfo = {
     object: I
   ): GroupInfo {
     const message = { ...baseGroupInfo } as GroupInfo;
-    message.groupId = object.groupId ?? 0;
+    message.group_id = object.group_id ?? 0;
     message.admin = object.admin ?? "";
     message.metadata = object.metadata ?? new Uint8Array();
     message.version = object.version ?? 0;
-    message.totalWeight = object.totalWeight ?? "";
+    message.total_weight = object.total_weight ?? "";
     return message;
   },
 };
 
-const baseGroupMember: object = { groupId: 0 };
+const baseGroupMember: object = { group_id: 0 };
 
 export const GroupMember = {
   encode(
     message: GroupMember,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.groupId !== 0) {
-      writer.uint32(8).uint64(message.groupId);
+    if (message.group_id !== 0) {
+      writer.uint32(8).uint64(message.group_id);
     }
     if (message.member !== undefined) {
       Member.encode(message.member, writer.uint32(18).fork()).ldelim();
@@ -730,7 +730,7 @@ export const GroupMember = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.groupId = longToNumber(reader.uint64() as Long);
+          message.group_id = longToNumber(reader.uint64() as Long);
           break;
         case 2:
           message.member = Member.decode(reader, reader.uint32());
@@ -745,9 +745,9 @@ export const GroupMember = {
 
   fromJSON(object: any): GroupMember {
     const message = { ...baseGroupMember } as GroupMember;
-    message.groupId =
-      object.groupId !== undefined && object.groupId !== null
-        ? Number(object.groupId)
+    message.group_id =
+      object.group_id !== undefined && object.group_id !== null
+        ? Number(object.group_id)
         : 0;
     message.member =
       object.member !== undefined && object.member !== null
@@ -758,8 +758,8 @@ export const GroupMember = {
 
   toJSON(message: GroupMember): unknown {
     const obj: any = {};
-    message.groupId !== undefined &&
-      (obj.groupId = Math.round(message.groupId));
+    message.group_id !== undefined &&
+      (obj.group_id = Math.round(message.group_id));
     message.member !== undefined &&
       (obj.member = message.member ? Member.toJSON(message.member) : undefined);
     return obj;
@@ -769,7 +769,7 @@ export const GroupMember = {
     object: I
   ): GroupMember {
     const message = { ...baseGroupMember } as GroupMember;
-    message.groupId = object.groupId ?? 0;
+    message.group_id = object.group_id ?? 0;
     message.member =
       object.member !== undefined && object.member !== null
         ? Member.fromPartial(object.member)
@@ -780,7 +780,7 @@ export const GroupMember = {
 
 const baseGroupAccountInfo: object = {
   address: "",
-  groupId: 0,
+  group_id: 0,
   admin: "",
   version: 0,
 };
@@ -793,8 +793,8 @@ export const GroupAccountInfo = {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
     }
-    if (message.groupId !== 0) {
-      writer.uint32(16).uint64(message.groupId);
+    if (message.group_id !== 0) {
+      writer.uint32(16).uint64(message.group_id);
     }
     if (message.admin !== "") {
       writer.uint32(26).string(message.admin);
@@ -805,11 +805,11 @@ export const GroupAccountInfo = {
     if (message.version !== 0) {
       writer.uint32(40).uint64(message.version);
     }
-    if (message.decisionPolicy !== undefined) {
-      Any.encode(message.decisionPolicy, writer.uint32(50).fork()).ldelim();
+    if (message.decision_policy !== undefined) {
+      Any.encode(message.decision_policy, writer.uint32(50).fork()).ldelim();
     }
-    if (message.derivationKey.length !== 0) {
-      writer.uint32(58).bytes(message.derivationKey);
+    if (message.derivation_key.length !== 0) {
+      writer.uint32(58).bytes(message.derivation_key);
     }
     return writer;
   },
@@ -819,7 +819,7 @@ export const GroupAccountInfo = {
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseGroupAccountInfo } as GroupAccountInfo;
     message.metadata = new Uint8Array();
-    message.derivationKey = new Uint8Array();
+    message.derivation_key = new Uint8Array();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -827,7 +827,7 @@ export const GroupAccountInfo = {
           message.address = reader.string();
           break;
         case 2:
-          message.groupId = longToNumber(reader.uint64() as Long);
+          message.group_id = longToNumber(reader.uint64() as Long);
           break;
         case 3:
           message.admin = reader.string();
@@ -839,10 +839,10 @@ export const GroupAccountInfo = {
           message.version = longToNumber(reader.uint64() as Long);
           break;
         case 6:
-          message.decisionPolicy = Any.decode(reader, reader.uint32());
+          message.decision_policy = Any.decode(reader, reader.uint32());
           break;
         case 7:
-          message.derivationKey = reader.bytes();
+          message.derivation_key = reader.bytes();
           break;
         default:
           reader.skipType(tag & 7);
@@ -858,9 +858,9 @@ export const GroupAccountInfo = {
       object.address !== undefined && object.address !== null
         ? String(object.address)
         : "";
-    message.groupId =
-      object.groupId !== undefined && object.groupId !== null
-        ? Number(object.groupId)
+    message.group_id =
+      object.group_id !== undefined && object.group_id !== null
+        ? Number(object.group_id)
         : 0;
     message.admin =
       object.admin !== undefined && object.admin !== null
@@ -874,13 +874,13 @@ export const GroupAccountInfo = {
       object.version !== undefined && object.version !== null
         ? Number(object.version)
         : 0;
-    message.decisionPolicy =
-      object.decisionPolicy !== undefined && object.decisionPolicy !== null
-        ? Any.fromJSON(object.decisionPolicy)
+    message.decision_policy =
+      object.decision_policy !== undefined && object.decision_policy !== null
+        ? Any.fromJSON(object.decision_policy)
         : undefined;
-    message.derivationKey =
-      object.derivationKey !== undefined && object.derivationKey !== null
-        ? bytesFromBase64(object.derivationKey)
+    message.derivation_key =
+      object.derivation_key !== undefined && object.derivation_key !== null
+        ? bytesFromBase64(object.derivation_key)
         : new Uint8Array();
     return message;
   },
@@ -888,8 +888,8 @@ export const GroupAccountInfo = {
   toJSON(message: GroupAccountInfo): unknown {
     const obj: any = {};
     message.address !== undefined && (obj.address = message.address);
-    message.groupId !== undefined &&
-      (obj.groupId = Math.round(message.groupId));
+    message.group_id !== undefined &&
+      (obj.group_id = Math.round(message.group_id));
     message.admin !== undefined && (obj.admin = message.admin);
     message.metadata !== undefined &&
       (obj.metadata = base64FromBytes(
@@ -897,14 +897,14 @@ export const GroupAccountInfo = {
       ));
     message.version !== undefined &&
       (obj.version = Math.round(message.version));
-    message.decisionPolicy !== undefined &&
-      (obj.decisionPolicy = message.decisionPolicy
-        ? Any.toJSON(message.decisionPolicy)
+    message.decision_policy !== undefined &&
+      (obj.decision_policy = message.decision_policy
+        ? Any.toJSON(message.decision_policy)
         : undefined);
-    message.derivationKey !== undefined &&
-      (obj.derivationKey = base64FromBytes(
-        message.derivationKey !== undefined
-          ? message.derivationKey
+    message.derivation_key !== undefined &&
+      (obj.derivation_key = base64FromBytes(
+        message.derivation_key !== undefined
+          ? message.derivation_key
           : new Uint8Array()
       ));
     return obj;
@@ -915,28 +915,28 @@ export const GroupAccountInfo = {
   ): GroupAccountInfo {
     const message = { ...baseGroupAccountInfo } as GroupAccountInfo;
     message.address = object.address ?? "";
-    message.groupId = object.groupId ?? 0;
+    message.group_id = object.group_id ?? 0;
     message.admin = object.admin ?? "";
     message.metadata = object.metadata ?? new Uint8Array();
     message.version = object.version ?? 0;
-    message.decisionPolicy =
-      object.decisionPolicy !== undefined && object.decisionPolicy !== null
-        ? Any.fromPartial(object.decisionPolicy)
+    message.decision_policy =
+      object.decision_policy !== undefined && object.decision_policy !== null
+        ? Any.fromPartial(object.decision_policy)
         : undefined;
-    message.derivationKey = object.derivationKey ?? new Uint8Array();
+    message.derivation_key = object.derivation_key ?? new Uint8Array();
     return message;
   },
 };
 
 const baseProposal: object = {
-  proposalId: 0,
+  proposal_id: 0,
   address: "",
   proposers: "",
-  groupVersion: 0,
-  groupAccountVersion: 0,
+  group_version: 0,
+  group_account_version: 0,
   status: 0,
   result: 0,
-  executorResult: 0,
+  executor_result: 0,
 };
 
 export const Proposal = {
@@ -944,8 +944,8 @@ export const Proposal = {
     message: Proposal,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.proposalId !== 0) {
-      writer.uint32(8).uint64(message.proposalId);
+    if (message.proposal_id !== 0) {
+      writer.uint32(8).uint64(message.proposal_id);
     }
     if (message.address !== "") {
       writer.uint32(18).string(message.address);
@@ -956,17 +956,17 @@ export const Proposal = {
     for (const v of message.proposers) {
       writer.uint32(34).string(v!);
     }
-    if (message.submittedAt !== undefined) {
+    if (message.submitted_at !== undefined) {
       Timestamp.encode(
-        toTimestamp(message.submittedAt),
+        toTimestamp(message.submitted_at),
         writer.uint32(42).fork()
       ).ldelim();
     }
-    if (message.groupVersion !== 0) {
-      writer.uint32(48).uint64(message.groupVersion);
+    if (message.group_version !== 0) {
+      writer.uint32(48).uint64(message.group_version);
     }
-    if (message.groupAccountVersion !== 0) {
-      writer.uint32(56).uint64(message.groupAccountVersion);
+    if (message.group_account_version !== 0) {
+      writer.uint32(56).uint64(message.group_account_version);
     }
     if (message.status !== 0) {
       writer.uint32(64).int32(message.status);
@@ -974,8 +974,8 @@ export const Proposal = {
     if (message.result !== 0) {
       writer.uint32(72).int32(message.result);
     }
-    if (message.voteState !== undefined) {
-      Tally.encode(message.voteState, writer.uint32(82).fork()).ldelim();
+    if (message.vote_state !== undefined) {
+      Tally.encode(message.vote_state, writer.uint32(82).fork()).ldelim();
     }
     if (message.timeout !== undefined) {
       Timestamp.encode(
@@ -983,8 +983,8 @@ export const Proposal = {
         writer.uint32(90).fork()
       ).ldelim();
     }
-    if (message.executorResult !== 0) {
-      writer.uint32(96).int32(message.executorResult);
+    if (message.executor_result !== 0) {
+      writer.uint32(96).int32(message.executor_result);
     }
     for (const v of message.msgs) {
       Any.encode(v!, writer.uint32(106).fork()).ldelim();
@@ -1003,7 +1003,7 @@ export const Proposal = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.proposalId = longToNumber(reader.uint64() as Long);
+          message.proposal_id = longToNumber(reader.uint64() as Long);
           break;
         case 2:
           message.address = reader.string();
@@ -1015,15 +1015,15 @@ export const Proposal = {
           message.proposers.push(reader.string());
           break;
         case 5:
-          message.submittedAt = fromTimestamp(
+          message.submitted_at = fromTimestamp(
             Timestamp.decode(reader, reader.uint32())
           );
           break;
         case 6:
-          message.groupVersion = longToNumber(reader.uint64() as Long);
+          message.group_version = longToNumber(reader.uint64() as Long);
           break;
         case 7:
-          message.groupAccountVersion = longToNumber(reader.uint64() as Long);
+          message.group_account_version = longToNumber(reader.uint64() as Long);
           break;
         case 8:
           message.status = reader.int32() as any;
@@ -1032,7 +1032,7 @@ export const Proposal = {
           message.result = reader.int32() as any;
           break;
         case 10:
-          message.voteState = Tally.decode(reader, reader.uint32());
+          message.vote_state = Tally.decode(reader, reader.uint32());
           break;
         case 11:
           message.timeout = fromTimestamp(
@@ -1040,7 +1040,7 @@ export const Proposal = {
           );
           break;
         case 12:
-          message.executorResult = reader.int32() as any;
+          message.executor_result = reader.int32() as any;
           break;
         case 13:
           message.msgs.push(Any.decode(reader, reader.uint32()));
@@ -1055,9 +1055,9 @@ export const Proposal = {
 
   fromJSON(object: any): Proposal {
     const message = { ...baseProposal } as Proposal;
-    message.proposalId =
-      object.proposalId !== undefined && object.proposalId !== null
-        ? Number(object.proposalId)
+    message.proposal_id =
+      object.proposal_id !== undefined && object.proposal_id !== null
+        ? Number(object.proposal_id)
         : 0;
     message.address =
       object.address !== undefined && object.address !== null
@@ -1068,18 +1068,18 @@ export const Proposal = {
         ? bytesFromBase64(object.metadata)
         : new Uint8Array();
     message.proposers = (object.proposers ?? []).map((e: any) => String(e));
-    message.submittedAt =
-      object.submittedAt !== undefined && object.submittedAt !== null
-        ? fromJsonTimestamp(object.submittedAt)
+    message.submitted_at =
+      object.submitted_at !== undefined && object.submitted_at !== null
+        ? fromJsonTimestamp(object.submitted_at)
         : undefined;
-    message.groupVersion =
-      object.groupVersion !== undefined && object.groupVersion !== null
-        ? Number(object.groupVersion)
+    message.group_version =
+      object.group_version !== undefined && object.group_version !== null
+        ? Number(object.group_version)
         : 0;
-    message.groupAccountVersion =
-      object.groupAccountVersion !== undefined &&
-      object.groupAccountVersion !== null
-        ? Number(object.groupAccountVersion)
+    message.group_account_version =
+      object.group_account_version !== undefined &&
+      object.group_account_version !== null
+        ? Number(object.group_account_version)
         : 0;
     message.status =
       object.status !== undefined && object.status !== null
@@ -1089,17 +1089,17 @@ export const Proposal = {
       object.result !== undefined && object.result !== null
         ? proposal_ResultFromJSON(object.result)
         : 0;
-    message.voteState =
-      object.voteState !== undefined && object.voteState !== null
-        ? Tally.fromJSON(object.voteState)
+    message.vote_state =
+      object.vote_state !== undefined && object.vote_state !== null
+        ? Tally.fromJSON(object.vote_state)
         : undefined;
     message.timeout =
       object.timeout !== undefined && object.timeout !== null
         ? fromJsonTimestamp(object.timeout)
         : undefined;
-    message.executorResult =
-      object.executorResult !== undefined && object.executorResult !== null
-        ? proposal_ExecutorResultFromJSON(object.executorResult)
+    message.executor_result =
+      object.executor_result !== undefined && object.executor_result !== null
+        ? proposal_ExecutorResultFromJSON(object.executor_result)
         : 0;
     message.msgs = (object.msgs ?? []).map((e: any) => Any.fromJSON(e));
     return message;
@@ -1107,8 +1107,8 @@ export const Proposal = {
 
   toJSON(message: Proposal): unknown {
     const obj: any = {};
-    message.proposalId !== undefined &&
-      (obj.proposalId = Math.round(message.proposalId));
+    message.proposal_id !== undefined &&
+      (obj.proposal_id = Math.round(message.proposal_id));
     message.address !== undefined && (obj.address = message.address);
     message.metadata !== undefined &&
       (obj.metadata = base64FromBytes(
@@ -1119,25 +1119,25 @@ export const Proposal = {
     } else {
       obj.proposers = [];
     }
-    message.submittedAt !== undefined &&
-      (obj.submittedAt = message.submittedAt.toISOString());
-    message.groupVersion !== undefined &&
-      (obj.groupVersion = Math.round(message.groupVersion));
-    message.groupAccountVersion !== undefined &&
-      (obj.groupAccountVersion = Math.round(message.groupAccountVersion));
+    message.submitted_at !== undefined &&
+      (obj.submitted_at = message.submitted_at.toISOString());
+    message.group_version !== undefined &&
+      (obj.group_version = Math.round(message.group_version));
+    message.group_account_version !== undefined &&
+      (obj.group_account_version = Math.round(message.group_account_version));
     message.status !== undefined &&
       (obj.status = proposal_StatusToJSON(message.status));
     message.result !== undefined &&
       (obj.result = proposal_ResultToJSON(message.result));
-    message.voteState !== undefined &&
-      (obj.voteState = message.voteState
-        ? Tally.toJSON(message.voteState)
+    message.vote_state !== undefined &&
+      (obj.vote_state = message.vote_state
+        ? Tally.toJSON(message.vote_state)
         : undefined);
     message.timeout !== undefined &&
       (obj.timeout = message.timeout.toISOString());
-    message.executorResult !== undefined &&
-      (obj.executorResult = proposal_ExecutorResultToJSON(
-        message.executorResult
+    message.executor_result !== undefined &&
+      (obj.executor_result = proposal_ExecutorResultToJSON(
+        message.executor_result
       ));
     if (message.msgs) {
       obj.msgs = message.msgs.map((e) => (e ? Any.toJSON(e) : undefined));
@@ -1149,46 +1149,46 @@ export const Proposal = {
 
   fromPartial<I extends Exact<DeepPartial<Proposal>, I>>(object: I): Proposal {
     const message = { ...baseProposal } as Proposal;
-    message.proposalId = object.proposalId ?? 0;
+    message.proposal_id = object.proposal_id ?? 0;
     message.address = object.address ?? "";
     message.metadata = object.metadata ?? new Uint8Array();
     message.proposers = object.proposers?.map((e) => e) || [];
-    message.submittedAt = object.submittedAt ?? undefined;
-    message.groupVersion = object.groupVersion ?? 0;
-    message.groupAccountVersion = object.groupAccountVersion ?? 0;
+    message.submitted_at = object.submitted_at ?? undefined;
+    message.group_version = object.group_version ?? 0;
+    message.group_account_version = object.group_account_version ?? 0;
     message.status = object.status ?? 0;
     message.result = object.result ?? 0;
-    message.voteState =
-      object.voteState !== undefined && object.voteState !== null
-        ? Tally.fromPartial(object.voteState)
+    message.vote_state =
+      object.vote_state !== undefined && object.vote_state !== null
+        ? Tally.fromPartial(object.vote_state)
         : undefined;
     message.timeout = object.timeout ?? undefined;
-    message.executorResult = object.executorResult ?? 0;
+    message.executor_result = object.executor_result ?? 0;
     message.msgs = object.msgs?.map((e) => Any.fromPartial(e)) || [];
     return message;
   },
 };
 
 const baseTally: object = {
-  yesCount: "",
-  noCount: "",
-  abstainCount: "",
-  vetoCount: "",
+  yes_count: "",
+  no_count: "",
+  abstain_count: "",
+  veto_count: "",
 };
 
 export const Tally = {
   encode(message: Tally, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.yesCount !== "") {
-      writer.uint32(10).string(message.yesCount);
+    if (message.yes_count !== "") {
+      writer.uint32(10).string(message.yes_count);
     }
-    if (message.noCount !== "") {
-      writer.uint32(18).string(message.noCount);
+    if (message.no_count !== "") {
+      writer.uint32(18).string(message.no_count);
     }
-    if (message.abstainCount !== "") {
-      writer.uint32(26).string(message.abstainCount);
+    if (message.abstain_count !== "") {
+      writer.uint32(26).string(message.abstain_count);
     }
-    if (message.vetoCount !== "") {
-      writer.uint32(34).string(message.vetoCount);
+    if (message.veto_count !== "") {
+      writer.uint32(34).string(message.veto_count);
     }
     return writer;
   },
@@ -1201,16 +1201,16 @@ export const Tally = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.yesCount = reader.string();
+          message.yes_count = reader.string();
           break;
         case 2:
-          message.noCount = reader.string();
+          message.no_count = reader.string();
           break;
         case 3:
-          message.abstainCount = reader.string();
+          message.abstain_count = reader.string();
           break;
         case 4:
-          message.vetoCount = reader.string();
+          message.veto_count = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -1222,51 +1222,51 @@ export const Tally = {
 
   fromJSON(object: any): Tally {
     const message = { ...baseTally } as Tally;
-    message.yesCount =
-      object.yesCount !== undefined && object.yesCount !== null
-        ? String(object.yesCount)
+    message.yes_count =
+      object.yes_count !== undefined && object.yes_count !== null
+        ? String(object.yes_count)
         : "";
-    message.noCount =
-      object.noCount !== undefined && object.noCount !== null
-        ? String(object.noCount)
+    message.no_count =
+      object.no_count !== undefined && object.no_count !== null
+        ? String(object.no_count)
         : "";
-    message.abstainCount =
-      object.abstainCount !== undefined && object.abstainCount !== null
-        ? String(object.abstainCount)
+    message.abstain_count =
+      object.abstain_count !== undefined && object.abstain_count !== null
+        ? String(object.abstain_count)
         : "";
-    message.vetoCount =
-      object.vetoCount !== undefined && object.vetoCount !== null
-        ? String(object.vetoCount)
+    message.veto_count =
+      object.veto_count !== undefined && object.veto_count !== null
+        ? String(object.veto_count)
         : "";
     return message;
   },
 
   toJSON(message: Tally): unknown {
     const obj: any = {};
-    message.yesCount !== undefined && (obj.yesCount = message.yesCount);
-    message.noCount !== undefined && (obj.noCount = message.noCount);
-    message.abstainCount !== undefined &&
-      (obj.abstainCount = message.abstainCount);
-    message.vetoCount !== undefined && (obj.vetoCount = message.vetoCount);
+    message.yes_count !== undefined && (obj.yes_count = message.yes_count);
+    message.no_count !== undefined && (obj.no_count = message.no_count);
+    message.abstain_count !== undefined &&
+      (obj.abstain_count = message.abstain_count);
+    message.veto_count !== undefined && (obj.veto_count = message.veto_count);
     return obj;
   },
 
   fromPartial<I extends Exact<DeepPartial<Tally>, I>>(object: I): Tally {
     const message = { ...baseTally } as Tally;
-    message.yesCount = object.yesCount ?? "";
-    message.noCount = object.noCount ?? "";
-    message.abstainCount = object.abstainCount ?? "";
-    message.vetoCount = object.vetoCount ?? "";
+    message.yes_count = object.yes_count ?? "";
+    message.no_count = object.no_count ?? "";
+    message.abstain_count = object.abstain_count ?? "";
+    message.veto_count = object.veto_count ?? "";
     return message;
   },
 };
 
-const baseVote: object = { proposalId: 0, voter: "", choice: 0 };
+const baseVote: object = { proposal_id: 0, voter: "", choice: 0 };
 
 export const Vote = {
   encode(message: Vote, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.proposalId !== 0) {
-      writer.uint32(8).uint64(message.proposalId);
+    if (message.proposal_id !== 0) {
+      writer.uint32(8).uint64(message.proposal_id);
     }
     if (message.voter !== "") {
       writer.uint32(18).string(message.voter);
@@ -1277,9 +1277,9 @@ export const Vote = {
     if (message.metadata.length !== 0) {
       writer.uint32(34).bytes(message.metadata);
     }
-    if (message.submittedAt !== undefined) {
+    if (message.submitted_at !== undefined) {
       Timestamp.encode(
-        toTimestamp(message.submittedAt),
+        toTimestamp(message.submitted_at),
         writer.uint32(42).fork()
       ).ldelim();
     }
@@ -1295,7 +1295,7 @@ export const Vote = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.proposalId = longToNumber(reader.uint64() as Long);
+          message.proposal_id = longToNumber(reader.uint64() as Long);
           break;
         case 2:
           message.voter = reader.string();
@@ -1307,7 +1307,7 @@ export const Vote = {
           message.metadata = reader.bytes();
           break;
         case 5:
-          message.submittedAt = fromTimestamp(
+          message.submitted_at = fromTimestamp(
             Timestamp.decode(reader, reader.uint32())
           );
           break;
@@ -1321,9 +1321,9 @@ export const Vote = {
 
   fromJSON(object: any): Vote {
     const message = { ...baseVote } as Vote;
-    message.proposalId =
-      object.proposalId !== undefined && object.proposalId !== null
-        ? Number(object.proposalId)
+    message.proposal_id =
+      object.proposal_id !== undefined && object.proposal_id !== null
+        ? Number(object.proposal_id)
         : 0;
     message.voter =
       object.voter !== undefined && object.voter !== null
@@ -1337,35 +1337,35 @@ export const Vote = {
       object.metadata !== undefined && object.metadata !== null
         ? bytesFromBase64(object.metadata)
         : new Uint8Array();
-    message.submittedAt =
-      object.submittedAt !== undefined && object.submittedAt !== null
-        ? fromJsonTimestamp(object.submittedAt)
+    message.submitted_at =
+      object.submitted_at !== undefined && object.submitted_at !== null
+        ? fromJsonTimestamp(object.submitted_at)
         : undefined;
     return message;
   },
 
   toJSON(message: Vote): unknown {
     const obj: any = {};
-    message.proposalId !== undefined &&
-      (obj.proposalId = Math.round(message.proposalId));
+    message.proposal_id !== undefined &&
+      (obj.proposal_id = Math.round(message.proposal_id));
     message.voter !== undefined && (obj.voter = message.voter);
     message.choice !== undefined && (obj.choice = choiceToJSON(message.choice));
     message.metadata !== undefined &&
       (obj.metadata = base64FromBytes(
         message.metadata !== undefined ? message.metadata : new Uint8Array()
       ));
-    message.submittedAt !== undefined &&
-      (obj.submittedAt = message.submittedAt.toISOString());
+    message.submitted_at !== undefined &&
+      (obj.submitted_at = message.submitted_at.toISOString());
     return obj;
   },
 
   fromPartial<I extends Exact<DeepPartial<Vote>, I>>(object: I): Vote {
     const message = { ...baseVote } as Vote;
-    message.proposalId = object.proposalId ?? 0;
+    message.proposal_id = object.proposal_id ?? 0;
     message.voter = object.voter ?? "";
     message.choice = object.choice ?? 0;
     message.metadata = object.metadata ?? new Uint8Array();
-    message.submittedAt = object.submittedAt ?? undefined;
+    message.submitted_at = object.submitted_at ?? undefined;
     return message;
   },
 };

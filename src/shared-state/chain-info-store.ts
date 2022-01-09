@@ -5,6 +5,11 @@ import { Bech32Address } from '@keplr-wallet/cosmos'
 export class ChainInfoStore {
     @observable
     chainInfo: ChainInfo = getDefaultChainInfo()
+
+    @observable
+    keplrAccount: string = ""
+
+    // fetchKeplrAcc
 }
 
 //testnet
@@ -15,25 +20,25 @@ function getDefaultChainInfo(): ChainInfo {
         chainId: "test",
         chainName: "TESTNET",
         stakeCurrency: {
-            coinDenom: "STAKE",
-            coinMinimalDenom: "stake",
+            coinDenom: "UREGEN",
+            coinMinimalDenom: "uregen",
             coinDecimals: 6
         },
         bip44: {
             coinType: 118
         },
-        bech32Config: Bech32Address.defaultBech32Config("cosmos"),
+        bech32Config: Bech32Address.defaultBech32Config("regen"),
         currencies: [
             {
-                coinDenom: "STAKE",
-                coinMinimalDenom: "stake",
+                coinDenom: "UREGEN",
+                coinMinimalDenom: "uregen",
                 coinDecimals: 6
             }
         ],
         feeCurrencies: [
             {
-                coinDenom: "STAKE",
-                coinMinimalDenom: "stake",
+                coinDenom: "UREGEN",
+                coinMinimalDenom: "uregen",
                 coinDecimals: 6
             }
         ],

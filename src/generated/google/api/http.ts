@@ -24,7 +24,7 @@ export interface Http {
    * The default behavior is to not decode RFC 6570 reserved characters in multi
    * segment matches.
    */
-  fullyDecodeReservedExpansion: boolean;
+  fully_decode_reserved_expansion: boolean;
 }
 
 /**
@@ -282,13 +282,13 @@ export interface HttpRule {
    * body of response. Other response fields are ignored. When
    * not set, the response message will be used as HTTP body of response.
    */
-  responseBody: string;
+  response_body: string;
   /**
    * Additional HTTP bindings for the selector. Nested bindings must
    * not contain an `additional_bindings` field themselves (that is,
    * the nesting may only be one level deep).
    */
-  additionalBindings: HttpRule[];
+  additional_bindings: HttpRule[];
 }
 
 /** A custom pattern is used for defining custom HTTP verb. */
@@ -299,15 +299,15 @@ export interface CustomHttpPattern {
   path: string;
 }
 
-const baseHttp: object = { fullyDecodeReservedExpansion: false };
+const baseHttp: object = { fully_decode_reserved_expansion: false };
 
 export const Http = {
   encode(message: Http, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.rules) {
       HttpRule.encode(v!, writer.uint32(10).fork()).ldelim();
     }
-    if (message.fullyDecodeReservedExpansion === true) {
-      writer.uint32(16).bool(message.fullyDecodeReservedExpansion);
+    if (message.fully_decode_reserved_expansion === true) {
+      writer.uint32(16).bool(message.fully_decode_reserved_expansion);
     }
     return writer;
   },
@@ -324,7 +324,7 @@ export const Http = {
           message.rules.push(HttpRule.decode(reader, reader.uint32()));
           break;
         case 2:
-          message.fullyDecodeReservedExpansion = reader.bool();
+          message.fully_decode_reserved_expansion = reader.bool();
           break;
         default:
           reader.skipType(tag & 7);
@@ -337,10 +337,10 @@ export const Http = {
   fromJSON(object: any): Http {
     const message = { ...baseHttp } as Http;
     message.rules = (object.rules ?? []).map((e: any) => HttpRule.fromJSON(e));
-    message.fullyDecodeReservedExpansion =
-      object.fullyDecodeReservedExpansion !== undefined &&
-      object.fullyDecodeReservedExpansion !== null
-        ? Boolean(object.fullyDecodeReservedExpansion)
+    message.fully_decode_reserved_expansion =
+      object.fully_decode_reserved_expansion !== undefined &&
+      object.fully_decode_reserved_expansion !== null
+        ? Boolean(object.fully_decode_reserved_expansion)
         : false;
     return message;
   },
@@ -354,21 +354,22 @@ export const Http = {
     } else {
       obj.rules = [];
     }
-    message.fullyDecodeReservedExpansion !== undefined &&
-      (obj.fullyDecodeReservedExpansion = message.fullyDecodeReservedExpansion);
+    message.fully_decode_reserved_expansion !== undefined &&
+      (obj.fully_decode_reserved_expansion =
+        message.fully_decode_reserved_expansion);
     return obj;
   },
 
   fromPartial<I extends Exact<DeepPartial<Http>, I>>(object: I): Http {
     const message = { ...baseHttp } as Http;
     message.rules = object.rules?.map((e) => HttpRule.fromPartial(e)) || [];
-    message.fullyDecodeReservedExpansion =
-      object.fullyDecodeReservedExpansion ?? false;
+    message.fully_decode_reserved_expansion =
+      object.fully_decode_reserved_expansion ?? false;
     return message;
   },
 };
 
-const baseHttpRule: object = { selector: "", body: "", responseBody: "" };
+const baseHttpRule: object = { selector: "", body: "", response_body: "" };
 
 export const HttpRule = {
   encode(
@@ -402,10 +403,10 @@ export const HttpRule = {
     if (message.body !== "") {
       writer.uint32(58).string(message.body);
     }
-    if (message.responseBody !== "") {
-      writer.uint32(98).string(message.responseBody);
+    if (message.response_body !== "") {
+      writer.uint32(98).string(message.response_body);
     }
-    for (const v of message.additionalBindings) {
+    for (const v of message.additional_bindings) {
       HttpRule.encode(v!, writer.uint32(90).fork()).ldelim();
     }
     return writer;
@@ -415,7 +416,7 @@ export const HttpRule = {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseHttpRule } as HttpRule;
-    message.additionalBindings = [];
+    message.additional_bindings = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -444,10 +445,10 @@ export const HttpRule = {
           message.body = reader.string();
           break;
         case 12:
-          message.responseBody = reader.string();
+          message.response_body = reader.string();
           break;
         case 11:
-          message.additionalBindings.push(
+          message.additional_bindings.push(
             HttpRule.decode(reader, reader.uint32())
           );
           break;
@@ -493,11 +494,11 @@ export const HttpRule = {
       object.body !== undefined && object.body !== null
         ? String(object.body)
         : "";
-    message.responseBody =
-      object.responseBody !== undefined && object.responseBody !== null
-        ? String(object.responseBody)
+    message.response_body =
+      object.response_body !== undefined && object.response_body !== null
+        ? String(object.response_body)
         : "";
-    message.additionalBindings = (object.additionalBindings ?? []).map(
+    message.additional_bindings = (object.additional_bindings ?? []).map(
       (e: any) => HttpRule.fromJSON(e)
     );
     return message;
@@ -516,14 +517,14 @@ export const HttpRule = {
         ? CustomHttpPattern.toJSON(message.custom)
         : undefined);
     message.body !== undefined && (obj.body = message.body);
-    message.responseBody !== undefined &&
-      (obj.responseBody = message.responseBody);
-    if (message.additionalBindings) {
-      obj.additionalBindings = message.additionalBindings.map((e) =>
+    message.response_body !== undefined &&
+      (obj.response_body = message.response_body);
+    if (message.additional_bindings) {
+      obj.additional_bindings = message.additional_bindings.map((e) =>
         e ? HttpRule.toJSON(e) : undefined
       );
     } else {
-      obj.additionalBindings = [];
+      obj.additional_bindings = [];
     }
     return obj;
   },
@@ -541,9 +542,9 @@ export const HttpRule = {
         ? CustomHttpPattern.fromPartial(object.custom)
         : undefined;
     message.body = object.body ?? "";
-    message.responseBody = object.responseBody ?? "";
-    message.additionalBindings =
-      object.additionalBindings?.map((e) => HttpRule.fromPartial(e)) || [];
+    message.response_body = object.response_body ?? "";
+    message.additional_bindings =
+      object.additional_bindings?.map((e) => HttpRule.fromPartial(e)) || [];
     return message;
   },
 };

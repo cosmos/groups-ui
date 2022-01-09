@@ -37,7 +37,7 @@ export interface PageRequest {
    * count_total is only respected when offset is used. It is ignored when key
    * is set.
    */
-  countTotal: boolean;
+  count_total: boolean;
   /** reverse is set to true if results are to be returned in the descending order. */
   reverse: boolean;
 }
@@ -56,7 +56,7 @@ export interface PageResponse {
    * next_key is the key to be passed to PageRequest.key to
    * query the next page most efficiently
    */
-  nextKey: Uint8Array;
+  next_key: Uint8Array;
   /**
    * total is total number of results available if PageRequest.count_total
    * was set, its value is undefined otherwise
@@ -67,7 +67,7 @@ export interface PageResponse {
 const basePageRequest: object = {
   offset: 0,
   limit: 0,
-  countTotal: false,
+  count_total: false,
   reverse: false,
 };
 
@@ -85,8 +85,8 @@ export const PageRequest = {
     if (message.limit !== 0) {
       writer.uint32(24).uint64(message.limit);
     }
-    if (message.countTotal === true) {
-      writer.uint32(32).bool(message.countTotal);
+    if (message.count_total === true) {
+      writer.uint32(32).bool(message.count_total);
     }
     if (message.reverse === true) {
       writer.uint32(40).bool(message.reverse);
@@ -112,7 +112,7 @@ export const PageRequest = {
           message.limit = longToNumber(reader.uint64() as Long);
           break;
         case 4:
-          message.countTotal = reader.bool();
+          message.count_total = reader.bool();
           break;
         case 5:
           message.reverse = reader.bool();
@@ -139,9 +139,9 @@ export const PageRequest = {
       object.limit !== undefined && object.limit !== null
         ? Number(object.limit)
         : 0;
-    message.countTotal =
-      object.countTotal !== undefined && object.countTotal !== null
-        ? Boolean(object.countTotal)
+    message.count_total =
+      object.count_total !== undefined && object.count_total !== null
+        ? Boolean(object.count_total)
         : false;
     message.reverse =
       object.reverse !== undefined && object.reverse !== null
@@ -158,7 +158,8 @@ export const PageRequest = {
       ));
     message.offset !== undefined && (obj.offset = Math.round(message.offset));
     message.limit !== undefined && (obj.limit = Math.round(message.limit));
-    message.countTotal !== undefined && (obj.countTotal = message.countTotal);
+    message.count_total !== undefined &&
+      (obj.count_total = message.count_total);
     message.reverse !== undefined && (obj.reverse = message.reverse);
     return obj;
   },
@@ -170,7 +171,7 @@ export const PageRequest = {
     message.key = object.key ?? new Uint8Array();
     message.offset = object.offset ?? 0;
     message.limit = object.limit ?? 0;
-    message.countTotal = object.countTotal ?? false;
+    message.count_total = object.count_total ?? false;
     message.reverse = object.reverse ?? false;
     return message;
   },
@@ -183,8 +184,8 @@ export const PageResponse = {
     message: PageResponse,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.nextKey.length !== 0) {
-      writer.uint32(10).bytes(message.nextKey);
+    if (message.next_key.length !== 0) {
+      writer.uint32(10).bytes(message.next_key);
     }
     if (message.total !== 0) {
       writer.uint32(16).uint64(message.total);
@@ -196,12 +197,12 @@ export const PageResponse = {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...basePageResponse } as PageResponse;
-    message.nextKey = new Uint8Array();
+    message.next_key = new Uint8Array();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.nextKey = reader.bytes();
+          message.next_key = reader.bytes();
           break;
         case 2:
           message.total = longToNumber(reader.uint64() as Long);
@@ -216,9 +217,9 @@ export const PageResponse = {
 
   fromJSON(object: any): PageResponse {
     const message = { ...basePageResponse } as PageResponse;
-    message.nextKey =
-      object.nextKey !== undefined && object.nextKey !== null
-        ? bytesFromBase64(object.nextKey)
+    message.next_key =
+      object.next_key !== undefined && object.next_key !== null
+        ? bytesFromBase64(object.next_key)
         : new Uint8Array();
     message.total =
       object.total !== undefined && object.total !== null
@@ -229,9 +230,9 @@ export const PageResponse = {
 
   toJSON(message: PageResponse): unknown {
     const obj: any = {};
-    message.nextKey !== undefined &&
-      (obj.nextKey = base64FromBytes(
-        message.nextKey !== undefined ? message.nextKey : new Uint8Array()
+    message.next_key !== undefined &&
+      (obj.next_key = base64FromBytes(
+        message.next_key !== undefined ? message.next_key : new Uint8Array()
       ));
     message.total !== undefined && (obj.total = Math.round(message.total));
     return obj;
@@ -241,7 +242,7 @@ export const PageResponse = {
     object: I
   ): PageResponse {
     const message = { ...basePageResponse } as PageResponse;
-    message.nextKey = object.nextKey ?? new Uint8Array();
+    message.next_key = object.next_key ?? new Uint8Array();
     message.total = object.total ?? 0;
     return message;
   },

@@ -17,23 +17,23 @@ export interface GenesisState {
    * group_seq is the group table orm.Sequence,
    * it is used to get the next group ID.
    */
-  groupSeq: number;
+  group_seq: number;
   /** groups is the list of groups info. */
   groups: GroupInfo[];
   /** group_members is the list of groups members. */
-  groupMembers: GroupMember[];
+  group_members: GroupMember[];
   /**
    * group_account_seq is the group account table orm.Sequence,
    * it is used to generate the next group account address.
    */
-  groupAccountSeq: number;
+  group_account_seq: number;
   /** group_accounts is the list of group accounts info. */
-  groupAccounts: GroupAccountInfo[];
+  group_accounts: GroupAccountInfo[];
   /**
    * proposal_seq is the proposal table orm.Sequence,
    * it is used to get the next proposal ID.
    */
-  proposalSeq: number;
+  proposal_seq: number;
   /** proposals is the list of proposals. */
   proposals: Proposal[];
   /** votes is the list of votes. */
@@ -41,9 +41,9 @@ export interface GenesisState {
 }
 
 const baseGenesisState: object = {
-  groupSeq: 0,
-  groupAccountSeq: 0,
-  proposalSeq: 0,
+  group_seq: 0,
+  group_account_seq: 0,
+  proposal_seq: 0,
 };
 
 export const GenesisState = {
@@ -51,23 +51,23 @@ export const GenesisState = {
     message: GenesisState,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.groupSeq !== 0) {
-      writer.uint32(8).uint64(message.groupSeq);
+    if (message.group_seq !== 0) {
+      writer.uint32(8).uint64(message.group_seq);
     }
     for (const v of message.groups) {
       GroupInfo.encode(v!, writer.uint32(18).fork()).ldelim();
     }
-    for (const v of message.groupMembers) {
+    for (const v of message.group_members) {
       GroupMember.encode(v!, writer.uint32(26).fork()).ldelim();
     }
-    if (message.groupAccountSeq !== 0) {
-      writer.uint32(32).uint64(message.groupAccountSeq);
+    if (message.group_account_seq !== 0) {
+      writer.uint32(32).uint64(message.group_account_seq);
     }
-    for (const v of message.groupAccounts) {
+    for (const v of message.group_accounts) {
       GroupAccountInfo.encode(v!, writer.uint32(42).fork()).ldelim();
     }
-    if (message.proposalSeq !== 0) {
-      writer.uint32(48).uint64(message.proposalSeq);
+    if (message.proposal_seq !== 0) {
+      writer.uint32(48).uint64(message.proposal_seq);
     }
     for (const v of message.proposals) {
       Proposal.encode(v!, writer.uint32(58).fork()).ldelim();
@@ -83,34 +83,34 @@ export const GenesisState = {
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseGenesisState } as GenesisState;
     message.groups = [];
-    message.groupMembers = [];
-    message.groupAccounts = [];
+    message.group_members = [];
+    message.group_accounts = [];
     message.proposals = [];
     message.votes = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.groupSeq = longToNumber(reader.uint64() as Long);
+          message.group_seq = longToNumber(reader.uint64() as Long);
           break;
         case 2:
           message.groups.push(GroupInfo.decode(reader, reader.uint32()));
           break;
         case 3:
-          message.groupMembers.push(
+          message.group_members.push(
             GroupMember.decode(reader, reader.uint32())
           );
           break;
         case 4:
-          message.groupAccountSeq = longToNumber(reader.uint64() as Long);
+          message.group_account_seq = longToNumber(reader.uint64() as Long);
           break;
         case 5:
-          message.groupAccounts.push(
+          message.group_accounts.push(
             GroupAccountInfo.decode(reader, reader.uint32())
           );
           break;
         case 6:
-          message.proposalSeq = longToNumber(reader.uint64() as Long);
+          message.proposal_seq = longToNumber(reader.uint64() as Long);
           break;
         case 7:
           message.proposals.push(Proposal.decode(reader, reader.uint32()));
@@ -128,26 +128,27 @@ export const GenesisState = {
 
   fromJSON(object: any): GenesisState {
     const message = { ...baseGenesisState } as GenesisState;
-    message.groupSeq =
-      object.groupSeq !== undefined && object.groupSeq !== null
-        ? Number(object.groupSeq)
+    message.group_seq =
+      object.group_seq !== undefined && object.group_seq !== null
+        ? Number(object.group_seq)
         : 0;
     message.groups = (object.groups ?? []).map((e: any) =>
       GroupInfo.fromJSON(e)
     );
-    message.groupMembers = (object.groupMembers ?? []).map((e: any) =>
+    message.group_members = (object.group_members ?? []).map((e: any) =>
       GroupMember.fromJSON(e)
     );
-    message.groupAccountSeq =
-      object.groupAccountSeq !== undefined && object.groupAccountSeq !== null
-        ? Number(object.groupAccountSeq)
+    message.group_account_seq =
+      object.group_account_seq !== undefined &&
+      object.group_account_seq !== null
+        ? Number(object.group_account_seq)
         : 0;
-    message.groupAccounts = (object.groupAccounts ?? []).map((e: any) =>
+    message.group_accounts = (object.group_accounts ?? []).map((e: any) =>
       GroupAccountInfo.fromJSON(e)
     );
-    message.proposalSeq =
-      object.proposalSeq !== undefined && object.proposalSeq !== null
-        ? Number(object.proposalSeq)
+    message.proposal_seq =
+      object.proposal_seq !== undefined && object.proposal_seq !== null
+        ? Number(object.proposal_seq)
         : 0;
     message.proposals = (object.proposals ?? []).map((e: any) =>
       Proposal.fromJSON(e)
@@ -158,8 +159,8 @@ export const GenesisState = {
 
   toJSON(message: GenesisState): unknown {
     const obj: any = {};
-    message.groupSeq !== undefined &&
-      (obj.groupSeq = Math.round(message.groupSeq));
+    message.group_seq !== undefined &&
+      (obj.group_seq = Math.round(message.group_seq));
     if (message.groups) {
       obj.groups = message.groups.map((e) =>
         e ? GroupInfo.toJSON(e) : undefined
@@ -167,24 +168,24 @@ export const GenesisState = {
     } else {
       obj.groups = [];
     }
-    if (message.groupMembers) {
-      obj.groupMembers = message.groupMembers.map((e) =>
+    if (message.group_members) {
+      obj.group_members = message.group_members.map((e) =>
         e ? GroupMember.toJSON(e) : undefined
       );
     } else {
-      obj.groupMembers = [];
+      obj.group_members = [];
     }
-    message.groupAccountSeq !== undefined &&
-      (obj.groupAccountSeq = Math.round(message.groupAccountSeq));
-    if (message.groupAccounts) {
-      obj.groupAccounts = message.groupAccounts.map((e) =>
+    message.group_account_seq !== undefined &&
+      (obj.group_account_seq = Math.round(message.group_account_seq));
+    if (message.group_accounts) {
+      obj.group_accounts = message.group_accounts.map((e) =>
         e ? GroupAccountInfo.toJSON(e) : undefined
       );
     } else {
-      obj.groupAccounts = [];
+      obj.group_accounts = [];
     }
-    message.proposalSeq !== undefined &&
-      (obj.proposalSeq = Math.round(message.proposalSeq));
+    message.proposal_seq !== undefined &&
+      (obj.proposal_seq = Math.round(message.proposal_seq));
     if (message.proposals) {
       obj.proposals = message.proposals.map((e) =>
         e ? Proposal.toJSON(e) : undefined
@@ -204,14 +205,14 @@ export const GenesisState = {
     object: I
   ): GenesisState {
     const message = { ...baseGenesisState } as GenesisState;
-    message.groupSeq = object.groupSeq ?? 0;
+    message.group_seq = object.group_seq ?? 0;
     message.groups = object.groups?.map((e) => GroupInfo.fromPartial(e)) || [];
-    message.groupMembers =
-      object.groupMembers?.map((e) => GroupMember.fromPartial(e)) || [];
-    message.groupAccountSeq = object.groupAccountSeq ?? 0;
-    message.groupAccounts =
-      object.groupAccounts?.map((e) => GroupAccountInfo.fromPartial(e)) || [];
-    message.proposalSeq = object.proposalSeq ?? 0;
+    message.group_members =
+      object.group_members?.map((e) => GroupMember.fromPartial(e)) || [];
+    message.group_account_seq = object.group_account_seq ?? 0;
+    message.group_accounts =
+      object.group_accounts?.map((e) => GroupAccountInfo.fromPartial(e)) || [];
+    message.proposal_seq = object.proposal_seq ?? 0;
     message.proposals =
       object.proposals?.map((e) => Proposal.fromPartial(e)) || [];
     message.votes = object.votes?.map((e) => Vote.fromPartial(e)) || [];

@@ -15,10 +15,10 @@ export class ChainInfoStore {
 //testnet
 function getDefaultChainInfo(): ChainInfo {
     return {
-        rpc: "http://localhost:26657",
-        rest: "http://localhost:1317",
+        rpc: `http://${window.location.hostname}:26657`,
+        rest: `http://${window.location.hostname}:1317`,
         chainId: "test",
-        chainName: "TESTNET",
+        chainName: "GROUPS-UI-REGEN-TEST",
         stakeCurrency: {
             coinDenom: "UREGEN",
             coinMinimalDenom: "uregen",

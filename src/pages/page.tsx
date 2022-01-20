@@ -5,7 +5,9 @@ import './page.css'
 export const Page: React.FC = props => {
     return (
         <div className="page">
-            { props.children }
+            <div className="page-inner">
+                { props.children }
+            </div>
         </div>
     )
 }

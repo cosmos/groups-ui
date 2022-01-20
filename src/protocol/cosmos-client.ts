@@ -46,7 +46,6 @@ export class CosmosClient {
         } catch (e) {
             console.error(`error when stargateClient signAndBroadcast`, e)
         }
-
     }
 
     applyChainInfo = async (chainInfo: ChainInfo): Promise<void> => {
@@ -67,6 +66,8 @@ export class CosmosClient {
         });
 
         const offlineSigner = this.keplr.getOfflineSigner(chainInfo.chainId);
+        console.log('offlineSigner', offlineSigner)
+        console.log('this.registry', this.registry)
 
         this.stargateClient = await SigningStargateClient.connectWithSigner(
             chainInfo.rpc,
@@ -76,7 +77,7 @@ export class CosmosClient {
             }
         );
 
-        this.stargateClient.getChainId()
+        console.log('this.stargateClient.getChainId()', await this.stargateClient.getChainId())
 
         this.lcdClient = LcdClient.withExtensions(
             { apiUrl: chainInfo.rest },

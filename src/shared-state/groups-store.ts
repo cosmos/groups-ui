@@ -31,7 +31,8 @@ export class GroupsStore {
     }
 
     fetchGroups = async () => {
-        const groupInfoItems = await GroupsService.instance.groupsByAdmin('regen1c4tmw7cknjkppazxc4d36ueww56t6vvgg69pk8')
+        const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
+        const groupInfoItems = await GroupsService.instance.groupsByAdmin(key.bech32Address)
 
         const groups: Group[] = []
 
@@ -57,15 +58,14 @@ export class GroupsStore {
     updateGroup = async () => {
         console.log('chaininfo', CosmosNodeService.instance.chainInfo)
         const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
-        console.log('key', key)
 
         const sender = key.bech32Address
 
-        const msgDeleteAdminRequest: MsgUpdateGroupMetadata = {
-            admin: 'regen1c4tmw7cknjkppazxc4d36ueww56t6vvgg69pk8',
+        const msg: MsgUpdateGroupMetadata = {
+            admin: key.bech32Address,
             group_id: 1,
             metadata: toUint8Array(JSON.stringify({
-                name: 'bla',
+                name: 'Blaaaa',
                 description: 'blabbl',
                 created: 1640599686655,
                 lastEdited: Date.now(),
@@ -75,7 +75,7 @@ export class GroupsStore {
         }
         const msgAny = {
             typeUrl: `/${protobufPackage}.MsgUpdateGroupMetadata`,
-            value: msgDeleteAdminRequest
+            value: msg
         }
 
         const fee = {
@@ -84,6 +84,7 @@ export class GroupsStore {
         }
 
         const broadcastRes = await CosmosNodeService.instance.cosmosClient.signAndBroadcast(sender, [msgAny], fee)
+        console.log('broadcastRes', broadcastRes)
     }
 }
 

@@ -2,9 +2,11 @@ import React, { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useStores } from '../../shared-state/repo'
 import { Button, Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core'
+import { Routes } from '../../routes'
+import { Link } from 'react-router-dom'
 
 export const Groups: React.FC<{}> = observer(() => {
-    const { groups, fetchGroups, updateGroup } = useStores().groupsStore
+    const { groups, fetchGroups } = useStores().groupsStore
     useEffect(() => {
         fetchGroups()
     }, [fetchGroups])
@@ -23,13 +25,14 @@ export const Groups: React.FC<{}> = observer(() => {
                 }}>
                     Groups
                 </div>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={updateGroup}
-                >
-                    {'Create group'}
-                </Button>
+                <Link to={Routes.GROUPS_NEW}>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                    >
+                        {'Create group'}
+                    </Button>
+                </Link>
             </div>
 
             <Paper style={{

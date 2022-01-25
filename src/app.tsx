@@ -28,6 +28,7 @@ export const App: React.FC = () => {
                     <Page>
                         <CreateGroup />
                     </Page>
+                </Route>
                 <Route exact path={Routes.GROUPS_NEW}>
                     <EditGroup />
                 </Route>

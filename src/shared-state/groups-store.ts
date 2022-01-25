@@ -1,9 +1,9 @@
-import { makeObservable, observable, runInAction } from 'mobx'
+import { action, makeObservable, observable, runInAction } from 'mobx'
 import { GroupsService } from '../protocol/groups-service'
 import { GroupAccountInfo, GroupInfo, GroupMember } from '../generated/regen/group/v1alpha1/types'
 import { CosmosNodeService } from '../protocol/cosmos-node-service'
 import { coins } from '@cosmjs/launchpad'
-import { MsgUpdateGroupMetadata, protobufPackage } from '../generated/regen/group/v1alpha1/tx'
+import { MsgCreateGroup, MsgUpdateGroupMetadata, protobufPackage } from '../generated/regen/group/v1alpha1/tx'
 
 // {"name": "bla", "description": "blabbl", "created": 1640599686655, "lastEdited": 1640599686655, "linkToForum": "", "other": "blabla"}
 interface GroupMetadata {
@@ -16,7 +16,7 @@ interface GroupMetadata {
 }
 
 export interface Group {
-    info: GroupInfo
+    info: Omit<GroupInfo, 'metadata'>
     members: GroupMember[]
     groupAccounts: GroupAccountInfo[]
     metadata: GroupMetadata
@@ -25,6 +25,9 @@ export interface Group {
 export class GroupsStore {
     @observable
     groups: Group[] = []
+
+    @observable
+    editedGroup: Group = null
 
     constructor() {
         makeObservable(this)
@@ -55,15 +58,81 @@ export class GroupsStore {
         })
     }
 
-    updateGroup = async () => {
-        console.log('chaininfo', CosmosNodeService.instance.chainInfo)
-        const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
+    @action
+    updateEditedGroup = (newGroup: Group) => {
+        this.editedGroup = newGroup
+    }
 
-        const sender = key.bech32Address
+    setDefaultEditedGroup = async () => {
+        const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
+        const me = key.bech32Address
+
+        runInAction(() => {
+            this.editedGroup = {
+                info: {
+                    group_id: -1,
+                    admin: me,
+                    version: 1,
+                    total_weight: "1",
+                },
+                members: [{
+                    group_id: -1,
+                    member: {
+                        address: me,
+                        weight: "1",
+                        metadata: toUint8Array(JSON.stringify({
+                            name: "me",
+                        }))
+                    }
+                }],
+                groupAccounts: [],
+                metadata: {
+                    name: '',
+                    description: '',
+                    created: -1,
+                    lastEdited: -1,
+                    linkToForum: '',
+                    other: ''
+                }
+            }
+        })
+    }
+
+    @action
+    resetEditedGroup = () => {
+        this.editedGroup = null
+    }
+
+    createGroup = async () => {
+        const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
+        const me = key.bech32Address
+
+        const msg: MsgCreateGroup = {
+            admin: this.editedGroup.info.admin,
+            members: this.editedGroup.members.map(m => m.member),
+            metadata: toUint8Array(JSON.stringify(this.editedGroup.metadata))
+        }
+        const msgAny = {
+            typeUrl: `/${protobufPackage}.MsgCreateGroup`,
+            value: msg
+        }
+
+        const fee = {
+            amount: coins(0, CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom),
+            gas: '2000000'
+        }
+
+        const broadcastRes = await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny], fee)
+        console.log('broadcastRes', broadcastRes)
+    }
+
+    saveGroup = async () => {
+        const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
+        const me = key.bech32Address
 
         const msg: MsgUpdateGroupMetadata = {
-            admin: key.bech32Address,
-            group_id: 1,
+            admin: me,
+            group_id: 2,
             metadata: toUint8Array(JSON.stringify({
                 name: 'Blaaaa',
                 description: 'blabbl',
@@ -83,7 +152,7 @@ export class GroupsStore {
             gas: '2000000'
         }
 
-        const broadcastRes = await CosmosNodeService.instance.cosmosClient.signAndBroadcast(sender, [msgAny], fee)
+        const broadcastRes = await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny], fee)
         console.log('broadcastRes', broadcastRes)
     }
 }

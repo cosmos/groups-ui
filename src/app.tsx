@@ -5,13 +5,15 @@ import { Groups } from './pages/groups/groups'
 import { Nav } from './components/nav'
 import { Routes } from './routes'
 import { EditGroup } from './pages/edit-group/edit-group'
+import CreateGroup from './pages/groups/create'
 
 import './app.css'
+
 
 export const App: React.FC = () => {
     return (
         <Router>
-            <Nav/>
+            <Nav />
             <Switch>
                 <Route exact path={Routes.ROOT}>
                     <span>home</span>
@@ -22,6 +24,10 @@ export const App: React.FC = () => {
                         <Groups />
                     </Page>
                 </Route>
+                <Route exact path={Routes.GROUPS_CREATE}>
+                    <Page>
+                        <CreateGroup />
+                    </Page>
                 <Route exact path={Routes.GROUPS_NEW}>
                     <EditGroup />
                 </Route>

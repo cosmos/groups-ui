@@ -29,31 +29,31 @@ export const Nav: React.FC<{}> = observer(() => {
                 <div>
                     <img src={`${window.location.origin}/groups_logo.svg`} alt="logo" width="53px" />
                 </div>
-                {/*<ul className="nav">*/}
-                {/*    <li className={classNames({*/}
-                {/*        'active': pathname === Routes.ROOT*/}
-                {/*    })}>*/}
-                {/*        <Link to={Routes.ROOT}>Home</Link>*/}
-                {/*    </li>*/}
+                <ul className="nav">
+                    <li className={classNames({
+                        'active': pathname === Routes.ROOT
+                    })}>
+                        <Link to={Routes.ROOT}>Home</Link>
+                    </li>
 
-                {/*    <li className={classNames({*/}
-                {/*        'active': pathname === Routes.GROUPS*/}
-                {/*    })}>*/}
-                {/*        <Link to={Routes.GROUPS}>Groups</Link>*/}
-                {/*    </li>*/}
+                    <li className={classNames({
+                        'active': pathname === Routes.GROUPS
+                    })}>
+                        <Link to={Routes.GROUPS}>Groups</Link>
+                    </li>
 
-                {/*    <li className={classNames({*/}
-                {/*        'active': pathname === Routes.GROUPS_EDIT*/}
-                {/*    })}>*/}
-                {/*        <Link to={Routes.GROUPS_EDIT}>EDIT GROUP</Link>*/}
-                {/*    </li>*/}
+                    <li className={classNames({
+                        'active': pathname === Routes.GROUPS_EDIT
+                    })}>
+                        <Link to={Routes.GROUPS_EDIT}>EDIT GROUP</Link>
+                    </li>
 
-                {/*    <li className={classNames({*/}
-                {/*        'active': pathname === Routes.SETTINGS*/}
-                {/*    })}>*/}
-                {/*        <Link to={Routes.SETTINGS}>SETTINGS</Link>*/}
-                {/*    </li>*/}
-                {/*</ul>*/}
+                    <li className={classNames({
+                        'active': pathname === Routes.SETTINGS
+                    })}>
+                        <Link to={Routes.SETTINGS}>SETTINGS</Link>
+                    </li>
+                </ul>
             </div>
         </div>
     )

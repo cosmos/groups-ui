@@ -1,9 +1,48 @@
 import React, { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useStores } from '../../shared-state/repo'
-import { Button, Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core'
+import { Button, makeStyles, Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core'
 import { Routes } from '../../routes'
 import { Link } from 'react-router-dom'
+
+const useStyles = makeStyles((theme) => ({
+    tableHead: {
+
+        '& th': {
+            padding: '0',
+            border: 'none',
+            fontWeight: 800,
+            textAlign: 'left',
+            fontFamily: " 'Mulish' ",
+            fontSize: '12px',
+        }
+    },
+
+    tableRow: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        padding: '20px 40px',
+        alignItems: "center"
+    },
+
+    nameCol: {
+        width: '30%',
+    },
+
+    col: {
+        width: '20%'
+    },
+
+    tableItem: {
+        padding: '48px 40px',
+        transition: 'background-color .4s',
+
+        '&:hover': {
+            backgroundColor: '#FAFAFA',
+            transition: 'background-color .4s'
+        }
+    }
+}))
 
 export const Groups: React.FC<{}> = observer(() => {
     const { groups, fetchGroups } = useStores().groupsStore
@@ -11,8 +50,10 @@ export const Groups: React.FC<{}> = observer(() => {
         fetchGroups()
     }, [fetchGroups])
 
+    const tableStyle = useStyles();
+
     return (
-        <div>
+        <div style={{ width: '1140px' }}>
             <div style={{
                 marginTop: '24px',
                 display: 'flex',
@@ -39,29 +80,29 @@ export const Groups: React.FC<{}> = observer(() => {
                 marginTop: '48px',
             }}>
                 <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell style={{ fontWeight: 700 }}>Name</TableCell>
-                            <TableCell align="right" style={{ fontWeight: 700 }}>Created</TableCell>
-                            <TableCell align="right" style={{ fontWeight: 700 }}>Last edited</TableCell>
-                            <TableCell align="right" style={{ fontWeight: 700 }}>Description</TableCell>
-                            <TableCell align="right" style={{ fontWeight: 700 }}>Number of members</TableCell>
-                            <TableCell align="right" style={{ fontWeight: 700 }}>Your membership type</TableCell>
+                    <TableHead className={tableStyle.tableHead}>
+                        <TableRow className={tableStyle.tableRow}>
+                            <TableCell className={tableStyle.nameCol}>Name</TableCell>
+                            <TableCell className={tableStyle.col}>Created</TableCell>
+                            <TableCell className={tableStyle.col}>Last edited</TableCell>
+                            {/* <TableCell className={tableStyle.col}>Description</TableCell> */}
+                            <TableCell className={tableStyle.col}>Number of <br /> members</TableCell>
+                            <TableCell className={tableStyle.col}>Your <br /> membership type</TableCell>
                             <TableCell />
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {groups.map(group => (
-                            <TableRow key={group.info.group_id}>
-                                <TableCell component="th" scope="row" style={{ fontWeight: 900 }}>
-                                    { group.metadata.name }
+                            <TableRow key={group.info.group_id} className={tableStyle.tableItem}>
+                                <TableCell component="th" scope="row" className={tableStyle.nameCol} style={{ fontWeight: 900, fontSize: '18px' }}>
+                                    {group.metadata.name}
                                 </TableCell>
-                                <TableCell align="right">{new Date(group.metadata.created).toISOString()}</TableCell>
-                                <TableCell align="right">{new Date(group.metadata.lastEdited).toISOString()}</TableCell>
-                                <TableCell align="right">{group.metadata.description}</TableCell>
-                                <TableCell align="right">{(group.members || []).length}</TableCell>
-                                <TableCell align="right">TODO</TableCell>
-                                <TableCell align="right"><Link to={`/groups/${group.info.group_id}`}>Edit</Link></TableCell>
+                                <TableCell className={tableStyle.col} style={{ fontSize: '16px', fontFamily: " 'Lato' " }}>{new Date(group.metadata.created).toISOString()}</TableCell>
+                                <TableCell className={tableStyle.col} style={{ fontSize: '16px', fontFamily: " 'Lato' " }}>{new Date(group.metadata.lastEdited).toISOString()}</TableCell>
+                                {/* <TableCell align="right">{group.metadata.description}</TableCell> */}
+                                <TableCell className={tableStyle.col} style={{ fontSize: '16px', fontFamily: " 'Lato' " }}>{(group.members || []).length}</TableCell>
+                                <TableCell className={tableStyle.col} style={{ fontSize: '16px', fontFamily: " 'Lato' " }}>TODO</TableCell>
+                                <TableCell className={tableStyle.col} style={{ fontSize: '16px', fontFamily: " 'Lato' " }}><Link to={`/groups/${group.info.group_id}`}>Edit</Link></TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -70,7 +111,7 @@ export const Groups: React.FC<{}> = observer(() => {
             <br />
             <br />
             <pre style={{ maxWidth: 400, overflowX: 'scroll' }}>
-                { JSON.stringify(groups, null, 2) }
+                {JSON.stringify(groups, null, 2)}
             </pre>
         </div>
     )

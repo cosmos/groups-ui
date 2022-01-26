@@ -25,7 +25,7 @@ export const Groups: React.FC<{}> = observer(() => {
                 }}>
                     Groups
                 </div>
-                <Link to={Routes.GROUPS_NEW}>
+                <Link to="/groups/new">
                     <Button
                         variant="contained"
                         color="primary"
@@ -47,6 +47,7 @@ export const Groups: React.FC<{}> = observer(() => {
                             <TableCell align="right" style={{ fontWeight: 700 }}>Description</TableCell>
                             <TableCell align="right" style={{ fontWeight: 700 }}>Number of members</TableCell>
                             <TableCell align="right" style={{ fontWeight: 700 }}>Your membership type</TableCell>
+                            <TableCell />
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -60,6 +61,7 @@ export const Groups: React.FC<{}> = observer(() => {
                                 <TableCell align="right">{group.metadata.description}</TableCell>
                                 <TableCell align="right">{(group.members || []).length}</TableCell>
                                 <TableCell align="right">TODO</TableCell>
+                                <TableCell align="right"><Link to={`/groups/${group.info.group_id}`}>Edit</Link></TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

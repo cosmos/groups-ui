@@ -5,7 +5,6 @@ import { Groups } from './pages/groups/groups'
 import { Nav } from './components/nav'
 import { Routes } from './routes'
 import { EditGroup } from './pages/edit-group/edit-group'
-import CreateGroup from './pages/groups/create'
 
 import './app.css'
 
@@ -23,14 +22,6 @@ export const App: React.FC = () => {
                     <Page>
                         <Groups />
                     </Page>
-                </Route>
-                <Route exact path={Routes.GROUPS_CREATE}>
-                    <Page>
-                        <CreateGroup />
-                    </Page>
-                </Route>
-                <Route exact path={Routes.GROUPS_NEW}>
-                    <EditGroup />
                 </Route>
                 <Route exact path={Routes.GROUPS_EDIT}>
                     <EditGroup />

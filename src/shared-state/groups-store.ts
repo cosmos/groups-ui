@@ -33,7 +33,7 @@ export class GroupsStore {
         makeObservable(this)
     }
 
-    fetchGroups = async () => {
+    fetchGroups = async (): Promise<Group[]> => {
         const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
         const groupInfoItems = await GroupsService.instance.groupsByAdmin(key.bech32Address)
 
@@ -56,6 +56,33 @@ export class GroupsStore {
         runInAction(() => {
             this.groups = groups
         })
+
+        return groups
+    }
+
+    fetchEditedGroupById = async (id: number): Promise<Group | null> => {
+        const groupInfo = await GroupsService.instance.groupById(id)
+        if (groupInfo === null) {
+            return null
+        }
+
+        const results = await Promise.all([
+            GroupsService.instance.groupMembers(groupInfo.group_id),
+            GroupsService.instance.groupAccounts(groupInfo.group_id)
+        ])
+
+        const editedGroup = {
+            info: groupInfo,
+            members: results[0],
+            groupAccounts: results[1],
+            metadata: JSON.parse(atob(groupInfo.metadata as unknown as string))
+        }
+
+        runInAction(() => {
+            this.editedGroup = editedGroup
+        })
+
+        return editedGroup
     }
 
     @action
@@ -63,7 +90,7 @@ export class GroupsStore {
         this.editedGroup = newGroup
     }
 
-    setDefaultEditedGroup = async () => {
+    setDefaultNewGroup = async () => {
         const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
         const me = key.bech32Address
 
@@ -157,7 +184,7 @@ export class GroupsStore {
     }
 }
 
-function toUint8Array(str: string): Uint8Array {
+export function toUint8Array(str: string): Uint8Array {
     if (!('TextEncoder' in window))
         alert('Sorry, this browser does not support TextEncoder...')
 

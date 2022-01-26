@@ -40,14 +40,19 @@ export class GroupsService {
         const res = await this.cosmosClient.lcdClientGet(
             `/regen/group/v1alpha1/groups/admins/${admin}`
         ) as QueryGroupsByAdminResponse
-        return res.groups
+        return res.groups.map(normalizeBackendGroup)
     }
 
     groupById = async (groupId: number): Promise<GroupInfo> => {
         const res = await this.cosmosClient.lcdClientGet(
             `/regen/group/v1alpha1/groups/${groupId}/info`
         ) as QueryGroupInfoResponse
-        return res.info
+
+        if (!res.info) {
+            return null
+        }
+
+        return normalizeBackendGroup(res.info)
     }
 
     groupAccounts = async (groupId: number): Promise<GroupAccountInfo[]> => {
@@ -69,5 +74,13 @@ export class GroupsService {
             `/regen/group/v1alpha1/groups/accounts/${groupAddress}`
         ) as QueryGroupAccountInfoResponse
         return res.info
+    }
+}
+
+function normalizeBackendGroup(g: GroupInfo): GroupInfo { // it's grpc - Long numbers are strings, so we convert them here
+    return {
+        ...g,
+        group_id: Number(g.group_id),
+        version: Number(g.version)
     }
 }

@@ -1,7 +1,7 @@
-import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
-import { Button, TextField } from '@material-ui/core';
+import React from 'react'
+import { makeStyles } from '@material-ui/core/styles'
+import Paper from '@material-ui/core/Paper'
+import { Button, TextField } from '@material-ui/core'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -36,17 +36,17 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: "bold",
         lineHeight: "23px"
     }
-}));
+}))
 
 export default function CreateGroup() {
-    const classes = useStyles();
+    const classes = useStyles()
 
     return (
         <div className={classes.root}>
             <Paper elevation={2}>
                 <form action="" >
                     <label className={classes.label}>
-                        <p className={classes.inputTitle}>Admin adress</p>
+                        <p className={classes.inputTitle}>Admin address</p>
                         <TextField style={{ backgroundColor: '#EFEFEF' }} fullWidth disabled id="outlined-disabled" variant="outlined" />
                     </label>
                     <label className={classes.label}>
@@ -78,5 +78,5 @@ export default function CreateGroup() {
                 </form>
             </Paper>
         </div>
-    );
+    )
 }

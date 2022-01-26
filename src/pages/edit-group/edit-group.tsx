@@ -5,6 +5,42 @@ import { Button, Paper, Step, StepLabel, Stepper, TextField } from '@material-ui
 import { useHistory, useLocation, useParams } from 'react-router-dom'
 import { Routes } from '../../routes'
 import { toUint8Array } from '../../shared-state/groups-store'
+import { makeStyles } from '@material-ui/core/styles'
+
+const useStyles = makeStyles((theme) => ({
+    root: {
+        display: 'block',
+        flexWrap: 'wrap',
+        '& > *': {
+            margin: theme.spacing(1),
+            width: '560px',
+            padding: '50px 30px'
+        }
+    },
+    label: {
+        width: '100%',
+        display: 'block',
+        margin: '0 auto 42px auto'
+    },
+    inputTitle: {
+        fontFamily: '\'Lato\', sans-serif',
+        fontStyle: 'normal',
+        fontWeight: 'bold',
+        fontSize: '18px',
+        lineHeight: '145%',
+        marginBottom: '9px',
+        '& span': {
+            color: '#D2D5D9'
+        }
+    },
+    cardBtn: {
+        padding: '12px',
+        fontFamily: '\'Mulish\' sans-serif',
+        fontSize: '18px',
+        fontWeight: 'bold',
+        lineHeight: '23px'
+    }
+}))
 
 export const EditGroup: React.FC<{}> = observer(() => {
     const {
@@ -15,6 +51,8 @@ export const EditGroup: React.FC<{}> = observer(() => {
     const history = useHistory()
     const pathParams: any = useParams()
     const groupId = pathParams.id === 'new' ? -1 : Number(pathParams.id)
+
+    const classes = useStyles()
 
     useEffect(() => {
         if (!editedGroup) {
@@ -56,137 +94,158 @@ export const EditGroup: React.FC<{}> = observer(() => {
                 </Stepper>
             </div>
             <div style={{
-                padding: '24px',
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                backgroundColor: '#E5E5E5'
+                // padding: '24px',
+                // flex: 1,
+                // display: 'flex',
+                // flexDirection: 'column',
+                // alignItems: 'center',
+                // backgroundColor: '#E5E5E5'
             }}>
-                <div style={{
-                    maxWidth: '1200px'
+                <div className={classes.root} style={{
+                    // maxWidth: '1200px'
                 }}>
                     {activeStep === 0 && (
                         <>
                             <div>
                                 {'Create Group'}
                             </div>
-                            <Paper style={{
-                                minWidth: '700px',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center'
-                            }}>
-                                <div>
-                                    <TextField
-                                        label="Group admin"
-                                        value={editedGroup.info.admin}
-                                        disabled
-                                    />
-                                </div>
-                                <div>
-                                    <TextField
-                                        label="Group name"
-                                        value={editedGroup.metadata.name}
-                                        onChange={e => {
-                                            updateEditedGroup({
-                                                ...editedGroup,
-                                                metadata: {
-                                                    ...editedGroup.metadata,
-                                                    name: e.target.value
-                                                }
-                                            })
-                                        }}
-                                    />
-                                </div>
-                                <div>
-                                    <TextField
-                                        label="Description"
-                                        value={editedGroup.metadata.description}
-                                        onChange={e => {
-                                            updateEditedGroup({
-                                                ...editedGroup,
-                                                metadata: {
-                                                    ...editedGroup.metadata,
-                                                    description: e.target.value
-                                                }
-                                            })
-                                        }}
-                                    />
-                                </div>
-                                <div>
-                                    <TextField
-                                        label="Link to forum"
-                                        value={editedGroup.metadata.linkToForum}
-                                        onChange={e => {
-                                            updateEditedGroup({
-                                                ...editedGroup,
-                                                metadata: {
-                                                    ...editedGroup.metadata,
-                                                    linkToForum: e.target.value
-                                                }
-                                            })
-                                        }}
-                                    />
-                                </div>
-                                <div>
-                                    <TextField
-                                        label="Other metadata"
-                                        value={editedGroup.metadata.other}
-                                        onChange={e => {
-                                            updateEditedGroup({
-                                                ...editedGroup,
-                                                metadata: {
-                                                    ...editedGroup.metadata,
-                                                    other: e.target.value
-                                                }
-                                            })
-                                        }}
-                                    />
-                                </div>
-                                <div>
-                                    <div>{'Add member accounts'}</div>
-                                    { editedGroup.members.map((m, i) => {
+                            <Paper elevation={2}>
+                                <form action="">
+                                    <label className={classes.label}>
+                                        <p className={classes.inputTitle}>Admin address</p>
+                                        <TextField
+                                            style={{ backgroundColor: '#EFEFEF' }}
+                                            fullWidth
+                                            value={editedGroup.info.admin}
+                                            disabled
+                                            id="outlined-disabled"
+                                            variant="outlined"
+                                        />
+                                    </label>
+                                    <label className={classes.label}>
+                                        <p className={classes.inputTitle}>Group name</p>
+                                        <TextField
+                                            fullWidth
+                                            variant="outlined"
+                                            value={editedGroup.metadata.name}
+                                            onChange={e => {
+                                                updateEditedGroup({
+                                                    ...editedGroup,
+                                                    metadata: {
+                                                        ...editedGroup.metadata,
+                                                        name: e.target.value
+                                                    }
+                                                })
+                                            }}
+                                        />
+                                    </label>
+                                    <label className={classes.label}>
+                                        <p className={classes.inputTitle}>Description <span>(optional)</span></p>
+                                        <TextField
+                                            fullWidth
+                                            id="outlined"
+                                            variant="outlined"
+                                            multiline
+                                            rows={5}
+                                            value={editedGroup.metadata.description}
+                                            onChange={e => {
+                                                updateEditedGroup({
+                                                    ...editedGroup,
+                                                    metadata: {
+                                                        ...editedGroup.metadata,
+                                                        description: e.target.value
+                                                    }
+                                                })
+                                            }}
+                                        />
+                                    </label>
+                                    <label className={classes.label}>
+                                        <p className={classes.inputTitle}>Link to forum <span>(optional)</span></p>
+                                        <TextField
+                                            fullWidth
+                                            variant="outlined"
+                                            value={editedGroup.metadata.linkToForum}
+                                            onChange={e => {
+                                                updateEditedGroup({
+                                                    ...editedGroup,
+                                                    metadata: {
+                                                        ...editedGroup.metadata,
+                                                        linkToForum: e.target.value
+                                                    }
+                                                })
+                                            }}
+                                        />
+                                    </label>
+                                    <label className={classes.label}>
+                                        <p className={classes.inputTitle}>Other metadata <span>(optional)</span></p>
+                                        <TextField
+                                            fullWidth
+                                            id="outlined"
+                                            variant="outlined"
+                                            multiline
+                                            rows={5}
+                                            // label="Other metadata"
+                                            value={editedGroup.metadata.other}
+                                            onChange={e => {
+                                                updateEditedGroup({
+                                                    ...editedGroup,
+                                                    metadata: {
+                                                        ...editedGroup.metadata,
+                                                        other: e.target.value
+                                                    }
+                                                })
+                                            }}
+                                        />
+                                    </label>
+                                    {editedGroup.members.map((m, i) => {
                                         return (
-                                            <div key={i}>
-                                                <TextField
-                                                    label="Group member address"
-                                                    value={m.member.address}
-                                                    onChange={e => {
-                                                        const newMembers = editedGroup.members
-                                                        newMembers[i].member.address = e.target.value
-                                                        updateEditedGroup({
-                                                            ...editedGroup,
-                                                            members: newMembers
-                                                        })
-                                                    }}
-                                                />
-                                                { i === editedGroup.members.length - 1 && (
-                                                    <Button
-                                                        color="primary"
-                                                        onClick={() => {
+                                            <div className={classes.label} key={i}>
+                                                <p className={classes.inputTitle}>Add member accounts</p>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                    <TextField
+                                                        style={{ width: '80%' }}
+                                                        id="outlined"
+                                                        variant="outlined"
+                                                        label="Group member address"
+                                                        value={m.member.address}
+                                                        onChange={e => {
+                                                            const newMembers = editedGroup.members
+                                                            newMembers[i].member.address = e.target.value
                                                             updateEditedGroup({
                                                                 ...editedGroup,
-                                                                members: [...editedGroup.members, {
-                                                                    group_id: editedGroup.info.group_id,
-                                                                    member: {
-                                                                        address: "",
-                                                                        weight: "1",
-                                                                        metadata: toUint8Array(JSON.stringify({
-                                                                            name: "",
-                                                                        }))
-                                                                    }
-                                                                }]
+                                                                members: newMembers
                                                             })
                                                         }}
-                                                    >
-                                                        {'Add'}
-                                                    </Button>
-                                                ) }
+                                                    />
+                                                    {i === editedGroup.members.length - 1 && (
+                                                        <Button
+                                                            className={classes.cardBtn}
+                                                            variant="outlined"
+                                                            color="primary"
+                                                            onClick={() => {
+                                                                updateEditedGroup({
+                                                                    ...editedGroup,
+                                                                    members: [...editedGroup.members, {
+                                                                        group_id: editedGroup.info.group_id,
+                                                                        member: {
+                                                                            address: '',
+                                                                            weight: '1',
+                                                                            metadata: toUint8Array(JSON.stringify({
+                                                                                name: ''
+                                                                            }))
+                                                                        }
+                                                                    }]
+                                                                })
+                                                            }}
+                                                        >
+                                                            {'Add'}
+                                                        </Button>
+                                                    )}
+                                                </div>
                                             </div>
                                         )
-                                    }) }
-                                </div>
+                                    })}
+                                </form>
                             </Paper>
                         </>
                     )}

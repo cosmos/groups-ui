@@ -18,6 +18,12 @@ const useStyles = makeStyles((theme) => ({
             padding: '50px 30px'
         }
     },
+    title: {
+        fontWeight: 900,
+        fontSize: '38px',
+        margin: '0 auto',
+        textAlign: 'center'
+    },
     label: {
         width: '100%',
         display: 'block',
@@ -108,7 +114,7 @@ export const EditGroup: React.FC<{}> = observer(() => {
                     }}>
                         {activeStep === 0 && (
                             <>
-                                <div>
+                                <div className={classes.title}>
                                     {'Create Group'}
                                 </div>
                                 <Paper elevation={2}>

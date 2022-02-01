@@ -97,12 +97,27 @@ export const Groups: React.FC<{}> = observer(() => {
                                 <TableCell component="th" scope="row" className={tableStyle.nameCol} style={{ fontWeight: 900, fontSize: '18px' }}>
                                     {group.metadata.name}
                                 </TableCell>
-                                <TableCell className={tableStyle.col} style={{ fontSize: '16px', fontFamily: " 'Lato' " }}>{new Date(group.metadata.created).toISOString()}</TableCell>
-                                <TableCell className={tableStyle.col} style={{ fontSize: '16px', fontFamily: " 'Lato' " }}>{new Date(group.metadata.lastEdited).toISOString()}</TableCell>
+                                <TableCell className={tableStyle.col} style={{
+                                    fontSize: '16px',
+                                    fontFamily: " 'Lato' "
+                                }}>{new Date(group.metadata.created).toISOString()}</TableCell>
+                                <TableCell className={tableStyle.col} style={{
+                                    fontSize: '16px',
+                                    fontFamily: " 'Lato' "
+                                }}>{new Date(group.metadata.lastEdited).toISOString()}</TableCell>
                                 {/* <TableCell align="right">{group.metadata.description}</TableCell> */}
-                                <TableCell className={tableStyle.col} style={{ fontSize: '16px', fontFamily: " 'Lato' " }}>{(group.members || []).length}</TableCell>
-                                <TableCell className={tableStyle.col} style={{ fontSize: '16px', fontFamily: " 'Lato' " }}>TODO</TableCell>
-                                <TableCell className={tableStyle.col} style={{ fontSize: '16px', fontFamily: " 'Lato' " }}><Link to={`/groups/${group.info.group_id}`}>Edit</Link></TableCell>
+                                <TableCell className={tableStyle.col} style={{
+                                    fontSize: '16px',
+                                    fontFamily: " 'Lato' "
+                                }}>{(group.members || []).length}</TableCell>
+                                <TableCell className={tableStyle.col} style={{
+                                    fontSize: '16px',
+                                    fontFamily: " 'Lato' "
+                                }}>TODO</TableCell>
+                                <TableCell className={tableStyle.col} style={{
+                                    fontSize: '16px',
+                                    fontFamily: " 'Lato' "
+                                }}><Link to={`/groups/${group.info.group_id}`}>Edit</Link></TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

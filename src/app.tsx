@@ -7,6 +7,7 @@ import { Routes } from './routes'
 import { EditGroup } from './pages/edit-group/edit-group'
 
 import './app.css'
+import { Settings } from './pages/settings/settings'
 
 
 export const App: React.FC = () => {
@@ -28,7 +29,7 @@ export const App: React.FC = () => {
                 </Route>
                 <Route exact path={Routes.SETTINGS}>
                     <Page>
-                        <span>settings</span>
+                        <Settings />
                     </Page>
                 </Route>
             </Switch>

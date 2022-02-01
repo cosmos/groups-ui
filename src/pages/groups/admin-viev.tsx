@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: '18px',
-        fontFamily: " 'Lato', sans-serif  ",
+        // fontFamily: " 'Lato', sans-serif  ", // TODO download and specify in css (like with Mulish)
         '& h1': {
             fontWeight: 900,
             lineHeight: '50px'
@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
         display: 'inline-flex',
         fontSize: '18px',
         alignItems: 'center',
-        fontFamily: " 'Lato', sans-serif ",
+        // fontFamily: " 'Lato', sans-serif ", // TODO download and specify in css (like with Mulish)
         marginBottom: '35px'
     },
     regen: {

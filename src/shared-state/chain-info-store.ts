@@ -1,4 +1,4 @@
-import { observable } from 'mobx'
+import { action, makeObservable, observable } from 'mobx'
 import { ChainInfo } from '@keplr-wallet/types'
 import { Bech32Address } from '@keplr-wallet/cosmos'
 
@@ -9,11 +9,24 @@ export class ChainInfoStore {
     @observable
     keplrAccount: string = ""
 
-    // fetchKeplrAcc
+    constructor() {
+        makeObservable(this)
+    }
+
+    @action
+    setChainInfo = (chainInfo: ChainInfo) => {
+        this.chainInfo = chainInfo
+        window.localStorage.setItem("chainInfo", JSON.stringify(chainInfo))
+    }
 }
 
 //testnet
 function getDefaultChainInfo(): ChainInfo {
+    const lsChainInfo = window.localStorage.getItem("chainInfo")
+    if (lsChainInfo) {
+        return JSON.parse(lsChainInfo)
+    }
+
     return {
         rpc: `http://${window.location.hostname}:26657`,
         rest: `http://${window.location.hostname}:1317`,

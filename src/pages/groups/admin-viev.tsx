@@ -35,6 +35,13 @@ export const useStyles = makeStyles((theme) => ({
             fontSize: '20px',
             lineHeight: '33px',
             color: '#545555'
+        },
+
+        '& .tableBtn': {
+            padding: '12px 45px',
+            fontSize: '16px',
+            fontWeight: 700,
+            marginRight: '40px'
         }
     },
     date: {

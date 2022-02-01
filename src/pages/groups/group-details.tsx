@@ -109,7 +109,12 @@ export const GroupDetails: React.FC<{}> = observer(() => {
                 </Table>
             </Paper>
             <Paper elevation={2} style={{ marginTop: '21px' }}>
-                <h2 style={{ padding: '40px', fontWeight: 900 }}>Group Policy</h2>
+                <div className={classes.heroBlock}>
+                    <h2 style={{ padding: '40px', fontWeight: 900 }}>Group Policy</h2>
+                    <Button variant='outlined' color='primary' className='tableBtn'>
+                        edit group
+                    </Button>
+                </div>
                 <Table className={table.table} aria-label="customized table">
                     <TableHead>
                         <TableRow>

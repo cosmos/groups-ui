@@ -65,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
         }
     },
     inputTitle: {
-        // fontFamily: '\'Lato\', sans-serif', // TODO download and specify in css (like with Mulish)
+        fontFamily: '\'Lato\', sans-serif',
         fontStyle: 'normal',
         fontWeight: 'bold',
         fontSize: '18px',

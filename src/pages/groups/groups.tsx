@@ -9,38 +9,42 @@ const useStyles = makeStyles((theme) => ({
     tableHead: {
 
         '& th': {
-            padding: '0',
-            border: 'none',
-            fontWeight: 800,
-            textAlign: 'left',
-            fontFamily: " 'Mulish' ",
-            fontSize: '12px',
+            // padding: '0',
+            // border: 'none',
+            // fontWeight: 800,
+            // textAlign: 'left',
+            // fontFamily: " 'Mulish' ",
+            // fontSize: '12px',
         }
     },
 
     tableRow: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        padding: '20px 40px',
-        alignItems: "center"
+        // display: 'flex',
+        // justifyContent: 'space-between',
+        // padding: '20px 40px',
+        // alignItems: "center"
+    },
+
+    headCell: {
+        fontWeight: 700,
     },
 
     nameCol: {
-        width: '30%',
+        // width: '30%',
     },
 
     col: {
-        width: '20%'
+        // width: '20%'
     },
 
     tableItem: {
-        padding: '48px 40px',
-        transition: 'background-color .4s',
-
-        '&:hover': {
-            backgroundColor: '#FAFAFA',
-            transition: 'background-color .4s'
-        }
+        // padding: '48px 40px',
+        // transition: 'background-color .4s',
+        //
+        // '&:hover': {
+        //     backgroundColor: '#FAFAFA',
+        //     transition: 'background-color .4s'
+        // }
     }
 }))
 
@@ -82,12 +86,12 @@ export const Groups: React.FC<{}> = observer(() => {
                 <Table>
                     <TableHead className={tableStyle.tableHead}>
                         <TableRow className={tableStyle.tableRow}>
-                            <TableCell className={tableStyle.nameCol}>Name</TableCell>
-                            <TableCell className={tableStyle.col}>Created</TableCell>
-                            <TableCell className={tableStyle.col}>Last edited</TableCell>
+                            <TableCell className={tableStyle.headCell}>Name</TableCell>
+                            <TableCell className={tableStyle.headCell}>Created</TableCell>
+                            <TableCell className={tableStyle.headCell}>Last edited</TableCell>
                             {/* <TableCell className={tableStyle.col}>Description</TableCell> */}
-                            <TableCell className={tableStyle.col}>Number of <br /> members</TableCell>
-                            <TableCell className={tableStyle.col}>Your <br /> membership type</TableCell>
+                            <TableCell className={tableStyle.headCell}>Number of <br /> members</TableCell>
+                            <TableCell className={tableStyle.headCell}>Your <br /> membership type</TableCell>
                             <TableCell />
                         </TableRow>
                     </TableHead>
@@ -125,9 +129,9 @@ export const Groups: React.FC<{}> = observer(() => {
             </Paper>
             <br />
             <br />
-            <pre style={{ maxWidth: 400, overflowX: 'scroll' }}>
-                {JSON.stringify(groups, null, 2)}
-            </pre>
+            {/*<pre style={{ maxWidth: 400, overflowX: 'scroll' }}>*/}
+            {/*    {JSON.stringify(groups, null, 2)}*/}
+            {/*</pre>*/}
         </div>
     )
 })

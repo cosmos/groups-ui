@@ -137,7 +137,11 @@ export class GroupsStore {
         const msg: MsgCreateGroup = {
             admin: this.editedGroup.info.admin,
             members: this.editedGroup.members.map(m => m.member),
-            metadata: toUint8Array(JSON.stringify(this.editedGroup.metadata))
+            metadata: toUint8Array(JSON.stringify({
+                ...this.editedGroup.metadata,
+                created: Date.now(),
+                lastEdited: Date.now(),
+            }))
         }
         const msgAny = {
             typeUrl: `/${protobufPackage}.MsgCreateGroup`,
@@ -151,6 +155,7 @@ export class GroupsStore {
 
         const broadcastRes = await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny], fee)
         console.log('broadcastRes', broadcastRes)
+        return broadcastRes
     }
 
     saveGroup = async () => {
@@ -158,16 +163,22 @@ export class GroupsStore {
         const me = key.bech32Address
 
         const msg: MsgUpdateGroupMetadata = {
-            admin: me,
-            group_id: 2,
+            admin: this.editedGroup.info.admin,
+            // members: this.editedGroup.members.map(m => m.member),
             metadata: toUint8Array(JSON.stringify({
-                name: 'Blaaaa',
-                description: 'blabbl',
-                created: 1640599686655,
+                ...this.editedGroup.metadata,
                 lastEdited: Date.now(),
-                linkToForum: '',
-                other: 'blabla'
-            }))
+            })),
+            group_id: this.editedGroup.info.group_id,
+            // admin: me,
+            // metadata: toUint8Array(JSON.stringify({
+            //     name: 'Blaaaa',
+            //     description: 'blabbl',
+            //     created: 1640599686655,
+            //     lastEdited: Date.now(),
+            //     linkToForum: '',
+            //     other: 'blabla'
+            // }))
         }
         const msgAny = {
             typeUrl: `/${protobufPackage}.MsgUpdateGroupMetadata`,
@@ -181,6 +192,7 @@ export class GroupsStore {
 
         const broadcastRes = await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny], fee)
         console.log('broadcastRes', broadcastRes)
+        return broadcastRes
     }
 }
 

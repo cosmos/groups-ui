@@ -1,7 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useStores } from '../../shared-state/repo'
-import { Button, FormControl, InputLabel, MenuItem, Paper, Select, Step, StepLabel, Stepper, TextField } from '@material-ui/core'
+import {
+    Button,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Paper,
+    Select,
+    Step,
+    StepLabel,
+    Stepper,
+    TextField
+} from '@material-ui/core'
 import { useHistory, useLocation, useParams } from 'react-router-dom'
 import { Routes } from '../../routes'
 import { toUint8Array } from '../../shared-state/groups-store'
@@ -40,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
         textAlign: 'center',
         fontWeight: 800,
         fontSize: '18px',
-        lineHeight: '23px',
+        lineHeight: '23px'
     },
     label: {
         width: '100%',
@@ -61,7 +72,7 @@ const useStyles = makeStyles((theme) => ({
             fontWeight: 700,
             fontSize: '16px',
             lineHeight: '23.2px',
-            marginLeft: '20px',
+            marginLeft: '20px'
         }
     },
     inputTitle: {
@@ -79,7 +90,7 @@ const useStyles = makeStyles((theme) => ({
             color: '#545555',
             fontSize: '14px',
             lineHeight: '21px',
-            fontWeight: 400,
+            fontWeight: 400
         }
     },
     cardBtn: {
@@ -99,12 +110,13 @@ export const EditGroup: React.FC<{}> = observer(() => {
     const [activeStep, setActiveStep] = useState(0)
     const history = useHistory()
     const pathParams: any = useParams()
-    const groupId = pathParams.id === 'new' ? -1 : Number(pathParams.id);
-    const [group, setGroup] = React.useState('');
+    const groupId = pathParams.id === 'new' ? -1 : Number(pathParams.id)
+    const [group, setGroup] = React.useState(10)
+    const [loading, setLoading] = React.useState(false)
 
     const handleChange = (event) => {
-        setGroup(event.target.value);
-    };
+        setGroup(event.target.value)
+    }
 
     const classes = useStyles()
 
@@ -115,7 +127,6 @@ export const EditGroup: React.FC<{}> = observer(() => {
             } else {
                 (async () => {
                     const group = await fetchEditedGroupById(groupId)
-                    console.log('group', group)
                     if (!group) {
                         history.push(Routes.GROUPS)
                     }
@@ -162,7 +173,7 @@ export const EditGroup: React.FC<{}> = observer(() => {
                         {activeStep === 0 && (
                             <>
                                 <div className={classes.title}>
-                                    {'Create Group'}
+                                    {groupId === -1 ? 'Create Group' : 'Edit Group'}
                                 </div>
                                 <Paper elevation={2}>
                                     <label className={classes.label}>
@@ -251,10 +262,10 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                             }}
                                         />
                                     </label>
+                                    <p className={classes.inputTitle}>Add member accounts</p>
                                     {editedGroup.members.map((m, i) => {
                                         return (
                                             <div className={classes.label} key={i}>
-                                                <p className={classes.inputTitle}>Add member accounts</p>
                                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                                     <TextField
                                                         style={{ width: '80%' }}
@@ -299,126 +310,150 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                             </div>
                                         )
                                     })}
+                                    <div style={{
+                                        width: '100%',
+                                        display: 'flex',
+                                        justifyContent: 'flex-end'
+                                    }}>
+                                        <Button
+                                            color="primary"
+                                            variant="outlined"
+                                            onClick={() => setActiveStep(activeStep + 1)}
+                                        >
+                                            {'Next'}
+                                        </Button>
+                                    </div>
                                 </Paper>
                             </>
                         )}
-                        {(() => {
-                            switch (activeStep) {
-                                case 1:
-                                    return (
-                                        <>
-                                            <div className={classes.title}>
-                                                {'Create Group Policy'}
-                                            </div>
-                                            <Paper elevation={2} style={{ padding: '50px 30px' }}>
-                                                <FormControl variant="outlined" className={classes.label}>
-                                                    <p className={classes.inputTitle}>Group
-                                                        <p className='subTitle'>All members addresses of this group will be added to this group account</p>
-                                                    </p>
-                                                    <InputLabel id="demo-simple-select-outlined-label"></InputLabel>
-                                                    <Select
-                                                        fullWidth
-                                                        id="demo-simple-select-outlined"
-                                                        value={group}
-                                                        onChange={handleChange}
-                                                    >
-                                                        <MenuItem value="Group">
-                                                            <em>None</em>
-                                                        </MenuItem>
-                                                        <MenuItem value={10}>Ten</MenuItem>
-                                                        <MenuItem value={20}>Twenty</MenuItem>
-                                                        <MenuItem value={30}>Thirty</MenuItem>
-                                                    </Select>
-                                                </FormControl>
-                                                <div className={classes.label}>
-                                                    <p className={classes.inputTitle}>
-                                                        Voting window
-                                                        <p className='subTitle'>Define the maximum amount of time that must pass in order for a proposal to potentially pass.</p>
-                                                    </p>
-                                                    <p className='max'>Maximum</p>
-                                                    <div className={classes.input}>
-                                                        <TextField
-                                                            variant="outlined">
-                                                        </TextField>
-                                                        <p>days</p>
-                                                    </div>
-                                                </div>
-                                                <div className={classes.label}>
-                                                    <p className={classes.inputTitle}>
-                                                        Set a threshold
-                                                        <p className='subTitle'>Defines a threshold of yes votes (based on a tally of voter weights) that must be achieved in order for a proposal to pass.</p>
-                                                    </p>
-                                                    <div className={classes.input}>
-                                                        <TextField
-                                                            variant="outlined">
-                                                        </TextField>
-                                                        <p>yes votes of 100</p>
-                                                    </div>
-                                                </div>
-                                                <div className={classes.label}>
-                                                    <p className={classes.inputTitle}>
-                                                        Define a quorum <span>(optional)</span>
-                                                        <p className='subTitle'>Quorums define the percentage of total voting power that needs to vote for a proposal to pass.</p>
-                                                    </p>
-                                                    <div className={classes.input}>
-                                                        <TextField
-                                                            variant="outlined">
-                                                        </TextField>
-                                                        <p>% of total voting power</p>
-                                                    </div>
-                                                </div>
-                                            </Paper>
-                                            <Button
-                                                color="primary"
-                                                onClick={() => setActiveStep(activeStep + 1)}
+                        {activeStep === 1 && (
+                            <>
+                                <div className={classes.title}>
+                                    {groupId === -1 ? 'Create Group Policy' : 'Edit Group Policy'}
+                                </div>
+                                <Paper elevation={2} style={{ padding: '50px 30px' }}>
+                                    <FormControl variant="outlined" className={classes.label}>
+                                        <div className={classes.inputTitle}>Group
+                                            <p className="subTitle">All members addresses of this group will be added to
+                                                this group account</p>
+                                        </div>
+                                        <InputLabel id="demo-simple-select-outlined-label">
+                                            <Select
+                                                fullWidth
+                                                id="demo-simple-select-outlined"
+                                                value={group}
+                                                onChange={handleChange}
                                             >
-                                                {'Next'}
-                                            </Button>
-                                        </>
-                                    );
-                                case 2:
-                                    if (editedGroup.info.group_id === -1) {
-                                        return (
-                                            <div>
-                                                <div className={classes.title}>
-                                                    {'Finished'}
-                                                </div>
-                                                <div className={classes.subTitle}>
-                                                    You have successfully set up your group and group policy.
-                                                </div>
-                                                <div>
-                                                    <Button className={classes.finishedBtn}
-                                                        color="primary"
-                                                        onClick={createGroup}
-                                                    >
-                                                        {'view your group page'}
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        )
-                                    } else {
-                                        return (
-                                            <div>
-                                                <Button
-                                                    color="primary"
-                                                    onClick={saveGroup}
-                                                >
-                                                    {'Save Group'}
-                                                </Button>
-                                            </div>
-                                        )
-                                    }
-                                default:
-                                    return (
+                                                <MenuItem value="Group">
+                                                    <em>None</em>
+                                                </MenuItem>
+                                                <MenuItem value={10}>Ten</MenuItem>
+                                                <MenuItem value={20}>Twenty</MenuItem>
+                                                <MenuItem value={30}>Thirty</MenuItem>
+                                            </Select>
+                                        </InputLabel>
+                                    </FormControl>
+                                    <div className={classes.label}>
+                                        <div className={classes.inputTitle}>
+                                            Voting window
+                                            <p className="subTitle">Define the maximum amount of time that must pass in
+                                                order for a proposal to potentially pass.</p>
+                                        </div>
+                                        <p className="max">Maximum</p>
+                                        <div className={classes.input}>
+                                            <TextField
+                                                variant="outlined">
+                                            </TextField>
+                                            <p>days</p>
+                                        </div>
+                                    </div>
+                                    <div className={classes.label}>
+                                        <div className={classes.inputTitle}>
+                                            Set a threshold
+                                            <p className="subTitle">Defines a threshold of yes votes (based on a tally
+                                                of voter weights) that must be achieved in order for a proposal to
+                                                pass.</p>
+                                        </div>
+                                        <div className={classes.input}>
+                                            <TextField
+                                                variant="outlined">
+                                            </TextField>
+                                            <p>yes votes of 100</p>
+                                        </div>
+                                    </div>
+                                    <div className={classes.label}>
+                                        <div className={classes.inputTitle}>
+                                            Define a quorum <span>(optional)</span>
+                                            <p className="subTitle">Quorums define the percentage of total voting power
+                                                that needs to vote for a proposal to pass.</p>
+                                        </div>
+                                        <div className={classes.input}>
+                                            <TextField
+                                                variant="outlined">
+                                            </TextField>
+                                            <p>% of total voting power</p>
+                                        </div>
+                                    </div>
+                                    <div style={{
+                                        width: '100%',
+                                        display: 'flex',
+                                        justifyContent: 'flex-end'
+                                    }}>
+                                        <Button
+                                            color="primary"
+                                            variant="outlined"
+                                            onClick={() => setActiveStep(activeStep + 1)}
+                                        >
+                                            {'Next'}
+                                        </Button>
+                                    </div>
+                                </Paper>
+                            </>
+                        )}
+                        {activeStep === 2 && (() => {
+                            if (editedGroup.info.group_id === -1) {
+                                return (
+                                    <div>
+                                        <div className={classes.title}>
+                                            {'Finished'}
+                                        </div>
+                                        <div className={classes.subTitle}>
+                                            You have successfully set up your group and group policy.
+                                        </div>
                                         <div>
-                                            <Button
-                                                color="primary"
-                                                onClick={() => setActiveStep(activeStep + 1)}
+                                            <Button className={classes.finishedBtn}
+                                                    color="primary"
+                                                    onClick={async () => {
+                                                        setLoading(true)
+                                                        const broadcastRes = await createGroup()
+                                                        setLoading(false)
+                                                        alert(`BroadcastRes: 
+${JSON.stringify(broadcastRes, null, 2)}`)
+                                                    }}
                                             >
-                                                {'Next'}
+                                                {'Create group'}
                                             </Button>
                                         </div>
-                                    )
+                                    </div>
+                                )
+                            } else {
+                                return (
+                                    <div>
+                                        <Button
+                                            color="primary"
+                                            disabled={loading}
+                                            onClick={async () => {
+                                                setLoading(true)
+                                                const broadcastRes = await saveGroup()
+                                                setLoading(false)
+                                                alert(`BroadcastRes: 
+${JSON.stringify(broadcastRes, null, 2)}`)
+                                            }}
+                                        >
+                                            {'Save Group'}
+                                        </Button>
+                                    </div>
+                                )
                             }
                         })()}
                     </div>

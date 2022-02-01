@@ -169,7 +169,7 @@ export const GroupDetails: React.FC<{}> = observer(() => {
             </Paper>
             <Paper elevation={2} style={{ marginTop: '21px' }}>
                 <div className={classes.heroBlock}>
-                    <h2 style={{ padding: '40px', fontWeight: 900 }}>Group Policy</h2>
+                    <h2 style={{ padding: '40px', fontWeight: 900 }}>Members</h2>
                     <Button variant='outlined' color='primary' className='tableBtn'>
                         edit group
                     </Button>
@@ -179,7 +179,7 @@ export const GroupDetails: React.FC<{}> = observer(() => {
                         <TableRow>
                             <StyledTableCell>Adress</StyledTableCell>
                             <StyledTableCell align="left">voting window</StyledTableCell>
-                            <StyledTableCell align="left">date</StyledTableCell>
+                            <StyledTableCell align="left">date added</StyledTableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

@@ -1,18 +1,63 @@
-import { Button, Link, makeStyles, Paper, Table, TableBody, TableCell, TableHead, TableRow, withStyles } from '@material-ui/core';
-import { ArrowBack } from '@material-ui/icons';
+import { Button, IconButton, Link, makeStyles, Paper, Table, TableBody, TableCell, TableFooter, TableHead, TablePagination, TableRow, useTheme, withStyles } from '@material-ui/core';
+import { ArrowBack, KeyboardArrowLeft, KeyboardArrowRight } from '@material-ui/icons';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
 import { useStyles } from './admin-viev';
+import PropTypes from 'prop-types';
 
 function createPolicyData(date, window, threshold, quorum, admin) {
     return { date, window, threshold, quorum, admin };
 }
+
+const useStyles1 = makeStyles((theme) => ({
+    root: {
+        flexShrink: 0,
+        marginLeft: theme.spacing(2.5),
+    },
+}));
 
 const policyRows = [
     createPolicyData("21.22.12", '20 days', '49 / 100 (49%)', '40%', 'regencx2891203isoasper...'),
     createPolicyData("53.63.24", '15 days', '51 / 100 (51%)', '50%', 'regencx2891203isoasper...'),
     createPolicyData("45.42.12", '10 days', '50 / 100 (50%)', '30%', 'regencx2891203isoasper...'),
 ];
+
+function TablePaginationActions(props) {
+    const classes = useStyles1();
+    const theme = useTheme();
+    const { count, page, rowsPerPage, onPageChange } = props;
+
+    const handleBackButtonClick = (event) => {
+        onPageChange(event, page - 1);
+    };
+
+    const handleNextButtonClick = (event) => {
+        onPageChange(event, page + 1);
+    };
+
+    return (
+        <div className={classes.root}>
+            <IconButton onClick={handleBackButtonClick} disabled={page === 0} aria-label="previous page">
+                {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+            </IconButton>
+            <IconButton
+                onClick={handleNextButtonClick}
+                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+                aria-label="next page"
+            >
+                {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+            </IconButton>
+        </div>
+    );
+}
+
+TablePaginationActions.propTypes = {
+    count: PropTypes.number.isRequired,
+    onPageChange: PropTypes.func.isRequired,
+    page: PropTypes.number.isRequired,
+    rowsPerPage: PropTypes.number.isRequired,
+};
+
 
 function createMemberData(adress, window, date) {
     return { adress, window, date }
@@ -58,6 +103,20 @@ const tableStyles = makeStyles({
 export const GroupDetails: React.FC<{}> = observer(() => {
     const classes = useStyles();
     const table = tableStyles();
+
+    const [page, setPage] = React.useState(0);
+    const [rowsPerPage, setRowsPerPage] = React.useState(4);
+
+    const emptyRows = rowsPerPage - Math.min(rowsPerPage, memberRows.length - page * rowsPerPage);
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
 
 
     return (
@@ -115,7 +174,7 @@ export const GroupDetails: React.FC<{}> = observer(() => {
                         edit group
                     </Button>
                 </div>
-                <Table className={table.table} aria-label="customized table">
+                <Table className={table.table} aria-label="custom pagination table">
                     <TableHead>
                         <TableRow>
                             <StyledTableCell>Adress</StyledTableCell>
@@ -124,14 +183,40 @@ export const GroupDetails: React.FC<{}> = observer(() => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {memberRows.map((row) => (
+                        {(rowsPerPage > 0
+                            ? memberRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                            : memberRows
+                        ).map((row) => (
                             <StyledTableRow key={row.date}>
                                 <StyledTableCell align="left" style={{ width: '15%', padding: '28px 40px' }}>{row.adress}</StyledTableCell>
                                 <StyledTableCell align="left" style={{ width: '15%', padding: '28px 40px' }}>{row.window}</StyledTableCell>
                                 <StyledTableCell align="left" style={{ width: '30%', padding: '28px 40px' }}>{row.date}</StyledTableCell>
                             </StyledTableRow>
                         ))}
+                        {emptyRows > 0 && (
+                            <TableRow style={{ height: 53 * emptyRows }}>
+                                <TableCell colSpan={6} />
+                            </TableRow>
+                        )}
                     </TableBody>
+                    <TableFooter>
+                        <TableRow>
+                            {/* <TablePagination
+                                rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+                                colSpan={3}
+                                count={memberRows.length}
+                                rowsPerPage={rowsPerPage}
+                                page={page}
+                                SelectProps={{
+                                    inputProps: { 'aria-label': 'rows per page' },
+                                    native: true,
+                                }}
+                                onPageChange={handleChangePage}
+                                onRowsPerPageChange={handleChangeRowsPerPage}
+                                ActionsComponent={TablePaginationActions}
+                            /> */}
+                        </TableRow>
+                    </TableFooter>
                 </Table>
             </Paper>
         </div>

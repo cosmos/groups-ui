@@ -6,7 +6,7 @@ import { ReactComponent as DeligateIcon } from '../../icons/deligate.svg';
 import { ReactComponent as SpendIcon } from '../../icons/spend.svg';
 
 
-const useStyles = makeStyles((theme) => ({
+export const useStyles = makeStyles((theme) => ({
     root: {
         padding: '0px 24px',
         width: '1200px',
@@ -30,12 +30,18 @@ const useStyles = makeStyles((theme) => ({
             padding: '3px 45px',
             fontSize: '16px',
             fontWeight: 700,
-            backgroundColor: 'white'
         },
         '& .subtitle': {
             fontSize: '20px',
             lineHeight: '33px',
             color: '#545555'
+        },
+
+        '& .tableBtn': {
+            padding: '12px 45px',
+            fontSize: '16px',
+            fontWeight: 700,
+            marginRight: '40px'
         }
     },
     date: {
@@ -146,7 +152,7 @@ export const GroupAdminViev: React.FC<{}> = observer(() => {
             <div>
                 <div className={classes.heroBlock}>
                     <h1>Foo Dev Team</h1>
-                    <Button variant="outlined" color="primary" className='btn'>
+                    <Button variant="outlined" color="primary" className='btn' style={{ backgroundColor: 'white' }}>
                         group details
                     </Button>
                 </div>

@@ -265,7 +265,7 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                     <p className={classes.inputTitle}>Add member accounts</p>
                                     {editedGroup.members.map((m, i) => {
                                         return (
-                                            <div className={classes.label} key={i}>
+                                            <div className={classes.label} key={`${m.member.address}_${i}`}>
                                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                                     <TextField
                                                         style={{ width: '80%' }}

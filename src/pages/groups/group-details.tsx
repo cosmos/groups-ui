@@ -18,6 +18,7 @@ import { observer } from 'mobx-react-lite'
 import { useStyles } from './admin-view'
 import PropTypes from 'prop-types'
 import { Link, useParams } from 'react-router-dom'
+import { Page } from '../page'
 
 function createPolicyData(date, window, threshold, quorum, admin) {
     return { date, window, threshold, quorum, admin }
@@ -136,90 +137,92 @@ export const GroupDetails: React.FC<{}> = observer(() => {
 
 
     return (
-        <div className={classes.root}>
-            <div>
-                <Link to="#" style={{ fontSize: '12px', textTransform: 'uppercase', fontWeight: 800 }} className={classes.link} onClick={() => console.log('click')} >
-                    <ArrowBack style={{ fontSize: '18px', marginRight: '8px' }} />
-                    Foo dev team
-                </Link>
-                <div className={classes.heroBlock}>
-                    <h1>Group Details</h1>
-                    <Link to={`/groups/${groupId}`}>
-                        <Button variant="contained" color="primary" className='btn'>
+        <Page>
+            <div className={classes.root}>
+
+                <div>
+                    <Link to="#" style={{ fontSize: '12px', textTransform: 'uppercase', fontWeight: 800 }} className={classes.link} onClick={() => console.log('click')} >
+                        <ArrowBack style={{ fontSize: '18px', marginRight: '8px' }} />
+                        Foo dev team
+                    </Link>
+                    <div className={classes.heroBlock}>
+                        <h1>Group Details</h1>
+                        <Link to={`/groups/${groupId}`}>
+                            <Button variant="contained" color="primary" className='btn'>
+                                edit group
+                            </Button>
+                        </Link>
+                    </div>
+                    <div className={classes.heroBlock}>
+                        <p className='subtitle'>This group is to manage the funds for the Foo developer team’s efforts.</p>
+                    </div>
+                    <div className={classes.regen}>
+                        <p style={{ marginLeft: '0' }}>group admin</p>
+                        <Link to="#" className={classes.link} onClick={() => console.log('click')} >
+                            regenj1isa90182095dser...
+                        </Link>
+                    </div>
+                </div>
+                <Paper elevation={2}>
+                    <h2 style={{ padding: '40px', fontWeight: 900 }}>Group Policy</h2>
+                    <Table className={table.table} aria-label="customized table">
+                        <TableHead>
+                            <TableRow>
+                                <StyledTableCell>Date</StyledTableCell>
+                                <StyledTableCell align="left">voting window</StyledTableCell>
+                                <StyledTableCell align="left">threshold</StyledTableCell>
+                                <StyledTableCell align="left">quorum</StyledTableCell>
+                                <StyledTableCell align="left">admin</StyledTableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {policyRows.map((row) => (
+                                <StyledTableRow key={row.date}>
+                                    <StyledTableCell align="left">{row.date}</StyledTableCell>
+                                    <StyledTableCell align="left">{row.window}</StyledTableCell>
+                                    <StyledTableCell align="left">{row.threshold}</StyledTableCell>
+                                    <StyledTableCell align="left">{row.quorum}</StyledTableCell>
+                                    <StyledTableCell align="left">{row.admin}</StyledTableCell>
+                                </StyledTableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </Paper>
+                <Paper elevation={2} style={{ marginTop: '21px' }}>
+                    <div className={classes.heroBlock}>
+                        <h2 style={{ padding: '40px', fontWeight: 900 }}>Members</h2>
+                        <Button variant='outlined' color='primary' className='tableBtn'>
                             edit group
                         </Button>
-                    </Link>
-                </div>
-                <div className={classes.heroBlock}>
-                    <p className='subtitle'>This group is to manage the funds for the Foo developer team’s efforts.</p>
-                </div>
-                <div className={classes.regen}>
-                    <p style={{ marginLeft: '0' }}>group admin</p>
-                    <Link to="#" className={classes.link} onClick={() => console.log('click')} >
-                        regenj1isa90182095dser...
-                    </Link>
-                </div>
-            </div>
-            <Paper elevation={2}>
-                <h2 style={{ padding: '40px', fontWeight: 900 }}>Group Policy</h2>
-                <Table className={table.table} aria-label="customized table">
-                    <TableHead>
-                        <TableRow>
-                            <StyledTableCell>Date</StyledTableCell>
-                            <StyledTableCell align="left">voting window</StyledTableCell>
-                            <StyledTableCell align="left">threshold</StyledTableCell>
-                            <StyledTableCell align="left">quorum</StyledTableCell>
-                            <StyledTableCell align="left">admin</StyledTableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {policyRows.map((row) => (
-                            <StyledTableRow key={row.date}>
-                                <StyledTableCell align="left">{row.date}</StyledTableCell>
-                                <StyledTableCell align="left">{row.window}</StyledTableCell>
-                                <StyledTableCell align="left">{row.threshold}</StyledTableCell>
-                                <StyledTableCell align="left">{row.quorum}</StyledTableCell>
-                                <StyledTableCell align="left">{row.admin}</StyledTableCell>
-                            </StyledTableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </Paper>
-            <Paper elevation={2} style={{ marginTop: '21px' }}>
-                <div className={classes.heroBlock}>
-                    <h2 style={{ padding: '40px', fontWeight: 900 }}>Members</h2>
-                    <Button variant='outlined' color='primary' className='tableBtn'>
-                        edit group
-                    </Button>
-                </div>
-                <Table className={table.table} aria-label="custom pagination table">
-                    <TableHead>
-                        <TableRow>
-                            <StyledTableCell>Adress</StyledTableCell>
-                            <StyledTableCell align="left">voting window</StyledTableCell>
-                            <StyledTableCell align="left">date added</StyledTableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {(rowsPerPage > 0
-                            ? memberRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                            : memberRows
-                        ).map((row) => (
-                            <StyledTableRow key={row.date}>
-                                <StyledTableCell align="left" style={{ width: '15%', padding: '28px 40px' }}>{row.adress}</StyledTableCell>
-                                <StyledTableCell align="left" style={{ width: '15%', padding: '28px 40px' }}>{row.window}</StyledTableCell>
-                                <StyledTableCell align="left" style={{ width: '30%', padding: '28px 40px' }}>{row.date}</StyledTableCell>
-                            </StyledTableRow>
-                        ))}
-                        {emptyRows > 0 && (
-                            <TableRow style={{ height: 53 * emptyRows }}>
-                                <TableCell colSpan={6} />
+                    </div>
+                    <Table className={table.table} aria-label="custom pagination table">
+                        <TableHead>
+                            <TableRow>
+                                <StyledTableCell>Adress</StyledTableCell>
+                                <StyledTableCell align="left">voting window</StyledTableCell>
+                                <StyledTableCell align="left">date added</StyledTableCell>
                             </TableRow>
-                        )}
-                    </TableBody>
-                    <TableFooter>
-                        <TableRow>
-                            {/* <TablePagination
+                        </TableHead>
+                        <TableBody>
+                            {(rowsPerPage > 0
+                                ? memberRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                : memberRows
+                            ).map((row) => (
+                                <StyledTableRow key={row.date}>
+                                    <StyledTableCell align="left" style={{ width: '15%', padding: '28px 40px' }}>{row.adress}</StyledTableCell>
+                                    <StyledTableCell align="left" style={{ width: '15%', padding: '28px 40px' }}>{row.window}</StyledTableCell>
+                                    <StyledTableCell align="left" style={{ width: '30%', padding: '28px 40px' }}>{row.date}</StyledTableCell>
+                                </StyledTableRow>
+                            ))}
+                            {emptyRows > 0 && (
+                                <TableRow style={{ height: 53 * emptyRows }}>
+                                    <TableCell colSpan={6} />
+                                </TableRow>
+                            )}
+                        </TableBody>
+                        <TableFooter>
+                            <TableRow>
+                                {/* <TablePagination
                                 rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
                                 colSpan={3}
                                 count={memberRows.length}
@@ -233,10 +236,11 @@ export const GroupDetails: React.FC<{}> = observer(() => {
                                 onRowsPerPageChange={handleChangeRowsPerPage}
                                 ActionsComponent={TablePaginationActions}
                             /> */}
-                        </TableRow>
-                    </TableFooter>
-                </Table>
-            </Paper>
-        </div>
+                            </TableRow>
+                        </TableFooter>
+                    </Table>
+                </Paper>
+            </div>
+        </Page>
     )
 })

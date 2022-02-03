@@ -20,6 +20,7 @@ import { observer } from 'mobx-react-lite'
 import { ReactComponent as DeligateIcon } from '../../icons/deligate.svg'
 import { ReactComponent as SpendIcon } from '../../icons/spend.svg'
 import { Link, useParams } from 'react-router-dom'
+import { Page } from '../page'
 
 
 export const useStyles = makeStyles(() => ({
@@ -167,88 +168,91 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
     const table = tableStyles()
 
     return (
-        <div className={classes.root}>
-            <div>
-                <div className={classes.heroBlock}>
-                    <h1>Foo Dev Team</h1>
-                    <Link to={`/groups/${groupId}/details`}>
-                        <Button variant="outlined" color="primary" className="btn" style={{ backgroundColor: 'white' }}>
-                            group details
-                        </Button>
-                    </Link>
+        <Page>
+            <div className={classes.root}>
+                <div>
+                    <div className={classes.heroBlock}>
+                        <h1>Foo Dev Team</h1>
+                        <Link to={`/groups/${groupId}/details`}>
+                            <Button variant="outlined" color="primary" className="btn" style={{ backgroundColor: 'white' }}>
+                                group details
+                            </Button>
+                        </Link>
 
-                </div>
-                <div className={classes.heroBlock}>
-                    <p className="subtitle">This group is to manage the funds for the Foo developer team’s efforts.</p>
-                    <p className={classes.date}>Created Nov 29th 2021, 12:00:35 AM</p>
-                </div>
-                <Link to="#" className={classes.link} onClick={() => console.log('click')} >
-                    <ChatBubbleOutline style={{ fontSize: '18px', marginRight: '8px' }} />
-                    View discussion on group forum»
-                </Link>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <div className={classes.regen}>
-                        <h2>1,200</h2>
-                        <p>regen</p>
-                        <span>($2,117 USD)</span>
                     </div>
-                    <FormControl variant="outlined" style={{ width: '30%' }}>
-                        <InputLabel id="demo-simple-select-outlined-label" />
-                        <Select
-                            id="demo-simple-select-outlined"
-                            value={age}
-                            onChange={handleChange}
-                        >
-                            <MenuItem value="">
-                                <em>None</em>
-                            </MenuItem>
-                            <MenuItem value={10}>Ten</MenuItem>
-                            <MenuItem value={20}>Twenty</MenuItem>
-                            <MenuItem value={30}>Thirty</MenuItem>
-                        </Select>
-                    </FormControl>
+                    <div className={classes.heroBlock}>
+                        <p className="subtitle">This group is to manage the funds for the Foo developer team’s efforts.</p>
+                        <p className={classes.date}>Created Nov 29th 2021, 12:00:35 AM</p>
+                    </div>
+                    <Link to="#" className={classes.link} onClick={() => console.log('click')} >
+                        <ChatBubbleOutline style={{ fontSize: '18px', marginRight: '8px' }} />
+                        View discussion on group forum»
+                    </Link>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <div className={classes.regen}>
+                            <h2>1,200</h2>
+                            <p>regen</p>
+                            <span>($2,117 USD)</span>
+                        </div>
+                        <FormControl variant="outlined" style={{ width: '30%' }}>
+                            <InputLabel id="demo-simple-select-outlined-label" />
+                            <Select
+                                id="demo-simple-select-outlined"
+                                value={age}
+                                onChange={handleChange}
+                            >
+                                <MenuItem value="">
+                                    <em>None</em>
+                                </MenuItem>
+                                <MenuItem value={10}>Ten</MenuItem>
+                                <MenuItem value={20}>Twenty</MenuItem>
+                                <MenuItem value={30}>Thirty</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </div>
                 </div>
+                <Paper elevation={2} className={classes.actions}>
+                    <h3>Actions</h3>
+                    <div className="actionBtns">
+                        <Button variant="outlined" color="primary" className="btn">
+                            <SvgIcon component={DeligateIcon} style={{ fontSize: '20px', height: '25px', marginRight: '5px' }} />
+                            delegate funds
+                        </Button>
+                        <Button variant="outlined" color="primary" className="btn">
+                            <SvgIcon component={SpendIcon} style={{ fontSize: '20px', height: '25px', marginRight: '5px' }} />
+                            spend funds
+                        </Button><Button variant="outlined" color="primary" className="btn">
+                            <Description style={{ fontSize: '20px', marginRight: '5px' }} />
+                            text proposal
+                        </Button><Button variant="outlined" color="primary" className="btn">
+                            <SettingsRounded style={{ fontSize: '20px', marginRight: '5px' }} />
+                            custom proposal
+                        </Button>
+                    </div>
+                </Paper>
+                <Paper elevation={2}>
+                    <h3 style={{ padding: '40px' }}>Proposed Actions</h3>
+                    <Table className={table.table} aria-label="customized table">
+                        <TableHead>
+                            <TableRow>
+                                <StyledTableCell>Date</StyledTableCell>
+                                <StyledTableCell align="left">Name</StyledTableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {rows.map((row) => (
+                                <StyledTableRow key={row.number}>
+                                    <StyledTableCell align="left" style={{ width: '30%' }}>{row.date}</StyledTableCell>
+                                    <StyledTableCell align="left">{row.status}</StyledTableCell>
+                                    <StyledTableCell align="left">{row.number}</StyledTableCell>
+                                    <StyledTableCell align="left">{row.desc}</StyledTableCell>
+                                </StyledTableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </Paper>
+
             </div>
-            <Paper elevation={2} className={classes.actions}>
-                <h3>Actions</h3>
-                <div className="actionBtns">
-                    <Button variant="outlined" color="primary" className="btn">
-                        <SvgIcon component={DeligateIcon} style={{ fontSize: '20px', height: '25px', marginRight: '5px' }} />
-                        delegate funds
-                    </Button>
-                    <Button variant="outlined" color="primary" className="btn">
-                        <SvgIcon component={SpendIcon} style={{ fontSize: '20px', height: '25px', marginRight: '5px' }} />
-                        spend funds
-                    </Button><Button variant="outlined" color="primary" className="btn">
-                        <Description style={{ fontSize: '20px', marginRight: '5px' }} />
-                        text proposal
-                    </Button><Button variant="outlined" color="primary" className="btn">
-                        <SettingsRounded style={{ fontSize: '20px', marginRight: '5px' }} />
-                        custom proposal
-                    </Button>
-                </div>
-            </Paper>
-            <Paper elevation={2}>
-                <h3 style={{ padding: '40px' }}>Proposed Actions</h3>
-                <Table className={table.table} aria-label="customized table">
-                    <TableHead>
-                        <TableRow>
-                            <StyledTableCell>Date</StyledTableCell>
-                            <StyledTableCell align="left">Name</StyledTableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {rows.map((row) => (
-                            <StyledTableRow key={row.number}>
-                                <StyledTableCell align="left" style={{ width: '30%' }}>{row.date}</StyledTableCell>
-                                <StyledTableCell align="left">{row.status}</StyledTableCell>
-                                <StyledTableCell align="left">{row.number}</StyledTableCell>
-                                <StyledTableCell align="left">{row.desc}</StyledTableCell>
-                            </StyledTableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </Paper>
-        </div>
+        </Page>
     )
 })

@@ -1,12 +1,26 @@
-import { Button, IconButton, Link, makeStyles, Paper, Table, TableBody, TableCell, TableFooter, TableHead, TablePagination, TableRow, useTheme, withStyles } from '@material-ui/core';
-import { ArrowBack, KeyboardArrowLeft, KeyboardArrowRight } from '@material-ui/icons';
-import { observer } from 'mobx-react-lite';
-import React, { useEffect } from 'react';
-import { useStyles } from './admin-viev';
-import PropTypes from 'prop-types';
+import React from 'react'
+import {
+    Button,
+    IconButton,
+    makeStyles,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableFooter,
+    TableHead,
+    TableRow,
+    useTheme,
+    withStyles
+} from '@material-ui/core'
+import { ArrowBack, KeyboardArrowLeft, KeyboardArrowRight } from '@material-ui/icons'
+import { observer } from 'mobx-react-lite'
+import { useStyles } from './admin-view'
+import PropTypes from 'prop-types'
+import { Link, useParams } from 'react-router-dom'
 
 function createPolicyData(date, window, threshold, quorum, admin) {
-    return { date, window, threshold, quorum, admin };
+    return { date, window, threshold, quorum, admin }
 }
 
 const useStyles1 = makeStyles((theme) => ({
@@ -14,26 +28,26 @@ const useStyles1 = makeStyles((theme) => ({
         flexShrink: 0,
         marginLeft: theme.spacing(2.5),
     },
-}));
+}))
 
 const policyRows = [
     createPolicyData("21.22.12", '20 days', '49 / 100 (49%)', '40%', 'regencx2891203isoasper...'),
     createPolicyData("53.63.24", '15 days', '51 / 100 (51%)', '50%', 'regencx2891203isoasper...'),
     createPolicyData("45.42.12", '10 days', '50 / 100 (50%)', '30%', 'regencx2891203isoasper...'),
-];
+]
 
 function TablePaginationActions(props) {
-    const classes = useStyles1();
-    const theme = useTheme();
-    const { count, page, rowsPerPage, onPageChange } = props;
+    const classes = useStyles1()
+    const theme = useTheme()
+    const { count, page, rowsPerPage, onPageChange } = props
 
     const handleBackButtonClick = (event) => {
-        onPageChange(event, page - 1);
-    };
+        onPageChange(event, page - 1)
+    }
 
     const handleNextButtonClick = (event) => {
-        onPageChange(event, page + 1);
-    };
+        onPageChange(event, page + 1)
+    }
 
     return (
         <div className={classes.root}>
@@ -48,7 +62,7 @@ function TablePaginationActions(props) {
                 {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
             </IconButton>
         </div>
-    );
+    )
 }
 
 TablePaginationActions.propTypes = {
@@ -56,8 +70,7 @@ TablePaginationActions.propTypes = {
     onPageChange: PropTypes.func.isRequired,
     page: PropTypes.number.isRequired,
     rowsPerPage: PropTypes.number.isRequired,
-};
-
+}
 
 function createMemberData(adress, window, date) {
     return { adress, window, date }
@@ -67,9 +80,9 @@ const memberRows = [
     createMemberData('regencx2891203isoasper...', '1', '23.01.21'),
     createMemberData('regencx2891203isoasper...', '1', '12.01.21'),
     createMemberData('regencx2891203isoasper...', '1', '05.01.21'),
-];
+]
 
-const StyledTableCell = withStyles((theme) => ({
+const StyledTableCell = withStyles(() => ({
     head: {
         padding: '23px 40px',
         fontSize: '12px',
@@ -81,7 +94,7 @@ const StyledTableCell = withStyles((theme) => ({
         padding: '48px 40px',
         fontSize: '16px',
     },
-}))(TableCell);
+}))(TableCell)
 
 const StyledTableRow = withStyles((theme) => ({
     root: {
@@ -90,54 +103,59 @@ const StyledTableRow = withStyles((theme) => ({
             backgroundColor: theme.palette.action.hover,
         },
     },
-}))(TableRow);
+}))(TableRow)
 
 const tableStyles = makeStyles({
     table: {
         borderTop: '1px solid #EFEFEF',
         minWidth: 700,
     },
-});
+})
 
 
 export const GroupDetails: React.FC<{}> = observer(() => {
-    const classes = useStyles();
-    const table = tableStyles();
+    const classes = useStyles()
+    const table = tableStyles()
 
-    const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(4);
+    const pathParams: any = useParams()
+    const groupId = pathParams.id === 'new' ? -1 : Number(pathParams.id)
 
-    const emptyRows = rowsPerPage - Math.min(rowsPerPage, memberRows.length - page * rowsPerPage);
+    const [page, setPage] = React.useState(0)
+    const [rowsPerPage, setRowsPerPage] = React.useState(4)
+
+    const emptyRows = rowsPerPage - Math.min(rowsPerPage, memberRows.length - page * rowsPerPage)
 
     const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
+        setPage(newPage)
+    }
 
     const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
-    };
+        setRowsPerPage(parseInt(event.target.value, 10))
+        setPage(0)
+    }
 
 
     return (
         <div className={classes.root}>
             <div>
-                <Link href="#" style={{ fontSize: '12px', textTransform: 'uppercase', fontWeight: 800 }} className={classes.link} onClick={() => console.log('click')} >
+                <Link to="#" style={{ fontSize: '12px', textTransform: 'uppercase', fontWeight: 800 }} className={classes.link} onClick={() => console.log('click')} >
                     <ArrowBack style={{ fontSize: '18px', marginRight: '8px' }} />
                     Foo dev team
                 </Link>
                 <div className={classes.heroBlock}>
                     <h1>Group Details</h1>
-                    <Button variant="contained" color="primary" className='btn'>
-                        edit group
-                    </Button>
+                    <Link to={`/groups/${groupId}`}>
+                        <Button variant="contained" color="primary" className='btn'>
+                            edit group
+                        </Button>
+                    </Link>
                 </div>
                 <div className={classes.heroBlock}>
                     <p className='subtitle'>This group is to manage the funds for the Foo developer team’s efforts.</p>
                 </div>
                 <div className={classes.regen}>
                     <p style={{ marginLeft: '0' }}>group admin</p>
-                    <Link href="#" className={classes.link} onClick={() => console.log('click')} >
+                    <Link to="#" className={classes.link} onClick={() => console.log('click')} >
                         regenj1isa90182095dser...
                     </Link>
                 </div>

@@ -8,6 +8,8 @@ import { EditGroup } from './pages/edit-group/edit-group'
 
 import './app.css'
 import { Settings } from './pages/settings/settings'
+import { GroupAdminView } from './pages/groups/admin-view'
+import { GroupDetails } from './pages/groups/group-details'
 
 
 export const App: React.FC = () => {
@@ -23,6 +25,12 @@ export const App: React.FC = () => {
                     <Page>
                         <Groups />
                     </Page>
+                </Route>
+                <Route exact path={Routes.GROUPS_ADMIN_VIEW}>
+                    <GroupAdminView />
+                </Route>
+                <Route exact path={Routes.GROUPS_DETAILS}>
+                    <GroupDetails />
                 </Route>
                 <Route exact path={Routes.GROUPS_EDIT}>
                     <EditGroup />

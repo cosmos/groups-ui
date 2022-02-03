@@ -332,27 +332,32 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                     {groupId === -1 ? 'Create Group Policy' : 'Edit Group Policy'}
                                 </div>
                                 <Paper elevation={2} style={{ padding: '50px 30px' }}>
-                                    <FormControl variant="outlined" className={classes.label}>
+
+                                    <div className={classes.label}>
                                         <div className={classes.inputTitle}>Group
                                             <p className="subTitle">All members addresses of this group will be added to
                                                 this group account</p>
+
                                         </div>
-                                        <InputLabel id="demo-simple-select-outlined-label">
+                                        <FormControl variant="outlined" fullWidth>
+                                            <InputLabel id="demo-simple-select-outlined-label" ></InputLabel>
                                             <Select
+                                                style={{ height: '56px' }}
                                                 fullWidth
                                                 id="demo-simple-select-outlined"
                                                 value={group}
                                                 onChange={handleChange}
                                             >
-                                                <MenuItem value="Group">
+                                                <MenuItem value="">
                                                     <em>None</em>
                                                 </MenuItem>
                                                 <MenuItem value={10}>Ten</MenuItem>
                                                 <MenuItem value={20}>Twenty</MenuItem>
                                                 <MenuItem value={30}>Thirty</MenuItem>
                                             </Select>
-                                        </InputLabel>
-                                    </FormControl>
+                                        </FormControl>
+
+                                    </div>
                                     <div className={classes.label}>
                                         <div className={classes.inputTitle}>
                                             Voting window
@@ -422,14 +427,14 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                         </div>
                                         <div>
                                             <Button className={classes.finishedBtn}
-                                                    color="primary"
-                                                    onClick={async () => {
-                                                        setLoading(true)
-                                                        const broadcastRes = await createGroup()
-                                                        setLoading(false)
-                                                        alert(`BroadcastRes: 
+                                                color="primary"
+                                                onClick={async () => {
+                                                    setLoading(true)
+                                                    const broadcastRes = await createGroup()
+                                                    setLoading(false)
+                                                    alert(`BroadcastRes: 
 ${JSON.stringify(broadcastRes, null, 2)}`)
-                                                    }}
+                                                }}
                                             >
                                                 {'Create group'}
                                             </Button>

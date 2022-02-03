@@ -54,7 +54,7 @@ export const Groups: React.FC<{}> = observer(() => {
         fetchGroups()
     }, [fetchGroups])
 
-    const tableStyle = useStyles();
+    const tableStyle = useStyles()
 
     return (
         <div style={{ width: '1140px' }}>
@@ -121,7 +121,7 @@ export const Groups: React.FC<{}> = observer(() => {
                                 <TableCell className={tableStyle.col} style={{
                                     fontSize: '16px',
                                     fontFamily: " 'Lato' "
-                                }}><Link to={`/groups/${group.info.group_id}`}>Edit</Link></TableCell>
+                                }}><Link to={`/groups/${group.info.group_id}/admin-view`}>Admin View</Link></TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

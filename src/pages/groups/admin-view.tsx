@@ -1,12 +1,28 @@
-import { Button, FormControl, InputLabel, Link, makeStyles, MenuItem, Paper, Select, SvgIcon, Table, TableBody, TableCell, TableHead, TableRow, withStyles } from '@material-ui/core';
-import { ChatBubbleOutline, Description, SettingsRounded } from '@material-ui/icons';
-import { observer } from 'mobx-react-lite';
-import React, { useEffect } from 'react';
-import { ReactComponent as DeligateIcon } from '../../icons/deligate.svg';
-import { ReactComponent as SpendIcon } from '../../icons/spend.svg';
+import React from 'react'
+import {
+    Button,
+    FormControl,
+    InputLabel,
+    makeStyles,
+    MenuItem,
+    Paper,
+    Select,
+    SvgIcon,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableRow,
+    withStyles
+} from '@material-ui/core'
+import { ChatBubbleOutline, Description, SettingsRounded } from '@material-ui/icons'
+import { observer } from 'mobx-react-lite'
+import { ReactComponent as DeligateIcon } from '../../icons/deligate.svg'
+import { ReactComponent as SpendIcon } from '../../icons/spend.svg'
+import { Link, useParams } from 'react-router-dom'
 
 
-export const useStyles = makeStyles((theme) => ({
+export const useStyles = makeStyles(() => ({
     root: {
         padding: '0px 24px',
         width: '1200px',
@@ -93,9 +109,9 @@ export const useStyles = makeStyles((theme) => ({
         }
     }
 
-}));
+}))
 
-const StyledTableCell = withStyles((theme) => ({
+const StyledTableCell = withStyles(() => ({
     head: {
         padding: '23px 40px',
         fontSize: '12px',
@@ -107,7 +123,7 @@ const StyledTableCell = withStyles((theme) => ({
         padding: '48px 40px',
         fontSize: '16px',
     },
-}))(TableCell);
+}))(TableCell)
 
 const StyledTableRow = withStyles((theme) => ({
     root: {
@@ -116,10 +132,10 @@ const StyledTableRow = withStyles((theme) => ({
             backgroundColor: theme.palette.action.hover,
         },
     },
-}))(TableRow);
+}))(TableRow)
 
 function createData(date, status, number, desc) {
-    return { date, status, number, desc };
+    return { date, status, number, desc }
 }
 
 const rows = [
@@ -128,39 +144,45 @@ const rows = [
     createData('52.15.2021', 'unfinalized', `#3`, 'sometext in description'),
     createData('02.02.2021', 'unfinalized', `#4`, 'sometext in description'),
     createData('21.11.2412', 'unfinalized', `#5`, 'sometext in description'),
-];
+]
 
 const tableStyles = makeStyles({
     table: {
         borderTop: '1px solid #EFEFEF',
         minWidth: 700,
     },
-});
+})
 
-export const GroupAdminViev: React.FC<{}> = observer(() => {
-    const [age, setAge] = React.useState('');
+export const GroupAdminView: React.FC<{}> = observer(() => {
+    const [age, setAge] = React.useState('')
+
+    const pathParams: any = useParams()
+    const groupId = pathParams.id === 'new' ? -1 : Number(pathParams.id)
 
     const handleChange = (event) => {
-        setAge(event.target.value);
-    };
+        setAge(event.target.value)
+    }
 
-    const classes = useStyles();
-    const table = tableStyles();
+    const classes = useStyles()
+    const table = tableStyles()
 
     return (
         <div className={classes.root}>
             <div>
                 <div className={classes.heroBlock}>
                     <h1>Foo Dev Team</h1>
-                    <Button variant="outlined" color="primary" className='btn' style={{ backgroundColor: 'white' }}>
-                        group details
-                    </Button>
+                    <Link to={`/groups/${groupId}/details`}>
+                        <Button variant="outlined" color="primary" className="btn" style={{ backgroundColor: 'white' }}>
+                            group details
+                        </Button>
+                    </Link>
+
                 </div>
                 <div className={classes.heroBlock}>
-                    <p className='subtitle'>This group is to manage the funds for the Foo developer team’s efforts.</p>
+                    <p className="subtitle">This group is to manage the funds for the Foo developer team’s efforts.</p>
                     <p className={classes.date}>Created Nov 29th 2021, 12:00:35 AM</p>
                 </div>
-                <Link href="#" className={classes.link} onClick={() => console.log('click')} >
+                <Link to="#" className={classes.link} onClick={() => console.log('click')} >
                     <ChatBubbleOutline style={{ fontSize: '18px', marginRight: '8px' }} />
                     View discussion on group forum»
                 </Link>
@@ -171,7 +193,7 @@ export const GroupAdminViev: React.FC<{}> = observer(() => {
                         <span>($2,117 USD)</span>
                     </div>
                     <FormControl variant="outlined" style={{ width: '30%' }}>
-                        <InputLabel id="demo-simple-select-outlined-label"></InputLabel>
+                        <InputLabel id="demo-simple-select-outlined-label" />
                         <Select
                             id="demo-simple-select-outlined"
                             value={age}
@@ -189,18 +211,18 @@ export const GroupAdminViev: React.FC<{}> = observer(() => {
             </div>
             <Paper elevation={2} className={classes.actions}>
                 <h3>Actions</h3>
-                <div className='actionBtns'>
-                    <Button variant="outlined" color="primary" className='btn'>
+                <div className="actionBtns">
+                    <Button variant="outlined" color="primary" className="btn">
                         <SvgIcon component={DeligateIcon} style={{ fontSize: '20px', height: '25px', marginRight: '5px' }} />
                         delegate funds
                     </Button>
-                    <Button variant="outlined" color="primary" className='btn'>
+                    <Button variant="outlined" color="primary" className="btn">
                         <SvgIcon component={SpendIcon} style={{ fontSize: '20px', height: '25px', marginRight: '5px' }} />
                         spend funds
-                    </Button><Button variant="outlined" color="primary" className='btn'>
+                    </Button><Button variant="outlined" color="primary" className="btn">
                         <Description style={{ fontSize: '20px', marginRight: '5px' }} />
                         text proposal
-                    </Button><Button variant="outlined" color="primary" className='btn'>
+                    </Button><Button variant="outlined" color="primary" className="btn">
                         <SettingsRounded style={{ fontSize: '20px', marginRight: '5px' }} />
                         custom proposal
                     </Button>
@@ -217,7 +239,7 @@ export const GroupAdminViev: React.FC<{}> = observer(() => {
                     </TableHead>
                     <TableBody>
                         {rows.map((row) => (
-                            <StyledTableRow key={row.status}>
+                            <StyledTableRow key={row.number}>
                                 <StyledTableCell align="left" style={{ width: '30%' }}>{row.date}</StyledTableCell>
                                 <StyledTableCell align="left">{row.status}</StyledTableCell>
                                 <StyledTableCell align="left">{row.number}</StyledTableCell>

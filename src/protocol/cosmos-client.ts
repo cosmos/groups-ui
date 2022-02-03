@@ -56,16 +56,16 @@ export class CosmosClient {
         }
         this.keplr = keplr
 
-        await this.keplr.experimentalSuggestChain(chainInfo);
-        await this.keplr.enable(chainInfo.chainId);
+        await this.keplr.experimentalSuggestChain(chainInfo)
+        await this.keplr.enable(chainInfo.chainId)
 
-        this.registry = new Registry();
+        this.registry = new Registry()
 
         defaultRegistryTypes.forEach((v) => {
-            this.registry.register(v[0], v[1]);
-        });
+            this.registry.register(v[0], v[1])
+        })
 
-        const offlineSigner = this.keplr.getOfflineSigner(chainInfo.chainId);
+        const offlineSigner = this.keplr.getOfflineSigner(chainInfo.chainId)
         console.log('offlineSigner', offlineSigner)
         console.log('this.registry', this.registry)
 
@@ -75,7 +75,7 @@ export class CosmosClient {
             {
                 registry: this.registry
             }
-        );
+        )
 
         console.log('this.stargateClient.getChainId()', await this.stargateClient.getChainId())
 
@@ -89,6 +89,6 @@ export class CosmosClient {
             // setupSlashingExtension,
             // setupStakingExtension,
             // setupSupplyExtension
-        );
+        )
     }
 }

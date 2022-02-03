@@ -29,11 +29,11 @@ export class GroupsService {
         this.cosmosClient.registry.register(
             "/regen.group.v1alpha1.MsgCreateGroup",
             MsgCreateGroup
-        );
+        )
         this.cosmosClient.registry.register(
             `/${protobufPackage}.MsgUpdateGroupMetadata`,
             MsgUpdateGroupMetadata
-        );
+        )
     }
 
     groupsByAdmin = async (admin: string): Promise<GroupInfo[]> => {

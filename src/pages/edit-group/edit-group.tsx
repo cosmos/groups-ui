@@ -4,6 +4,7 @@ import { useStores } from '../../shared-state/repo'
 import {
     Button,
     FormControl,
+    IconButton,
     InputLabel,
     MenuItem,
     Paper,
@@ -18,6 +19,7 @@ import { Routes } from '../../routes'
 import { toUint8Array } from '../../shared-state/groups-store'
 import { makeStyles } from '@material-ui/core/styles'
 import { Page } from '../page'
+import { Delete } from '@material-ui/icons'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -282,6 +284,9 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                                             })
                                                         }}
                                                     />
+                                                    <IconButton aria-label="delete">
+                                                        <Delete />
+                                                    </IconButton>
                                                     {i === editedGroup.members.length - 1 && (
                                                         <Button
                                                             className={classes.cardBtn}

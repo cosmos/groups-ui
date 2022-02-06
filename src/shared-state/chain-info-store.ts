@@ -6,9 +6,6 @@ export class ChainInfoStore {
     @observable
     chainInfo: ChainInfo = getDefaultChainInfo()
 
-    @observable
-    keplrAccount: string = ""
-
     constructor() {
         makeObservable(this)
     }

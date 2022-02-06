@@ -1,6 +1,11 @@
 import { getService, service } from './services'
 import { ChainInfo } from '@keplr-wallet/types'
-import { MsgCreateGroup, MsgUpdateGroupMetadata, protobufPackage } from '../generated/regen/group/v1alpha1/tx'
+import {
+    MsgCreateGroup,
+    MsgUpdateGroupMembers,
+    MsgUpdateGroupMetadata,
+    protobufPackage
+} from '../generated/regen/group/v1alpha1/tx'
 import { CosmosClient } from './cosmos-client'
 import { GroupAccountInfo, GroupInfo, GroupMember } from '../generated/regen/group/v1alpha1/types'
 import {
@@ -33,6 +38,10 @@ export class GroupsService {
         this.cosmosClient.registry.register(
             `/${protobufPackage}.MsgUpdateGroupMetadata`,
             MsgUpdateGroupMetadata
+        )
+        this.cosmosClient.registry.register(
+            `/${protobufPackage}.MsgUpdateGroupMembers`,
+            MsgUpdateGroupMembers
         )
     }
 

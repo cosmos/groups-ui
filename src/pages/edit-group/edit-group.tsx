@@ -449,19 +449,29 @@ ${JSON.stringify(broadcastRes, null, 2)}`)
                             } else {
                                 return (
                                     <div>
-                                        <Button
-                                            color="primary"
-                                            disabled={loading}
-                                            onClick={async () => {
-                                                setLoading(true)
-                                                const broadcastRes = await saveGroup()
-                                                setLoading(false)
-                                                alert(`BroadcastRes: 
+                                        <div className={classes.title}>
+                                            {'Finished editing'}
+                                        </div>
+                                        <div className={classes.subTitle}>
+                                            You have successfully edited your group.
+                                        </div>
+                                        <div>
+                                            <Button
+                                                className={classes.finishedBtn}
+                                                variant='outlined'
+                                                color="primary"
+                                                disabled={loading}
+                                                onClick={async () => {
+                                                    setLoading(true)
+                                                    const broadcastRes = await saveGroup()
+                                                    setLoading(false)
+                                                    alert(`BroadcastRes: 
 ${JSON.stringify(broadcastRes, null, 2)}`)
-                                            }}
-                                        >
-                                            {'Save Group'}
-                                        </Button>
+                                                }}
+                                            >
+                                                {'Save Group'}
+                                            </Button>
+                                        </div>
                                     </div>
                                 )
                             }

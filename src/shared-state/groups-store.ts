@@ -1,9 +1,15 @@
-import { action, makeObservable, observable, runInAction } from 'mobx'
+import { action, makeObservable, observable, runInAction, toJS } from 'mobx'
 import { GroupsService } from '../protocol/groups-service'
 import { GroupAccountInfo, GroupInfo, GroupMember } from '../generated/regen/group/v1alpha1/types'
 import { CosmosNodeService } from '../protocol/cosmos-node-service'
 import { coins } from '@cosmjs/launchpad'
-import { MsgCreateGroup, MsgUpdateGroupMetadata, protobufPackage } from '../generated/regen/group/v1alpha1/tx'
+import {
+    MsgCreateGroup,
+    MsgUpdateGroupMembers,
+    MsgUpdateGroupMetadata,
+    protobufPackage
+} from '../generated/regen/group/v1alpha1/tx'
+import { cloneDeep, isEqual } from 'lodash'
 
 // {"name": "bla", "description": "blabbl", "created": 1640599686655, "lastEdited": 1640599686655, "linkToForum": "", "other": "blabla"}
 interface GroupMetadata {
@@ -25,6 +31,8 @@ export interface Group {
 export class GroupsStore {
     @observable
     groups: Group[] = []
+
+    originalEditedGroup: Group = null
 
     @observable
     editedGroup: Group = null
@@ -80,6 +88,7 @@ export class GroupsStore {
 
         runInAction(() => {
             this.editedGroup = editedGroup
+            this.originalEditedGroup = cloneDeep(editedGroup)
         })
 
         return editedGroup
@@ -162,37 +171,54 @@ export class GroupsStore {
         const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
         const me = key.bech32Address
 
-        const msg: MsgUpdateGroupMetadata = {
-            admin: this.editedGroup.info.admin,
-            // members: this.editedGroup.members.map(m => m.member),
-            metadata: toUint8Array(JSON.stringify({
-                ...this.editedGroup.metadata,
-                lastEdited: Date.now(),
-            })),
-            group_id: this.editedGroup.info.group_id,
-            // admin: me,
-            // metadata: toUint8Array(JSON.stringify({
-            //     name: 'Blaaaa',
-            //     description: 'blabbl',
-            //     created: 1640599686655,
-            //     lastEdited: Date.now(),
-            //     linkToForum: '',
-            //     other: 'blabla'
-            // }))
-        }
-        const msgAny = {
-            typeUrl: `/${protobufPackage}.MsgUpdateGroupMetadata`,
-            value: msg
+        const results = []
+        if (!isEqual(toJS(this.editedGroup.metadata), this.originalEditedGroup.metadata)) {
+            const msg: MsgUpdateGroupMetadata = {
+                admin: this.editedGroup.info.admin,
+                group_id: this.editedGroup.info.group_id,
+                metadata: toUint8Array(JSON.stringify({
+                    ...this.editedGroup.metadata,
+                    lastEdited: Date.now(),
+                })),
+            }
+            const msgAny = {
+                typeUrl: `/${protobufPackage}.MsgUpdateGroupMetadata`,
+                value: msg
+            }
+
+            const fee = {
+                amount: coins(0, CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom),
+                gas: '2000000'
+            }
+
+            results.push(await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny], fee))
         }
 
-        const fee = {
-            amount: coins(0, CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom),
-            gas: '2000000'
+        if (!isEqual(toJS(this.editedGroup.members), this.originalEditedGroup.members)) {
+            const msg: MsgUpdateGroupMembers = {
+                admin: this.editedGroup.info.admin,
+                group_id: this.editedGroup.info.group_id,
+                member_updates: this.editedGroup.members.map(m => ({
+                    address: m.member.address,
+                    weight: m.member.weight,
+                    metadata: m.member.metadata
+                })),
+            }
+            const msgAny = {
+                typeUrl: `/${protobufPackage}.MsgUpdateGroupMembers`,
+                value: msg
+            }
+
+            const fee = {
+                amount: coins(0, CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom),
+                gas: '2000000'
+            }
+
+            results.push(await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny], fee))
         }
 
-        const broadcastRes = await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny], fee)
-        console.log('broadcastRes', broadcastRes)
-        return broadcastRes
+        console.log(results)
+        return results
     }
 }
 

@@ -1,13 +1,25 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import classNames from 'classnames'
 import { Routes } from '../routes'
 import { Link, useLocation } from 'react-router-dom'
 
 import './nav.css'
+import { CosmosNodeService } from '../protocol/cosmos-node-service'
 
 export const Nav: React.FC<{}> = observer(() => {
     const { pathname } = useLocation()
+    const [userString, setUserString] = useState('')
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
+            console.log('key', key)
+            setUserString(`${key.name}: ${key.bech32Address}`)
+        }
+
+        fetchData()
+    }, [])
 
     return (
         <div style={{
@@ -54,6 +66,9 @@ export const Nav: React.FC<{}> = observer(() => {
                         <Link to={Routes.SETTINGS}>SETTINGS</Link>
                     </li>
                 </ul>
+                <div>
+                    { userString }
+                </div>
             </div>
         </div>
     )

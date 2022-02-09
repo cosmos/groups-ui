@@ -42,6 +42,9 @@ export class CosmosClient {
 
     signAndBroadcast = (signerAddress: string, messages: readonly EncodeObject[], fee: StdFee, memo?: string): Promise<BroadcastTxResponse> => {
         try {
+            if (!this.stargateClient) {
+                throw new Error("NPE!")
+            }
             return this.stargateClient.signAndBroadcast(signerAddress, messages, fee, memo)
         } catch (e) {
             console.error(`error when stargateClient signAndBroadcast`, e)
@@ -69,15 +72,17 @@ export class CosmosClient {
         console.log('offlineSigner', offlineSigner)
         console.log('this.registry', this.registry)
 
-        this.stargateClient = await SigningStargateClient.connectWithSigner(
-            chainInfo.rpc,
-            offlineSigner,
-            {
-                registry: this.registry
-            }
-        )
+        setTimeout(async () => {
+            this.stargateClient = await SigningStargateClient.connectWithSigner( // TODO it is a slow one, mb not to block rendering?
+                chainInfo.rpc,
+                offlineSigner,
+                {
+                    registry: this.registry
+                }
+            )
 
-        console.log('this.stargateClient.getChainId()', await this.stargateClient.getChainId())
+            console.log('this.stargateClient.getChainId()', await this.stargateClient.getChainId())
+        }, 0)
 
         this.lcdClient = LcdClient.withExtensions(
             { apiUrl: chainInfo.rest },

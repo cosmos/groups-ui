@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useStores } from '../../shared-state/repo'
 import { Button, makeStyles, Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core'
@@ -50,8 +50,10 @@ const useStyles = makeStyles((theme) => ({
 
 export const Groups: React.FC<{}> = observer(() => {
     const { groups, fetchGroups } = useStores().groupsStore
+    const [loading, setLoading] = useState(true)
     useEffect(() => {
         fetchGroups()
+            .then(() => setLoading(false))
     }, [fetchGroups])
 
     const tableStyle = useStyles()
@@ -127,6 +129,7 @@ export const Groups: React.FC<{}> = observer(() => {
                     </TableBody>
                 </Table>
             </Paper>
+            { loading && <div>{'loading ...'}</div> }
             <br />
             <br />
             {/*<pre style={{ maxWidth: 400, overflowX: 'scroll' }}>*/}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useStores } from '../../shared-state/repo'
-import { Button, makeStyles, Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core'
+import { Button, makeStyles, Paper, Table, TableBody, TableCell, TableHead, TableRow, withStyles } from '@material-ui/core'
 import { Routes } from '../../routes'
 import { Link } from 'react-router-dom'
 
@@ -30,10 +30,15 @@ const useStyles = makeStyles((theme) => ({
     },
 
     nameCol: {
+        fontWeight: 900,
+        fontSize: '18px'
         // width: '30%',
     },
 
     col: {
+        fontSize: '16px',
+        fontFamily: " 'Lato', sans-serif ",
+        padding: '48px 16px',
         // width: '20%'
     },
 
@@ -47,6 +52,15 @@ const useStyles = makeStyles((theme) => ({
         // }
     }
 }))
+
+const StyledTableRow = withStyles((theme) => ({
+    root: {
+        textAlign: 'left',
+        '&:nth-of-type(odd)': {
+            backgroundColor: '#FAFAFA',
+        },
+    },
+}))(TableRow)
 
 export const Groups: React.FC<{}> = observer(() => {
     const { groups, fetchGroups } = useStores().groupsStore
@@ -99,32 +113,17 @@ export const Groups: React.FC<{}> = observer(() => {
                     </TableHead>
                     <TableBody>
                         {groups.map(group => (
-                            <TableRow key={group.info.group_id} className={tableStyle.tableItem}>
-                                <TableCell component="th" scope="row" className={tableStyle.nameCol} style={{ fontWeight: 900, fontSize: '18px' }}>
+                            <StyledTableRow key={group.info.group_id} className={tableStyle.tableItem}>
+                                <TableCell component="th" scope="row" className={tableStyle.nameCol}>
                                     {group.metadata.name}
                                 </TableCell>
-                                <TableCell className={tableStyle.col} style={{
-                                    fontSize: '16px',
-                                    fontFamily: " 'Lato' "
-                                }}>{new Date(group.metadata.created).toISOString()}</TableCell>
-                                <TableCell className={tableStyle.col} style={{
-                                    fontSize: '16px',
-                                    fontFamily: " 'Lato' "
-                                }}>{new Date(group.metadata.lastEdited).toISOString()}</TableCell>
+                                <TableCell className={tableStyle.col}>{new Date(group.metadata.created).toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</TableCell>
+                                <TableCell className={tableStyle.col}>{new Date(group.metadata.lastEdited).toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</TableCell>
                                 {/* <TableCell align="right">{group.metadata.description}</TableCell> */}
-                                <TableCell className={tableStyle.col} style={{
-                                    fontSize: '16px',
-                                    fontFamily: " 'Lato' "
-                                }}>{(group.members || []).length}</TableCell>
-                                <TableCell className={tableStyle.col} style={{
-                                    fontSize: '16px',
-                                    fontFamily: " 'Lato' "
-                                }}>TODO</TableCell>
-                                <TableCell className={tableStyle.col} style={{
-                                    fontSize: '16px',
-                                    fontFamily: " 'Lato' "
-                                }}><Link to={`/groups/${group.info.group_id}/admin-view`}>Admin View</Link></TableCell>
-                            </TableRow>
+                                <TableCell className={tableStyle.col}>{(group.members || []).length}</TableCell>
+                                <TableCell className={tableStyle.col}>TODO</TableCell>
+                                <TableCell className={tableStyle.col}><Link to={`/groups/${group.info.group_id}/admin-view`}>Admin View</Link></TableCell>
+                            </StyledTableRow>
                         ))}
                     </TableBody>
                 </Table>

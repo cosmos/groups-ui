@@ -4,12 +4,13 @@ import { GroupAccountInfo, GroupInfo, GroupMember } from '../generated/regen/gro
 import { CosmosNodeService } from '../protocol/cosmos-node-service'
 import { coins } from '@cosmjs/launchpad'
 import {
-    MsgCreateGroup,
+    MsgCreateGroup, MsgCreateGroupAccount,
     MsgUpdateGroupMembers,
     MsgUpdateGroupMetadata,
     protobufPackage
 } from '../generated/regen/group/v1alpha1/tx'
 import { cloneDeep, isEqual } from 'lodash'
+import { BroadcastTxResponse } from '@cosmjs/stargate/build/stargateclient'
 
 // {"name": "bla", "description": "blabbl", "created": 1640599686655, "lastEdited": 1640599686655, "linkToForum": "", "other": "blabla"}
 interface GroupMetadata {
@@ -21,10 +22,16 @@ interface GroupMetadata {
     other: string
 }
 
+interface GroupPolicy {
+    threshold: number
+    timeoutInDays: number
+}
+
 export interface Group {
     info: Omit<GroupInfo, 'metadata'>
     members: GroupMember[]
-    groupAccounts: GroupAccountInfo[]
+    // groupAccounts: GroupAccountInfo[]
+    policy: GroupPolicy
     metadata: GroupMetadata
 }
 
@@ -47,19 +54,21 @@ export class GroupsStore {
 
         const groups: Group[] = []
 
-        for (const g of groupInfoItems) {
-            const results = await Promise.all([
-                GroupsService.instance.groupMembers(g.group_id),
-                GroupsService.instance.groupAccounts(g.group_id)
-            ])
+        await Promise.all(groupInfoItems.map(g => {
+            return (async () => {
+                const results = await Promise.all([
+                    GroupsService.instance.groupMembers(g.group_id),
+                    GroupsService.instance.groupAccounts(g.group_id)
+                ])
 
-            groups.push({
-                info: g,
-                members: results[0],
-                groupAccounts: results[1],
-                metadata: JSON.parse(atob(g.metadata as unknown as string))
-            })
-        }
+                groups.push({
+                    info: g,
+                    members: results[0],
+                    policy: toGroupPolicy(results[1]),
+                    metadata: JSON.parse(atob(g.metadata as unknown as string))
+                })
+            })()
+        }))
 
         runInAction(() => {
             this.groups = groups
@@ -82,7 +91,7 @@ export class GroupsStore {
         const editedGroup = {
             info: groupInfo,
             members: results[0],
-            groupAccounts: results[1],
+            policy: toGroupPolicy(results[1]),
             metadata: JSON.parse(atob(groupInfo.metadata as unknown as string))
         }
 
@@ -121,7 +130,10 @@ export class GroupsStore {
                         }))
                     }
                 }],
-                groupAccounts: [],
+                policy: {
+                    timeoutInDays: 0,
+                    threshold: 0
+                },
                 metadata: {
                     name: '',
                     description: '',
@@ -139,11 +151,11 @@ export class GroupsStore {
         this.editedGroup = null
     }
 
-    createGroup = async () => {
+    createGroup = async (): Promise<[number, BroadcastTxResponse[]]> => {
         const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
         const me = key.bech32Address
 
-        const msg: MsgCreateGroup = {
+        const msg1: MsgCreateGroup = {
             admin: this.editedGroup.info.admin,
             members: this.editedGroup.members.map(m => m.member),
             metadata: toUint8Array(JSON.stringify({
@@ -152,19 +164,52 @@ export class GroupsStore {
                 lastEdited: Date.now(),
             }))
         }
-        const msgAny = {
+        const msgAny1 = {
             typeUrl: `/${protobufPackage}.MsgCreateGroup`,
-            value: msg
+            value: msg1
         }
 
-        const fee = {
+        const fee1 = {
             amount: coins(0, CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom),
             gas: '2000000'
         }
 
-        const broadcastRes = await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny], fee)
-        console.log('broadcastRes', broadcastRes)
-        return broadcastRes
+        const results = []
+
+        const result1 = await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny1], fee1)
+        results.push(result1)
+
+        const createdGroupId = Number(JSON.parse(result1.rawLog)[0].events.find(e => e.type === "regen.group.v1alpha1.EventCreateGroup").attributes[0].value.replaceAll('"', ""))
+        // const createdGroupId = 13 // TODO hardcode
+        // console.log('createdGroupId', createdGroupId)
+        //
+        // const msg2: MsgCreateGroupAccount = {
+        //     admin: this.editedGroup.info.admin,
+        //     group_id: createdGroupId,
+        //     metadata: toUint8Array(JSON.stringify({
+        //         foo: "bar"
+        //     })),
+        //     decision_policy: {
+        //         // @ts-ignore
+        //         typeUrl: "/regen.group.v1alpha1.ThresholdDecisionPolicy",
+        //         value: toUint8Array(`{"threshold":"${this.editedGroup.policy.threshold}", "timeout":"${this.editedGroup.policy.timeoutInDays * 24 * 60 * 60}s"}`)
+        //     }
+        // }
+        //
+        // const msgAny2 = {
+        //     typeUrl: `/${protobufPackage}.MsgCreateGroupAccount`,
+        //     value: msg2
+        // }
+        //
+        // const fee2 = {
+        //     amount: coins(0, CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom),
+        //     gas: '2000000'
+        // }
+        //
+        // results.push(await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny2], fee2))
+
+        console.log('results', results)
+        return [createdGroupId, results]
     }
 
     saveGroup = async () => {
@@ -198,7 +243,7 @@ export class GroupsStore {
             const msg: MsgUpdateGroupMembers = {
                 admin: this.editedGroup.info.admin,
                 group_id: this.editedGroup.info.group_id,
-                member_updates: this.editedGroup.members.map(m => ({
+                member_updates: this.editedGroup.members.map(m => ({ // TODO to delete member one should set its weight to 0
                     address: m.member.address,
                     weight: m.member.weight,
                     metadata: m.member.metadata
@@ -208,6 +253,8 @@ export class GroupsStore {
                 typeUrl: `/${protobufPackage}.MsgUpdateGroupMembers`,
                 value: msg
             }
+
+            console.log('msgAny', msgAny)
 
             const fee = {
                 amount: coins(0, CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom),
@@ -227,4 +274,13 @@ export function toUint8Array(str: string): Uint8Array {
         alert('Sorry, this browser does not support TextEncoder...')
 
     return new TextEncoder().encode(str)
+}
+
+function toGroupPolicy(groupAccounts: GroupAccountInfo[]): GroupPolicy {
+    // console.log(groupAccounts[0].decision_policy) // TODO
+
+    return {
+        threshold: 1,
+        timeoutInDays: 1,
+    }
 }

@@ -1,9 +1,11 @@
 import { Button, Divider, Drawer, FormControl, IconButton, InputLabel, List, ListItem, ListItemText, makeStyles, MenuItem, Paper, Select, Step, StepLabel, Stepper, SvgIcon, TextField } from "@material-ui/core";
-import { Close, CreateRounded, InfoOutlined, SettingsOutlined, SettingsRounded } from "@material-ui/icons";
+import { Close, CreateRounded, Description, InfoOutlined, SettingsOutlined, SettingsRounded, Tune } from "@material-ui/icons";
 import { observer } from "mobx-react-lite";
 import React, { useState } from "react";
 import { Page } from "../page";
 import { ReactComponent as VectorIcon } from '../../icons/vector.svg'
+import { ReactComponent as DeligateIcon } from '../../icons/deligate.svg'
+import { ReactComponent as SpendIcon } from '../../icons/spend.svg'
 import classNames from "classnames";
 type Anchor = 'top' | 'left' | 'bottom' | 'right';
 
@@ -252,17 +254,53 @@ export const CreateProposal: React.FC<{}> = observer(() => {
             <h1>Add New Action</h1>
             <p className={classes.paperTitle} style={{ marginBottom: '0' }}>Event type</p>
             <List>
-                {['Text', 'Spend proposal', 'Parameter change', 'Delegate funds', 'Create account'].map((text) => (
-                    <ListItem button key={text} className={drawer.button} onClick={() => (console.log('click'))}>
-                        <div className={drawer.iconBox}>
-                            <SettingsOutlined style={{ width: '100%', height: '100%', color: '#3D7ACF' }} />
-                        </div>
-                        <ListItemText className={drawer.text} >
-                            <p>{text}</p>
-                            <IconButton style={{ padding: '0px', marginRight: '23px', }}><InfoOutlined style={{ width: '25px', height: '25px', color: '#3D7ACF' }}></InfoOutlined></IconButton>
-                        </ListItemText>
-                    </ListItem>
-                ))}
+                {/* {['T', 'Spend proposal', 'Parameter change', 'Delegate funds', 'Create account'].map((text) => ( */}
+                <ListItem button className={drawer.button} onClick={() => (console.log('click'))}>
+                    <div className={drawer.iconBox}>
+                        <Description style={{ width: '100%', height: '100%', color: '#3D7ACF' }} />
+                    </div>
+                    <ListItemText className={drawer.text} >
+                        <p>Text</p>
+                        <IconButton style={{ padding: '0px', marginRight: '23px', }}><InfoOutlined style={{ width: '25px', height: '25px', color: '#3D7ACF' }}></InfoOutlined></IconButton>
+                    </ListItemText>
+                </ListItem>
+                <ListItem button className={drawer.button} onClick={() => (console.log('click'))}>
+                    <div className={drawer.iconBox}>
+                        <SvgIcon component={SpendIcon} style={{ width: '75%', height: '100%', marginLeft: '15%', color: '#3D7ACF' }} />
+                    </div>
+                    <ListItemText className={drawer.text} >
+                        <p>Spend proposal</p>
+                        <IconButton style={{ padding: '0px', marginRight: '23px', }}><InfoOutlined style={{ width: '25px', height: '25px', color: '#3D7ACF' }}></InfoOutlined></IconButton>
+                    </ListItemText>
+                </ListItem>
+                <ListItem button className={drawer.button} onClick={() => (console.log('click'))}>
+                    <div className={drawer.iconBox}>
+                        <Tune style={{ width: '100%', height: '100%', color: '#3D7ACF' }} />
+                    </div>
+                    <ListItemText className={drawer.text} >
+                        <p>Parameter change</p>
+                        <IconButton style={{ padding: '0px', marginRight: '23px', }}><InfoOutlined style={{ width: '25px', height: '25px', color: '#3D7ACF' }}></InfoOutlined></IconButton>
+                    </ListItemText>
+                </ListItem>
+                <ListItem button className={drawer.button} onClick={() => (console.log('click'))}>
+                    <div className={drawer.iconBox}>
+                        <SvgIcon component={DeligateIcon} style={{ width: '100%', height: '100%', color: '#3D7ACF' }} />
+                    </div>
+                    <ListItemText className={drawer.text} >
+                        <p>Delegate funds</p>
+                        <IconButton style={{ padding: '0px', marginRight: '23px', }}><InfoOutlined style={{ width: '25px', height: '25px', color: '#3D7ACF' }}></InfoOutlined></IconButton>
+                    </ListItemText>
+                </ListItem>
+                <ListItem button className={drawer.button} onClick={() => (console.log('click'))}>
+                    <div className={drawer.iconBox}>
+                        <SettingsOutlined style={{ width: '100%', height: '100%', color: '#3D7ACF' }} />
+                    </div>
+                    <ListItemText className={drawer.text} >
+                        <p>Create account</p>
+                        <IconButton style={{ padding: '0px', marginRight: '23px', }}><InfoOutlined style={{ width: '25px', height: '25px', color: '#3D7ACF' }}></InfoOutlined></IconButton>
+                    </ListItemText>
+                </ListItem>
+                {/* ))} */}
             </List>
         </div>
     );

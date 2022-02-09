@@ -192,7 +192,7 @@ export const GroupDetails: React.FC<{}> = observer(() => {
                     <div className={classes.heroBlock}>
                         <h2 style={{ padding: '40px', fontWeight: 900 }}>Members</h2>
                         <Button variant='outlined' color='primary' className='tableBtn'>
-                            edit group
+                            edit members
                         </Button>
                     </div>
                     <Table className={table.table} aria-label="custom pagination table">

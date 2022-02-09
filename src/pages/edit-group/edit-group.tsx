@@ -20,6 +20,8 @@ import { toUint8Array } from '../../shared-state/groups-store'
 import { makeStyles } from '@material-ui/core/styles'
 import { Page } from '../page'
 import { Delete } from '@material-ui/icons'
+import { cloneDeep } from 'lodash'
+import { toJS } from 'mobx'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -109,7 +111,8 @@ export const EditGroup: React.FC<{}> = observer(() => {
         editedGroup, updateEditedGroup, setDefaultNewGroup, resetEditedGroup, saveGroup, createGroup,
         fetchEditedGroupById
     } = useStores().groupsStore
-    const [activeStep, setActiveStep] = useState(0)
+    // const [activeStep, setActiveStep] = useState(1) // TODO hardcoded 1 for development
+    const [activeStep, setActiveStep] = useState(0) // TODO hardcoded 1 for development
     const history = useHistory()
     const pathParams: any = useParams()
     const groupId = pathParams.id === 'new' ? -1 : Number(pathParams.id)
@@ -267,7 +270,7 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                     <p className={classes.inputTitle}>Add member accounts</p>
                                     {editedGroup.members.map((m, i) => {
                                         return (
-                                            <div className={classes.label} key={`${m.member.address}_${i}`}>
+                                            <div className={classes.label} key={i}>
                                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                                     <TextField
                                                         style={{ width: '80%' }}
@@ -276,7 +279,7 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                                         label="Group member address"
                                                         value={m.member.address}
                                                         onChange={e => {
-                                                            const newMembers = editedGroup.members
+                                                            const newMembers = cloneDeep(toJS(editedGroup.members))
                                                             newMembers[i].member.address = e.target.value
                                                             updateEditedGroup({
                                                                 ...editedGroup,
@@ -284,12 +287,22 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                                             })
                                                         }}
                                                     />
-                                                    <IconButton aria-label="delete">
-                                                        <Delete />
+                                                    <IconButton
+                                                        aria-label="delete"
+                                                        disabled={editedGroup.members.length === 1}
+                                                        onClick={() => {
+                                                            updateEditedGroup({
+                                                                ...editedGroup,
+                                                                members: editedGroup.members.filter(i => m.member.address !== i.member.address)
+                                                            })
+                                                        }}
+                                                    >
+                                                        <Delete/>
                                                     </IconButton>
                                                     {i === editedGroup.members.length - 1 && (
                                                         <Button
                                                             className={classes.cardBtn}
+                                                            disabled={editedGroup.members[editedGroup.members.length - 1].member.address.length === 0}
                                                             variant="outlined"
                                                             color="primary"
                                                             onClick={() => {
@@ -338,31 +351,31 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                 </div>
                                 <Paper elevation={2} style={{ padding: '50px 30px' }}>
 
-                                    <div className={classes.label}>
-                                        <div className={classes.inputTitle}>Group
-                                            <p className="subTitle">All members addresses of this group will be added to
-                                                this group account</p>
+                                    {/*<div className={classes.label}>*/} {/* TODO What does it select from? */}
+                                    {/*    <div className={classes.inputTitle}>Group*/}
+                                    {/*        <p className="subTitle">All members addresses of this group will be added to*/}
+                                    {/*            this group account</p>*/}
 
-                                        </div>
-                                        <FormControl variant="outlined" fullWidth>
-                                            <InputLabel id="demo-simple-select-outlined-label" ></InputLabel>
-                                            <Select
-                                                style={{ height: '56px' }}
-                                                fullWidth
-                                                id="demo-simple-select-outlined"
-                                                value={group}
-                                                onChange={handleChange}
-                                            >
-                                                <MenuItem value="">
-                                                    <em>None</em>
-                                                </MenuItem>
-                                                <MenuItem value={10}>Ten</MenuItem>
-                                                <MenuItem value={20}>Twenty</MenuItem>
-                                                <MenuItem value={30}>Thirty</MenuItem>
-                                            </Select>
-                                        </FormControl>
+                                    {/*    </div>*/}
+                                    {/*    <FormControl variant="outlined" fullWidth>*/}
+                                    {/*        <InputLabel id="demo-simple-select-outlined-label" ></InputLabel>*/}
+                                    {/*        <Select*/}
+                                    {/*            style={{ height: '56px' }}*/}
+                                    {/*            fullWidth*/}
+                                    {/*            id="demo-simple-select-outlined"*/}
+                                    {/*            value={group}*/}
+                                    {/*            onChange={handleChange}*/}
+                                    {/*        >*/}
+                                    {/*            <MenuItem value="">*/}
+                                    {/*                <em>None</em>*/}
+                                    {/*            </MenuItem>*/}
+                                    {/*            <MenuItem value={10}>Ten</MenuItem>*/}
+                                    {/*            <MenuItem value={20}>Twenty</MenuItem>*/}
+                                    {/*            <MenuItem value={30}>Thirty</MenuItem>*/}
+                                    {/*        </Select>*/}
+                                    {/*    </FormControl>*/}
 
-                                    </div>
+                                    {/*</div>*/}
                                     <div className={classes.label}>
                                         <div className={classes.inputTitle}>
                                             Voting window
@@ -372,7 +385,20 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                         <p className="max">Maximum</p>
                                         <div className={classes.input}>
                                             <TextField
-                                                variant="outlined">
+                                                fullWidth
+                                                id="outlined"
+                                                variant="outlined"
+                                                value={editedGroup.policy.timeoutInDays}
+                                                onChange={e => {
+                                                    updateEditedGroup({
+                                                        ...editedGroup,
+                                                        policy: {
+                                                            ...editedGroup.policy,
+                                                            timeoutInDays: Number(e.target.value)
+                                                        }
+                                                    })
+                                                }}
+                                            >
                                             </TextField>
                                             <p>days</p>
                                         </div>
@@ -386,29 +412,49 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                         </div>
                                         <div className={classes.input}>
                                             <TextField
-                                                variant="outlined">
+                                                fullWidth
+                                                id="outlined"
+                                                variant="outlined"
+                                                value={editedGroup.policy.threshold}
+                                                onChange={e => {
+                                                    updateEditedGroup({
+                                                        ...editedGroup,
+                                                        policy: {
+                                                            ...editedGroup.policy,
+                                                            threshold: Number(e.target.value)
+                                                        }
+                                                    })
+                                                }}
+                                            >
                                             </TextField>
                                             <p>yes votes of 100</p>
                                         </div>
                                     </div>
-                                    <div className={classes.label}>
-                                        <div className={classes.inputTitle}>
-                                            Define a quorum <span>(optional)</span>
-                                            <p className="subTitle">Quorums define the percentage of total voting power
-                                                that needs to vote for a proposal to pass.</p>
-                                        </div>
-                                        <div className={classes.input}>
-                                            <TextField
-                                                variant="outlined">
-                                            </TextField>
-                                            <p>% of total voting power</p>
-                                        </div>
-                                    </div>
+                                    {/*<div className={classes.label}>*/} {/* TODO doesn't exist in ThresholdDecisionPolicy */}
+                                    {/*    <div className={classes.inputTitle}>*/}
+                                    {/*        Define a quorum <span>(optional)</span>*/}
+                                    {/*        <p className="subTitle">Quorums define the percentage of total voting power*/}
+                                    {/*            that needs to vote for a proposal to pass.</p>*/}
+                                    {/*    </div>*/}
+                                    {/*    <div className={classes.input}>*/}
+                                    {/*        <TextField*/}
+                                    {/*            variant="outlined">*/}
+                                    {/*        </TextField>*/}
+                                    {/*        <p>% of total voting power</p>*/}
+                                    {/*    </div>*/}
+                                    {/*</div>*/}
                                     <div style={{
                                         width: '100%',
                                         display: 'flex',
-                                        justifyContent: 'flex-end'
+                                        justifyContent: 'space-between'
                                     }}>
+                                        <Button
+                                            color="primary"
+                                            variant="outlined"
+                                            onClick={() => setActiveStep(activeStep - 1)}
+                                        >
+                                            {'Prev'}
+                                        </Button>
                                         <Button
                                             color="primary"
                                             variant="outlined"
@@ -432,14 +478,19 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                         </div>
                                         <div>
                                             <Button className={classes.finishedBtn}
-                                                color="primary"
-                                                onClick={async () => {
-                                                    setLoading(true)
-                                                    const broadcastRes = await createGroup()
-                                                    setLoading(false)
-                                                    alert(`BroadcastRes: 
-${JSON.stringify(broadcastRes, null, 2)}`)
-                                                }}
+                                                    color="primary"
+                                                    disabled={loading}
+                                                    onClick={async () => {
+                                                        setLoading(true)
+                                                        try {
+                                                            const [createdId, broadcastResults] = await createGroup()
+                                                            alert(`BroadcastRes: 
+${JSON.stringify(broadcastResults, null, 2)}`)
+                                                            history.push(`/groups/${createdId}`)
+                                                        } finally {
+                                                            setLoading(false)
+                                                        }
+                                                    }}
                                             >
                                                 {'Create group'}
                                             </Button>
@@ -457,16 +508,17 @@ ${JSON.stringify(broadcastRes, null, 2)}`)
                                         </div>
                                         <div>
                                             <Button
-                                                className={classes.finishedBtn}
-                                                variant='outlined'
                                                 color="primary"
                                                 disabled={loading}
                                                 onClick={async () => {
                                                     setLoading(true)
-                                                    const broadcastRes = await saveGroup()
-                                                    setLoading(false)
-                                                    alert(`BroadcastRes: 
-${JSON.stringify(broadcastRes, null, 2)}`)
+                                                    try {
+                                                        const broadcastRes = await saveGroup()
+                                                        alert(`BroadcastRes: 
+    ${JSON.stringify(broadcastRes, null, 2)}`)
+                                                    } finally {
+                                                        setLoading(false)
+                                                    }
                                                 }}
                                             >
                                                 {'Save Group'}

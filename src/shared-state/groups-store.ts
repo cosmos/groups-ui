@@ -1,6 +1,11 @@
 import { action, makeObservable, observable, runInAction, toJS } from 'mobx'
 import { GroupsService } from '../protocol/groups-service'
-import { GroupAccountInfo, GroupInfo, GroupMember } from '../generated/regen/group/v1alpha1/types'
+import {
+    GroupAccountInfo,
+    GroupInfo,
+    GroupMember,
+    ThresholdDecisionPolicy
+} from '../generated/regen/group/v1alpha1/types'
 import { CosmosNodeService } from '../protocol/cosmos-node-service'
 import { coins } from '@cosmjs/launchpad'
 import {
@@ -31,7 +36,7 @@ export interface Group {
     info: Omit<GroupInfo, 'metadata'>
     members: GroupMember[]
     // groupAccounts: GroupAccountInfo[]
-    policy: GroupPolicy
+    policy: GroupPolicy[]
     metadata: GroupMetadata
 }
 
@@ -118,22 +123,24 @@ export class GroupsStore {
                     group_id: -1,
                     admin: me,
                     version: 1,
-                    total_weight: "1",
+                    total_weight: '1'
                 },
                 members: [{
                     group_id: -1,
                     member: {
                         address: me,
-                        weight: "1",
+                        weight: '1',
                         metadata: toUint8Array(JSON.stringify({
-                            name: "me",
+                            name: 'me'
                         }))
                     }
                 }],
-                policy: {
-                    timeoutInDays: 0,
-                    threshold: 0
-                },
+                policy: [
+                    {
+                        timeoutInDays: 0,
+                        threshold: 0
+                    }
+                ],
                 metadata: {
                     name: '',
                     description: '',
@@ -161,7 +168,7 @@ export class GroupsStore {
             metadata: toUint8Array(JSON.stringify({
                 ...this.editedGroup.metadata,
                 created: Date.now(),
-                lastEdited: Date.now(),
+                lastEdited: Date.now()
             }))
         }
         const msgAny1 = {
@@ -180,33 +187,59 @@ export class GroupsStore {
         results.push(result1)
 
         const createdGroupId = Number(JSON.parse(result1.rawLog)[0].events.find(e => e.type === "regen.group.v1alpha1.EventCreateGroup").attributes[0].value.replaceAll('"', ""))
+
         // const createdGroupId = 13 // TODO hardcode
-        // console.log('createdGroupId', createdGroupId)
-        //
-        // const msg2: MsgCreateGroupAccount = {
-        //     admin: this.editedGroup.info.admin,
-        //     group_id: createdGroupId,
-        //     metadata: toUint8Array(JSON.stringify({
-        //         foo: "bar"
-        //     })),
-        //     decision_policy: {
-        //         // @ts-ignore
-        //         typeUrl: "/regen.group.v1alpha1.ThresholdDecisionPolicy",
-        //         value: toUint8Array(`{"threshold":"${this.editedGroup.policy.threshold}", "timeout":"${this.editedGroup.policy.timeoutInDays * 24 * 60 * 60}s"}`)
-        //     }
-        // }
-        //
-        // const msgAny2 = {
-        //     typeUrl: `/${protobufPackage}.MsgCreateGroupAccount`,
-        //     value: msg2
-        // }
-        //
-        // const fee2 = {
-        //     amount: coins(0, CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom),
-        //     gas: '2000000'
-        // }
-        //
-        // results.push(await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny2], fee2))
+        console.log('createdGroupId', createdGroupId)
+
+        const msg2: MsgCreateGroupAccount = {
+            admin: this.editedGroup.info.admin,
+            group_id: createdGroupId,
+            metadata: toUint8Array(JSON.stringify({
+                foo: 'bar'
+            })),
+            decision_policy: {
+                type_url: '/regen.group.v1alpha1.ThresholdDecisionPolicy',
+                value: toUint8Array(
+                    JSON.stringify({
+                        // "@type": "/regen.group.v1alpha1.ThresholdDecisionPolicy",
+                        'threshold': '1',
+                        'timeout': '1s'
+                    })
+                )
+            }
+        }
+
+        const msgAny2 = {
+            typeUrl: `/${protobufPackage}.MsgCreateGroupAccount`,
+            value: MsgCreateGroupAccount.encode({
+                admin: this.editedGroup.info.admin,
+                group_id: createdGroupId,
+                metadata: toUint8Array(JSON.stringify({
+                    foo: 'bar'
+                })),
+                decision_policy: {
+                    type_url: '/regen.group.v1alpha1.ThresholdDecisionPolicy',
+                    value: ThresholdDecisionPolicy.encode(
+                        {
+                            threshold: '1',
+                            timeout: {
+                                seconds: 1,
+                                nanos: 0
+                            }
+                        }
+                    ).finish()
+                }
+            }).finish()
+        }
+
+        console.log('msgAny2', msgAny2)
+
+        const fee2 = {
+            amount: coins(0, CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom),
+            gas: '2000000'
+        }
+
+        results.push(await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny2], fee2))
 
         console.log('results', results)
         return [createdGroupId, results]
@@ -223,8 +256,8 @@ export class GroupsStore {
                 group_id: this.editedGroup.info.group_id,
                 metadata: toUint8Array(JSON.stringify({
                     ...this.editedGroup.metadata,
-                    lastEdited: Date.now(),
-                })),
+                    lastEdited: Date.now()
+                }))
             }
             const msgAny = {
                 typeUrl: `/${protobufPackage}.MsgUpdateGroupMetadata`,
@@ -247,7 +280,7 @@ export class GroupsStore {
                     address: m.member.address,
                     weight: m.member.weight,
                     metadata: m.member.metadata
-                })),
+                }))
             }
             const msgAny = {
                 typeUrl: `/${protobufPackage}.MsgUpdateGroupMembers`,
@@ -276,11 +309,13 @@ export function toUint8Array(str: string): Uint8Array {
     return new TextEncoder().encode(str)
 }
 
-function toGroupPolicy(groupAccounts: GroupAccountInfo[]): GroupPolicy {
+function toGroupPolicy(groupAccounts: GroupAccountInfo[]): GroupPolicy[] {
     // console.log(groupAccounts[0].decision_policy) // TODO
 
-    return {
-        threshold: 1,
-        timeoutInDays: 1,
-    }
+    return [
+        {
+            threshold: 1,
+            timeoutInDays: 1
+        }
+    ]
 }

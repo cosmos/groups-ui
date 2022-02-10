@@ -8,10 +8,12 @@ import { Routes } from './routes'
 import { Settings } from './pages/settings/settings'
 import { GroupAdminView } from './pages/groups/admin-view'
 import { GroupDetails } from './pages/groups/group-details'
+import { ProposalPage } from './pages/create-proposal/proposal'
 import { CreateProposal } from './pages/create-proposal/create-proposal'
 
 import './app.css'
 import { EditGroup } from './pages/edit-group/edit-group'
+
 
 export const App: React.FC = () => {
     return (

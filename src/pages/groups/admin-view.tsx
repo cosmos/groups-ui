@@ -19,7 +19,7 @@ import { ChatBubbleOutline, Description, SettingsRounded } from '@material-ui/ic
 import { observer } from 'mobx-react-lite'
 import { ReactComponent as DeligateIcon } from '../../icons/deligate.svg'
 import { ReactComponent as SpendIcon } from '../../icons/spend.svg'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useHistory, useParams } from 'react-router-dom'
 import { Page } from '../page'
 
 
@@ -37,7 +37,7 @@ export const useStyles = makeStyles(() => ({
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: '18px',
-        fontFamily: " 'Lato', sans-serif  ",
+        fontFamily: ' \'Lato\', sans-serif  ',
         '& h1': {
             fontWeight: 900,
             lineHeight: '50px'
@@ -46,7 +46,7 @@ export const useStyles = makeStyles(() => ({
         '& .btn': {
             padding: '3px 45px',
             fontSize: '16px',
-            fontWeight: 700,
+            fontWeight: 700
         },
         '& .subtitle': {
             fontSize: '20px',
@@ -70,7 +70,7 @@ export const useStyles = makeStyles(() => ({
         display: 'inline-flex',
         fontSize: '18px',
         alignItems: 'center',
-        fontFamily: " 'Lato', sans-serif ",
+        fontFamily: ' \'Lato\', sans-serif ',
         marginBottom: '35px'
     },
     regen: {
@@ -100,7 +100,7 @@ export const useStyles = makeStyles(() => ({
         '& .actionBtns': {
             marginTop: '23px',
             display: 'flex',
-            justifyContent: 'space-between',
+            justifyContent: 'space-between'
         },
 
         '& button': {
@@ -118,21 +118,21 @@ const StyledTableCell = withStyles(() => ({
         fontSize: '12px',
         fontWeight: 800,
         textTransform: 'uppercase',
-        fontFamily: " 'Mulish', sans-serif "
+        fontFamily: ' \'Mulish\', sans-serif '
     },
     body: {
         padding: '48px 40px',
-        fontSize: '16px',
-    },
+        fontSize: '16px'
+    }
 }))(TableCell)
 
 const StyledTableRow = withStyles((theme) => ({
     root: {
         textAlign: 'left',
         '&:nth-of-type(odd)': {
-            backgroundColor: theme.palette.action.hover,
-        },
-    },
+            backgroundColor: theme.palette.action.hover
+        }
+    }
 }))(TableRow)
 
 function createData(date, status, number, desc) {
@@ -144,18 +144,19 @@ const rows = [
     createData('22.11.2021', 'unfinalized', `#2`, 'sometext in description'),
     createData('52.15.2021', 'unfinalized', `#3`, 'sometext in description'),
     createData('02.02.2021', 'unfinalized', `#4`, 'sometext in description'),
-    createData('21.11.2412', 'unfinalized', `#5`, 'sometext in description'),
+    createData('21.11.2412', 'unfinalized', `#5`, 'sometext in description')
 ]
 
 const tableStyles = makeStyles({
     table: {
         borderTop: '1px solid #EFEFEF',
-        minWidth: 700,
-    },
+        minWidth: 700
+    }
 })
 
 export const GroupAdminView: React.FC<{}> = observer(() => {
     const [age, setAge] = React.useState('')
+    const history = useHistory()
 
     const pathParams: any = useParams()
     const groupId = pathParams.id === 'new' ? -1 : Number(pathParams.id)
@@ -174,18 +175,20 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                     <div className={classes.heroBlock}>
                         <h1>Foo Dev Team</h1>
                         <Link to={`/groups/${groupId}/details`}>
-                            <Button variant="outlined" color="primary" className="btn" style={{ backgroundColor: 'white' }}>
+                            <Button variant="outlined" color="primary" className="btn"
+                                    style={{ backgroundColor: 'white' }}>
                                 group details
                             </Button>
                         </Link>
 
                     </div>
                     <div className={classes.heroBlock}>
-                        <p className="subtitle">This group is to manage the funds for the Foo developer team’s efforts.</p>
+                        <p className="subtitle">This group is to manage the funds for the Foo developer team’s
+                            efforts.</p>
                         <p className={classes.date}>Created Nov 29th 2021, 12:00:35 AM</p>
                     </div>
-                    <Link to="#" className={classes.link} onClick={() => console.log('click')} >
-                        <ChatBubbleOutline style={{ fontSize: '18px', marginRight: '8px' }} />
+                    <Link to="#" className={classes.link} onClick={() => console.log('click')}>
+                        <ChatBubbleOutline style={{ fontSize: '18px', marginRight: '8px' }}/>
                         View discussion on group forum»
                     </Link>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -195,7 +198,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                             <span>($2,117 USD)</span>
                         </div>
                         <FormControl variant="outlined" style={{ width: '30%' }}>
-                            <InputLabel id="demo-simple-select-outlined-label" />
+                            <InputLabel id="demo-simple-select-outlined-label"/>
                             <Select
                                 id="demo-simple-select-outlined"
                                 value={age}
@@ -214,18 +217,42 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                 <Paper elevation={2} className={classes.actions}>
                     <h3>Actions</h3>
                     <div className="actionBtns">
-                        <Button variant="outlined" color="primary" className="btn">
-                            <SvgIcon component={DeligateIcon} style={{ fontSize: '20px', height: '25px', marginRight: '5px' }} />
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            className="btn"
+                            onClick={() => history.push('/proposals/new')}
+                        >
+                            <SvgIcon component={DeligateIcon}
+                                     style={{ fontSize: '20px', height: '25px', marginRight: '5px' }}/>
                             delegate funds
                         </Button>
-                        <Button variant="outlined" color="primary" className="btn">
-                            <SvgIcon component={SpendIcon} style={{ fontSize: '20px', height: '25px', marginRight: '5px' }} />
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            className="btn"
+                            onClick={() => history.push('/proposals/new')}
+                        >
+                            <SvgIcon component={SpendIcon}
+                                     style={{ fontSize: '20px', height: '25px', marginRight: '5px' }}/>
                             spend funds
-                        </Button><Button variant="outlined" color="primary" className="btn">
-                            <Description style={{ fontSize: '20px', marginRight: '5px' }} />
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            className="btn"
+                            onClick={() => history.push('/proposals/new')}
+                        >
+                            <Description style={{ fontSize: '20px', marginRight: '5px' }}/>
                             text proposal
-                        </Button><Button variant="outlined" color="primary" className="btn">
-                            <SettingsRounded style={{ fontSize: '20px', marginRight: '5px' }} />
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            className="btn"
+                            onClick={() => history.push('/proposals/new')}
+                        >
+                            <SettingsRounded style={{ fontSize: '20px', marginRight: '5px' }}/>
                             custom proposal
                         </Button>
                     </div>

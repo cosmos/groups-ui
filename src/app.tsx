@@ -4,22 +4,21 @@ import { Page } from './pages/page'
 import { Groups } from './pages/groups/groups'
 import { Nav } from './components/nav'
 import { Routes } from './routes'
-import { EditGroup } from './pages/edit-group/edit-group'
 
-import './app.css'
 import { Settings } from './pages/settings/settings'
 import { GroupAdminView } from './pages/groups/admin-view'
 import { GroupDetails } from './pages/groups/group-details'
 import { ProposalPage } from './pages/create-proposal/proposal'
 import { CreateProposal } from './pages/create-proposal/create-proposal'
 
-
+import './app.css'
+import { EditGroup } from './pages/edit-group/edit-group'
 
 
 export const App: React.FC = () => {
     return (
         <Router>
-            <Nav />
+            <Nav/>
             <Switch>
                 <Route exact path={Routes.ROOT}>
                     <span>home</span>
@@ -27,24 +26,24 @@ export const App: React.FC = () => {
                 </Route>
                 <Route exact path={Routes.GROUPS}>
                     <Page>
-                        <Groups />
+                        <Groups/>
                     </Page>
                 </Route>
                 <Route exact path={Routes.GROUPS_ADMIN_VIEW}>
-                    <GroupAdminView />
+                    <GroupAdminView/>
                 </Route>
                 <Route exact path={Routes.GROUPS_DETAILS}>
-                    <GroupDetails />
+                    <GroupDetails/>
                 </Route>
                 <Route exact path={Routes.GROUPS_EDIT}>
-                    <EditGroup />
+                     <EditGroup />
                 </Route>
                 <Route exact path={Routes.PROPOSALS_EDIT}>
                     <CreateProposal />
                 </Route>
                 <Route exact path={Routes.SETTINGS}>
                     <Page>
-                        <Settings />
+                        <Settings/>
                     </Page>
                 </Route>
             </Switch>

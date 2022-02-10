@@ -19,7 +19,7 @@ import { ChatBubbleOutline, Description, SettingsRounded } from '@material-ui/ic
 import { observer } from 'mobx-react-lite'
 import { ReactComponent as DeligateIcon } from '../../icons/deligate.svg'
 import { ReactComponent as SpendIcon } from '../../icons/spend.svg'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useHistory, useParams } from 'react-router-dom'
 import { Page } from '../page'
 
 
@@ -156,6 +156,7 @@ const tableStyles = makeStyles({
 
 export const GroupAdminView: React.FC<{}> = observer(() => {
     const [age, setAge] = React.useState('')
+    const history = useHistory()
 
     const pathParams: any = useParams()
     const groupId = pathParams.id === 'new' ? -1 : Number(pathParams.id)
@@ -216,22 +217,44 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                 <Paper elevation={2} className={classes.actions}>
                     <h3>Actions</h3>
                     <div className="actionBtns">
-                        <Button variant="outlined" color="primary" className="btn">
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            className="btn"
+                            onClick={() => history.push('/proposals/new')}
+                        >
                             <SvgIcon component={DeligateIcon}
                                      style={{ fontSize: '20px', height: '25px', marginRight: '5px' }}/>
                             delegate funds
                         </Button>
-                        <Button variant="outlined" color="primary" className="btn">
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            className="btn"
+                            onClick={() => history.push('/proposals/new')}
+                        >
                             <SvgIcon component={SpendIcon}
                                      style={{ fontSize: '20px', height: '25px', marginRight: '5px' }}/>
                             spend funds
-                        </Button><Button variant="outlined" color="primary" className="btn">
-                        <Description style={{ fontSize: '20px', marginRight: '5px' }}/>
-                        text proposal
-                    </Button><Button variant="outlined" color="primary" className="btn">
-                        <SettingsRounded style={{ fontSize: '20px', marginRight: '5px' }}/>
-                        custom proposal
-                    </Button>
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            className="btn"
+                            onClick={() => history.push('/proposals/new')}
+                        >
+                            <Description style={{ fontSize: '20px', marginRight: '5px' }}/>
+                            text proposal
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            className="btn"
+                            onClick={() => history.push('/proposals/new')}
+                        >
+                            <SettingsRounded style={{ fontSize: '20px', marginRight: '5px' }}/>
+                            custom proposal
+                        </Button>
                     </div>
                 </Paper>
                 <Paper elevation={2}>

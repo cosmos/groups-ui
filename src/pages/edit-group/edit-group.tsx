@@ -1,20 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useStores } from '../../shared-state/repo'
-import {
-    Button,
-    FormControl,
-    IconButton,
-    InputLabel,
-    MenuItem,
-    Paper,
-    Select,
-    Step,
-    StepLabel,
-    Stepper,
-    TextField
-} from '@material-ui/core'
-import { useHistory, useLocation, useParams } from 'react-router-dom'
+import { Button, IconButton, Paper, Step, StepLabel, Stepper, TextField } from '@material-ui/core'
+import { useHistory, useParams } from 'react-router-dom'
 import { Routes } from '../../routes'
 import { toUint8Array } from '../../shared-state/groups-store'
 import { makeStyles } from '@material-ui/core/styles'
@@ -112,7 +100,7 @@ export const EditGroup: React.FC<{}> = observer(() => {
         fetchEditedGroupById
     } = useStores().groupsStore
     // const [activeStep, setActiveStep] = useState(1) // TODO hardcoded 1 for development
-    const [activeStep, setActiveStep] = useState(0) // TODO hardcoded 1 for development
+    const [activeStep, setActiveStep] = useState(0)
     const history = useHistory()
     const pathParams: any = useParams()
     const groupId = pathParams.id === 'new' ? -1 : Number(pathParams.id)
@@ -388,14 +376,16 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                                 fullWidth
                                                 id="outlined"
                                                 variant="outlined"
-                                                value={editedGroup.policy.timeoutInDays}
+                                                value={editedGroup.policy[0].timeoutInDays}
                                                 onChange={e => {
                                                     updateEditedGroup({
                                                         ...editedGroup,
-                                                        policy: {
-                                                            ...editedGroup.policy,
-                                                            timeoutInDays: Number(e.target.value)
-                                                        }
+                                                        policy: [
+                                                            {
+                                                                ...editedGroup.policy[0],
+                                                                timeoutInDays: Number(e.target.value)
+                                                            }
+                                                        ]
                                                     })
                                                 }}
                                             >
@@ -415,14 +405,16 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                                 fullWidth
                                                 id="outlined"
                                                 variant="outlined"
-                                                value={editedGroup.policy.threshold}
+                                                value={editedGroup.policy[0].threshold}
                                                 onChange={e => {
                                                     updateEditedGroup({
                                                         ...editedGroup,
-                                                        policy: {
-                                                            ...editedGroup.policy,
-                                                            threshold: Number(e.target.value)
-                                                        }
+                                                        policy: [
+                                                            {
+                                                                ...editedGroup.policy[0],
+                                                                threshold: Number(e.target.value)
+                                                            }
+                                                        ]
                                                     })
                                                 }}
                                             >

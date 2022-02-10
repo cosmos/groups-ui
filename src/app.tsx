@@ -10,7 +10,8 @@ import './app.css'
 import { Settings } from './pages/settings/settings'
 import { GroupAdminView } from './pages/groups/admin-view'
 import { GroupDetails } from './pages/groups/group-details'
-import { CreateProposal } from './pages/create-proposal/create-proposal'
+import { ProposalPage } from './pages/create-proposal/proposal'
+
 
 
 
@@ -36,7 +37,7 @@ export const App: React.FC = () => {
                 </Route>
                 <Route exact path={Routes.GROUPS_EDIT}>
                     {/* <EditGroup /> */}
-                    <CreateProposal></CreateProposal>
+                    <ProposalPage></ProposalPage>
                 </Route>
                 <Route exact path={Routes.SETTINGS}>
                     <Page>

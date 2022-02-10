@@ -5,12 +5,13 @@ import { Groups } from './pages/groups/groups'
 import { Nav } from './components/nav'
 import { Routes } from './routes'
 
-import './app.css'
 import { Settings } from './pages/settings/settings'
 import { GroupAdminView } from './pages/groups/admin-view'
 import { GroupDetails } from './pages/groups/group-details'
 import { CreateProposal } from './pages/create-proposal/create-proposal'
 
+import './app.css'
+import { EditGroup } from './pages/edit-group/edit-group'
 
 export const App: React.FC = () => {
     return (
@@ -33,8 +34,10 @@ export const App: React.FC = () => {
                     <GroupDetails/>
                 </Route>
                 <Route exact path={Routes.GROUPS_EDIT}>
-                    {/* <EditGroup /> */}
-                    <CreateProposal></CreateProposal>
+                     <EditGroup />
+                </Route>
+                <Route exact path={Routes.PROPOSALS_EDIT}>
+                    <CreateProposal />
                 </Route>
                 <Route exact path={Routes.SETTINGS}>
                     <Page>

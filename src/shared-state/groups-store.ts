@@ -1,21 +1,22 @@
 import { action, makeObservable, observable, runInAction, toJS } from 'mobx'
 import { GroupsService } from '../protocol/groups-service'
-import {
-    GroupAccountInfo,
-    GroupInfo,
-    GroupMember,
-    ThresholdDecisionPolicy
-} from '../generated/regen/group/v1alpha1/types'
 import { CosmosNodeService } from '../protocol/cosmos-node-service'
 import { coins } from '@cosmjs/launchpad'
+import { cloneDeep, isEqual } from 'lodash'
+import { BroadcastTxResponse } from '@cosmjs/stargate/build/stargateclient'
 import {
-    MsgCreateGroup, MsgCreateGroupAccount,
+    GroupInfo,
+    GroupMember,
+    GroupPolicyInfo,
+    ThresholdDecisionPolicy
+} from '../generated/cosmos/group/v1beta1/types'
+import {
+    MsgCreateGroup,
+    MsgCreateGroupPolicy,
     MsgUpdateGroupMembers,
     MsgUpdateGroupMetadata,
     protobufPackage
-} from '../generated/regen/group/v1alpha1/tx'
-import { cloneDeep, isEqual } from 'lodash'
-import { BroadcastTxResponse } from '@cosmjs/stargate/build/stargateclient'
+} from '../generated/cosmos/group/v1beta1/tx'
 
 // {"name": "bla", "description": "blabbl", "created": 1640599686655, "lastEdited": 1640599686655, "linkToForum": "", "other": "blabla"}
 interface GroupMetadata {
@@ -63,7 +64,7 @@ export class GroupsStore {
             return (async () => {
                 const results = await Promise.all([
                     GroupsService.instance.groupMembers(g.group_id),
-                    GroupsService.instance.groupAccounts(g.group_id)
+                    GroupsService.instance.groupPolicies(g.group_id)
                 ])
 
                 groups.push({
@@ -90,7 +91,7 @@ export class GroupsStore {
 
         const results = await Promise.all([
             GroupsService.instance.groupMembers(groupInfo.group_id),
-            GroupsService.instance.groupAccounts(groupInfo.group_id)
+            GroupsService.instance.groupPolicies(groupInfo.group_id)
         ])
 
         const editedGroup = {
@@ -123,7 +124,8 @@ export class GroupsStore {
                     group_id: -1,
                     admin: me,
                     version: 1,
-                    total_weight: '1'
+                    total_weight: '1',
+                    created_at: new Date()
                 },
                 members: [{
                     group_id: -1,
@@ -132,7 +134,8 @@ export class GroupsStore {
                         weight: '1',
                         metadata: toUint8Array(JSON.stringify({
                             name: 'me'
-                        }))
+                        })),
+                        added_at: new Date(),
                     }
                 }],
                 policy: [
@@ -191,7 +194,7 @@ export class GroupsStore {
         // const createdGroupId = 13 // TODO hardcode
         console.log('createdGroupId', createdGroupId)
 
-        const msg2: MsgCreateGroupAccount = {
+        const msg2: MsgCreateGroupPolicy = {
             admin: this.editedGroup.info.admin,
             group_id: createdGroupId,
             metadata: toUint8Array(JSON.stringify({
@@ -210,8 +213,8 @@ export class GroupsStore {
         }
 
         const msgAny2 = {
-            typeUrl: `/${protobufPackage}.MsgCreateGroupAccount`,
-            value: MsgCreateGroupAccount.encode({
+            typeUrl: `/${protobufPackage}.MsgCreateGroupPolicy`,
+            value: MsgCreateGroupPolicy.encode({
                 admin: this.editedGroup.info.admin,
                 group_id: createdGroupId,
                 metadata: toUint8Array(JSON.stringify({
@@ -279,6 +282,7 @@ export class GroupsStore {
                 member_updates: this.editedGroup.members.map(m => ({ // TODO to delete member one should set its weight to 0
                     address: m.member.address,
                     weight: m.member.weight,
+                    added_at: m.member.added_at,
                     metadata: m.member.metadata
                 }))
             }
@@ -309,7 +313,7 @@ export function toUint8Array(str: string): Uint8Array {
     return new TextEncoder().encode(str)
 }
 
-function toGroupPolicy(groupAccounts: GroupAccountInfo[]): GroupPolicy[] {
+function toGroupPolicy(groupAccounts: GroupPolicyInfo[]): GroupPolicy[] {
     // console.log(groupAccounts[0].decision_policy) // TODO
 
     return [

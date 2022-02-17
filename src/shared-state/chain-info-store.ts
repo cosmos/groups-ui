@@ -28,7 +28,7 @@ function getDefaultChainInfo(): ChainInfo {
         rpc: `http://${window.location.hostname}:26657`,
         rest: `http://${window.location.hostname}:1317`,
         chainId: "test",
-        chainName: "GROUPS-UI-REGEN-TEST",
+        chainName: "GROUPS-UI-COSMOS_SDK-TEST",
         stakeCurrency: {
             coinDenom: "UREGEN",
             coinMinimalDenom: "uregen",

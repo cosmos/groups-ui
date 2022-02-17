@@ -22,8 +22,8 @@ import { Link, useHistory, useParams } from 'react-router-dom'
 import { Page } from '../page'
 import { useStores } from '../../shared-state/repo'
 import { Routes } from '../../routes'
-import { GroupMember } from '../../generated/regen/group/v1alpha1/types'
 import { toUint8Array } from '../../shared-state/groups-store'
+import { GroupMember } from '../../generated/cosmos/group/v1beta1/types'
 import Pagination from '@material-ui/lab/Pagination'
 
 const useStyles1 = makeStyles((theme) => ({
@@ -422,6 +422,7 @@ export const GroupDetails: React.FC<{}> = observer(() => {
                                                         member: {
                                                             address: newMember,
                                                             weight: "1",
+                                                            added_at: new Date(),
                                                             metadata: toUint8Array(JSON.stringify({
                                                                 name: ''
                                                             }))

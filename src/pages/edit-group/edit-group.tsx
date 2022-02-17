@@ -306,6 +306,7 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                                                         member: {
                                                                             address: '',
                                                                             weight: '1',
+                                                                            added_at: new Date(),
                                                                             metadata: toUint8Array(JSON.stringify({
                                                                                 name: ''
                                                                             }))

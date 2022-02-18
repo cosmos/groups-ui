@@ -1,0 +1,90 @@
+import { action, makeObservable, observable } from 'mobx'
+import { Any } from '../generated/google/protobuf/any'
+import { Exec, MsgCreateProposal } from '../generated/regen/group/v1alpha1/tx'
+import { TextProposal } from '../generated/gov/gov'
+import { ParameterChangeProposal } from '../generated/params/params'
+import { Group } from './groups-store'
+import { CosmosNodeService } from '../protocol/cosmos-node-service'
+import { GroupProposalsUrls } from '../protocol/proposals-service'
+import { coins } from '@cosmjs/proto-signing'
+import { BroadcastTxResult } from '@cosmjs/launchpad'
+import { BroadcastTxResponse } from '@cosmjs/stargate'
+
+interface NewProposal {
+    // address: string
+    // proposers: string[]
+    metadata: any
+    msgs: Any[]
+    exec: Exec
+}
+
+enum ProposalTypeUrls {
+    TextProposal = "/cosmos.gov.v1beta1.TextProposal",
+    ParameterChangeProposal = "/cosmos.params.v1beta1.ParameterChangeProposal"
+}
+
+export class ProposalsService {
+    @observable
+    newProposal: NewProposal = null
+
+    constructor() {
+        makeObservable(this)
+    }
+
+    createProposal = async (group: Group): Promise<BroadcastTxResponse| null> => {
+        const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
+        const me = key.bech32Address
+
+        // TODO replace hardcode
+        const exec = Exec.EXEC_TRY
+
+        const msg: MsgCreateProposal = {
+            address: group.info.admin,
+            proposers: group.members.map((m) => m.member.address),
+            msgs: this.newProposal.msgs,
+            exec,
+            metadata: this.newProposal.metadata
+        }
+
+        const msgAny = {
+            typeUrl: GroupProposalsUrls.MsgCreateProposal,
+            value: MsgCreateProposal.encode(msg).finish()
+        }
+
+        const fee = {
+            amount: coins(0, CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom),
+            gas: '2000000'
+        }
+
+        try {
+            const res = await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny], fee)
+
+            console.log("proposal creation", res)
+            return res
+        } catch (error) {
+            console.log("error creating proposal", error);
+        }
+    }
+
+    @action
+    addProposalAction = (action: Any) => {
+        this.newProposal.msgs.push(action)
+    }
+
+    // for usage in components, encode before adding to proposal state
+    encodeTextProposal = (proposalValue: TextProposal): Any => {
+        const encodedProposal = {
+            type_url: ProposalTypeUrls.TextProposal,
+            value: TextProposal.encode(proposalValue).finish()
+        }
+        return encodedProposal
+    }
+
+    encodeParameterChangeProposal = (proposalValue: ParameterChangeProposal): Any => {
+        const encodedProposal = {
+            type_url: ProposalTypeUrls.ParameterChangeProposal,
+            value: ParameterChangeProposal.encode(proposalValue).finish()
+        }
+        return encodedProposal
+    }
+}

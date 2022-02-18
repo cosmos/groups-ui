@@ -10,6 +10,12 @@ import {
     QueryVotesByProposalResponse
 } from '../generated/regen/group/v1alpha1/query'
 
+export enum GroupProposalsUrls {
+    MsgCreateProposal = "/regen.group.v1alpha1.MsgCreateProposal",
+    MsgVote = "/regen.group.v1alpha1.MsgVote",
+    MsgExec = "/regen.group.v1alpha1.MsgExec"
+}
+
 @service
 export class ProposalsService {
     static serviceName: string = 'GroupsService'
@@ -26,15 +32,15 @@ export class ProposalsService {
 
     applyChainInfo = async (chainInfo: ChainInfo): Promise<void> => {
         this.cosmosClient.registry.register(
-            "/regen.group.v1alpha1.MsgCreateProposal",
+            GroupProposalsUrls.MsgCreateProposal,
             MsgCreateProposal
         )
         this.cosmosClient.registry.register(
-            "/regen.group.v1alpha1.MsgVote",
+            GroupProposalsUrls.MsgVote,
             MsgVote
         )
         this.cosmosClient.registry.register(
-            "/regen.group.v1alpha1.MsgExec",
+            GroupProposalsUrls.MsgExec,
             MsgExec
         )
     }

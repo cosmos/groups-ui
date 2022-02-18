@@ -1,10 +1,19 @@
 #!/usr/bin/env bash
 
+GOPATH=${GOPATH:-"$HOME/go"}
+PLATFORM='unknown'
+unamestr=$(uname)
+if [[ "$unamestr" == 'Linux' ]]; then
+   PLATFORM='linux'
+elif [[ "$unamestr" == 'Darwin' ]]; then
+   PLATFORM='osx'
+fi
+
 set -eo pipefail
 
 [ -d src/generated ] || mkdir src/generated
 [ -d protoc ] || mkdir protoc
-[ -f protoc/bin/protoc ] || (curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.17.3/protoc-3.17.3-linux-x86_64.zip && mv protoc-3.17.3-linux-x86_64.zip protoc && unzip -d protoc -o protoc/protoc-3.17.3-linux-x86_64.zip)
+[ -f protoc/bin/protoc ] || (curl -LO "https://github.com/protocolbuffers/protobuf/releases/download/v3.17.3/protoc-3.17.3-$PLATFORM-x86_64.zip" && mv "protoc-3.17.3-$PLATFORM-x86_64.zip" protoc && unzip -d protoc -o "protoc/protoc-3.17.3-$PLATFORM-x86_64.zip")
 
 #go get github.com/regen-network/regen-ledger/v2
 proto_files=$(find $GOPATH/pkg/mod/github.com/regen-network/regen-ledger/v2@v2.1.0/proto/regen/group/v1alpha1 -path -prune -o -name '*.proto')

@@ -1,10 +1,10 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { Any } from "../../../google/protobuf/any";
-import { Duration } from "../../../google/protobuf/duration";
-import { Timestamp } from "../../../google/protobuf/timestamp";
-import { Coin } from "../../../cosmos/base/v1beta1/coin";
+import { Any } from "../google/protobuf/any";
+import { Duration } from "../google/protobuf/duration";
+import { Timestamp } from "../google/protobuf/timestamp";
+import { Coin } from "../cosmos/base/v1beta1/coin";
 
 export const protobufPackage = "cosmos.gov.v1beta1";
 
@@ -1096,10 +1096,12 @@ export type DeepPartial<T> = T extends Builtin
 function toTimestamp(date: Date): Timestamp {
     const seconds = numberToLong(date.getTime() / 1_000);
     const nanos = (date.getTime() % 1_000) * 1_000_000;
+    // @ts-ignore
     return { seconds, nanos };
 }
 
 function fromTimestamp(t: Timestamp): Date {
+    // @ts-ignore
     let millis = t.seconds.toNumber() * 1_000;
     millis += t.nanos / 1_000_000;
     return new Date(millis);

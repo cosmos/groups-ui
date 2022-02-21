@@ -23,7 +23,7 @@ enum ProposalTypeUrls {
     ParameterChangeProposal = "/cosmos.params.v1beta1.ParameterChangeProposal"
 }
 
-export class ProposalsService {
+export class ProposalsStore {
     @observable
     newProposal: NewProposal = null
 

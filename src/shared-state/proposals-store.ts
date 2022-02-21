@@ -1,14 +1,14 @@
 import { action, makeObservable, observable } from 'mobx'
 import { Any } from '../generated/google/protobuf/any'
-import { Exec, MsgCreateProposal } from '../generated/regen/group/v1alpha1/tx'
+import { Exec, MsgCreateProposal, MsgExec, MsgVote } from '../generated/regen/group/v1alpha1/tx'
 import { TextProposal } from '../generated/gov/gov'
 import { ParameterChangeProposal } from '../generated/params/params'
-import { Group } from './groups-store'
+import { Group, toUint8Array } from './groups-store'
 import { CosmosNodeService } from '../protocol/cosmos-node-service'
 import { GroupProposalsUrls } from '../protocol/proposals-service'
 import { coins } from '@cosmjs/proto-signing'
-import { BroadcastTxResult } from '@cosmjs/launchpad'
 import { BroadcastTxResponse } from '@cosmjs/stargate'
+import { Choice } from '../generated/regen/group/v1alpha1/types'
 
 interface NewProposal {
     // address: string
@@ -62,13 +62,78 @@ export class ProposalsService {
             console.log("proposal creation", res)
             return res
         } catch (error) {
-            console.log("error creating proposal", error);
+            console.log("error creating proposal", error)
         }
     }
 
     @action
     addProposalAction = (action: Any) => {
         this.newProposal.msgs.push(action)
+    }
+
+    // Later may add choice and metadata to store, if needed for multiple components
+    voteProposal = async (proposalId: number, choice: Choice, metadata: any) => {
+        const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
+        const me = key.bech32Address
+
+        // TODO replace hardcode
+        const exec = Exec.EXEC_TRY
+
+        const msg: MsgVote = {
+            proposal_id: proposalId,
+            choice,
+            voter: me,
+            metadata: toUint8Array(metadata),
+            exec
+        }
+
+        const msgAny = {
+            typeUrl: GroupProposalsUrls.MsgVote,
+            value: MsgVote.encode(msg).finish()
+        }
+
+        const fee = {
+            amount: coins(0, CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom),
+            gas: '2000000'
+        }
+
+        try {
+            const res = await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny], fee)
+
+            console.log("proposal vote", res)
+            return res
+        } catch (error) {
+            console.log("error voting proposal", error)
+        }
+    }
+
+    executeProposal = async (proposalId: number) => {
+        const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
+        const me = key.bech32Address
+
+        const msg: MsgExec = {
+            proposal_id: proposalId,
+            signer: me
+        }
+
+        const msgAny = {
+            typeUrl: GroupProposalsUrls.MsgExec,
+            value: MsgExec.encode(msg).finish()
+        }
+
+        const fee = {
+            amount: coins(0, CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom),
+            gas: '2000000'
+        }
+
+        try {
+            const res = await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny], fee)
+
+            console.log("proposal exec", res)
+            return res
+        } catch (error) {
+            console.log("error exec proposal", error)
+        }
     }
 
     // for usage in components, encode before adding to proposal state

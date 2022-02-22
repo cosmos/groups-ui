@@ -471,26 +471,6 @@ export const ProposalPage: React.FC<{}> = observer(() => {
         setSelected([]);
     };
 
-    const handleClick = (event: React.MouseEvent<unknown>, name: any) => {
-        const selectedIndex = selected.indexOf(name);
-        let newSelected: readonly string[] = [];
-
-        if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selected, name);
-        } else if (selectedIndex === 0) {
-            newSelected = newSelected.concat(selected.slice(1));
-        } else if (selectedIndex === selected.length - 1) {
-            newSelected = newSelected.concat(selected.slice(0, -1));
-        } else if (selectedIndex > 0) {
-            newSelected = newSelected.concat(
-                selected.slice(0, selectedIndex),
-                selected.slice(selectedIndex + 1),
-            );
-        }
-
-        setSelected(newSelected);
-    };
-
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
     };

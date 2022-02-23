@@ -62,6 +62,16 @@ const useStyles = makeStyles((theme: Theme) =>
                 marginBottom: '10px',
                 marginTop: '43px'
             }
+        },
+        cancelBtn: {
+
+        },
+        addBtn: {
+            fontWeight: 800,
+            fontSize: '18px',
+            lineHeight: '22px',
+            padding: '10px 40px',
+            marginLeft: '20px'
         }
     }),
 );
@@ -178,6 +188,7 @@ export const Nav: React.FC<{}> = observer(() => {
                 BackdropProps={{
                     timeout: 500,
                 }}
+                style={{ overflowY: 'scroll' }}
             >
                 <Fade in={open}>
                     <Paper className={classes.modalPaper}>
@@ -192,7 +203,7 @@ export const Nav: React.FC<{}> = observer(() => {
                             <h3>Coin Minimal Denom</h3>
                             <TextField id="outlined-basic" variant="outlined" fullWidth />
                             <h3>Select chain preset:</h3>
-                            <FormControl variant="outlined" fullWidth>
+                            <FormControl variant="outlined" fullWidth style={{ marginBottom: '50px' }}>
                                 <Select
                                     labelId="demo-simple-select-outlined-label"
                                     id="demo-simple-select-outlined"
@@ -205,6 +216,20 @@ export const Nav: React.FC<{}> = observer(() => {
                                     <MenuItem value={30} className={classes.menuItem}>Cosmos</MenuItem>
                                 </Select>
                             </FormControl>
+                            <div style={{ display: 'flex', justifyContent: 'end' }}>
+                                <Button
+                                    className={classes.cancelBtn}
+                                    onClick={handleClose}
+                                >
+                                    cancel
+                                </Button>
+                                <Button
+                                    variant="contained" color="primary"
+                                    className={classes.addBtn}
+                                >
+                                    add chain
+                                </Button>
+                            </div>
                         </div>
                     </Paper>
                 </Fade>

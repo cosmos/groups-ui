@@ -6,7 +6,8 @@ import { Link, useLocation } from 'react-router-dom'
 
 import './nav.css'
 import { CosmosNodeService } from '../protocol/cosmos-node-service'
-import { Backdrop, Button, createStyles, Fade, FormControl, InputLabel, makeStyles, MenuItem, Modal, Paper, Select, TextField, Theme } from '@material-ui/core'
+import { Backdrop, Button, createStyles, Fade, FormControl, IconButton, InputLabel, makeStyles, MenuItem, Modal, Paper, Select, TextField, Theme } from '@material-ui/core'
+import { Close } from '@material-ui/icons'
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -39,12 +40,12 @@ const useStyles = makeStyles((theme: Theme) =>
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            paddingTop: '28px'
+            paddingTop: '130px'
         },
         modalPaper: {
             padding: '43px 30px',
             width: '556px',
-            marginTop: '28px',
+            marginTop: '100px',
 
             "& h2": {
                 fontWeight: 900,
@@ -62,9 +63,6 @@ const useStyles = makeStyles((theme: Theme) =>
                 marginBottom: '10px',
                 marginTop: '43px'
             }
-        },
-        cancelBtn: {
-
         },
         addBtn: {
             fontWeight: 800,
@@ -192,6 +190,7 @@ export const Nav: React.FC<{}> = observer(() => {
             >
                 <Fade in={open}>
                     <Paper className={classes.modalPaper}>
+                        <IconButton style={{ marginLeft: '90%' }} onClick={handleClose}><Close /></IconButton>
                         <h2>Add chain</h2>
                         <div>
                             <h3>REST endpoint</h3>
@@ -218,7 +217,6 @@ export const Nav: React.FC<{}> = observer(() => {
                             </FormControl>
                             <div style={{ display: 'flex', justifyContent: 'end' }}>
                                 <Button
-                                    className={classes.cancelBtn}
                                     onClick={handleClose}
                                 >
                                     cancel

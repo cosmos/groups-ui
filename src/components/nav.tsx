@@ -6,10 +6,94 @@ import { Link, useLocation } from 'react-router-dom'
 
 import './nav.css'
 import { CosmosNodeService } from '../protocol/cosmos-node-service'
+import { Backdrop, Button, createStyles, Fade, FormControl, IconButton, InputLabel, makeStyles, MenuItem, Modal, Paper, Select, TextField, Theme } from '@material-ui/core'
+import { Close } from '@material-ui/icons'
+
+const useStyles = makeStyles((theme: Theme) =>
+    createStyles({
+        formControl: {
+            margin: theme.spacing(1),
+            minWidth: 178,
+            height: 52,
+            fontSize: '12px',
+            fontWeight: 800,
+        },
+        menuItem: {
+            fontFamily: " 'Lato' ",
+            fontWeight: 400,
+            fontSize: "16px",
+            lineHeight: '37px'
+        },
+        addChainBtn: {
+            backgroundColor: 'transparent',
+            fontFamily: " 'Lato' ",
+            fontWeight: 400,
+            fontSize: "16px",
+            lineHeight: '37px',
+            justifyContent: 'start',
+            paddingLeft: '16px'
+        },
+        selectEmpty: {
+            marginTop: theme.spacing(2),
+        },
+        modal: {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingTop: '130px'
+        },
+        modalPaper: {
+            padding: '43px 30px',
+            width: '556px',
+            marginTop: '100px',
+
+            "& h2": {
+                fontWeight: 900,
+                fontSize: "32px",
+                lineHeight: '44px',
+                textAlign: 'center',
+                marginBottom: '57px'
+            },
+
+            "& h3": {
+                fontFamily: " 'Lato' ",
+                fontWeight: 700,
+                fontSize: "18px",
+                lineHeight: '26px',
+                marginBottom: '10px',
+                marginTop: '43px'
+            }
+        },
+        addBtn: {
+            fontWeight: 800,
+            fontSize: '18px',
+            lineHeight: '22px',
+            padding: '10px 40px',
+            marginLeft: '20px'
+        }
+    }),
+);
 
 export const Nav: React.FC<{}> = observer(() => {
     const { pathname } = useLocation()
     const [userString, setUserString] = useState('')
+
+    const classes = useStyles();
+    const [age, setAge] = React.useState('');
+
+    const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+        setAge(event.target.value as string);
+    };
+
+    const [open, setOpen] = React.useState(false);
+
+    const handleOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -66,10 +150,88 @@ export const Nav: React.FC<{}> = observer(() => {
                         <Link to={Routes.SETTINGS}>SETTINGS</Link>
                     </li>
                 </ul>
-                <div>
-                    { userString }
+                <div style={{ display: 'flex', alignItems: "center" }}>
+                    <FormControl variant="outlined" className={classes.formControl}>
+                        <InputLabel id="demo-simple-select-outlined-label" style={{ textTransform: 'uppercase', color: 'black' }}>regen chain</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-outlined-label"
+                            id="demo-simple-select-outlined"
+                            value={age}
+                            onChange={handleChange}
+                            label="REGEN CHAIN"
+                        >
+                            <MenuItem value={10} className={classes.menuItem}>REGEN</MenuItem>
+                            <MenuItem value={20} className={classes.menuItem}>Osmosis</MenuItem>
+                            <MenuItem value={30} className={classes.menuItem}>Cosmos</MenuItem>
+                            <MenuItem style={{ padding: '0' }}>
+                                <Button className={classes.addChainBtn}
+                                    fullWidth
+                                    onClick={handleOpen}>
+                                    + new chain
+                                </Button>
+                            </MenuItem>
+                        </Select>
+                    </FormControl>
+                    {userString}
                 </div>
             </div>
+            <Modal
+                aria-labelledby="transition-modal-title"
+                aria-describedby="transition-modal-description"
+                className={classes.modal}
+                open={open}
+                onClose={handleClose}
+                closeAfterTransition
+                BackdropComponent={Backdrop}
+                BackdropProps={{
+                    timeout: 500,
+                }}
+                style={{ overflowY: 'scroll' }}
+            >
+                <Fade in={open}>
+                    <Paper className={classes.modalPaper}>
+                        <IconButton style={{ marginLeft: '90%' }} onClick={handleClose}><Close /></IconButton>
+                        <h2>Add chain</h2>
+                        <div>
+                            <h3>REST endpoint</h3>
+                            <TextField id="outlined-basic" variant="outlined" fullWidth />
+                            <h3>Chain ID</h3>
+                            <TextField id="outlined-basic" variant="outlined" fullWidth />
+                            <h3>Coin Denom</h3>
+                            <TextField id="outlined-basic" variant="outlined" fullWidth />
+                            <h3>Coin Minimal Denom</h3>
+                            <TextField id="outlined-basic" variant="outlined" fullWidth />
+                            <h3>Select chain preset:</h3>
+                            <FormControl variant="outlined" fullWidth style={{ marginBottom: '50px' }}>
+                                <Select
+                                    labelId="demo-simple-select-outlined-label"
+                                    id="demo-simple-select-outlined"
+                                    value={age}
+                                    onChange={handleChange}
+                                    fullWidth
+                                >
+                                    <MenuItem value={10} className={classes.menuItem}>REGEN</MenuItem>
+                                    <MenuItem value={20} className={classes.menuItem}>Osmosis</MenuItem>
+                                    <MenuItem value={30} className={classes.menuItem}>Cosmos</MenuItem>
+                                </Select>
+                            </FormControl>
+                            <div style={{ display: 'flex', justifyContent: 'end' }}>
+                                <Button
+                                    onClick={handleClose}
+                                >
+                                    cancel
+                                </Button>
+                                <Button
+                                    variant="contained" color="primary"
+                                    className={classes.addBtn}
+                                >
+                                    add chain
+                                </Button>
+                            </div>
+                        </div>
+                    </Paper>
+                </Fade>
+            </Modal>
         </div>
     )
 })

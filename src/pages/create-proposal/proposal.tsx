@@ -375,7 +375,7 @@ const useStyles = makeStyles(() => ({
     }
 }))
 
-const statusStyles = makeStyles(() => ({
+export const statusStyles = makeStyles(() => ({
     marker: {
         fontFamily: " 'Lato' ",
         fontSize: '12px',

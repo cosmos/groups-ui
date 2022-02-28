@@ -21,6 +21,7 @@ import { ReactComponent as DeligateIcon } from '../../icons/deligate.svg'
 import { ReactComponent as SpendIcon } from '../../icons/spend.svg'
 import { Link, useHistory, useParams } from 'react-router-dom'
 import { Page } from '../page'
+import { statusStyles } from '../create-proposal/proposal'
 
 
 export const useStyles = makeStyles(() => ({
@@ -167,6 +168,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
 
     const classes = useStyles()
     const table = tableStyles()
+    const status = statusStyles()
 
     return (
         <Page>
@@ -176,7 +178,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                         <h1>Foo Dev Team</h1>
                         <Link to={`/groups/${groupId}/details`}>
                             <Button variant="outlined" color="primary" className="btn"
-                                    style={{ backgroundColor: 'white' }}>
+                                style={{ backgroundColor: 'white' }}>
                                 group details
                             </Button>
                         </Link>
@@ -188,7 +190,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                         <p className={classes.date}>Created Nov 29th 2021, 12:00:35 AM</p>
                     </div>
                     <Link to="#" className={classes.link} onClick={() => console.log('click')}>
-                        <ChatBubbleOutline style={{ fontSize: '18px', marginRight: '8px' }}/>
+                        <ChatBubbleOutline style={{ fontSize: '18px', marginRight: '8px' }} />
                         View discussion on group forum»
                     </Link>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -198,7 +200,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                             <span>($2,117 USD)</span>
                         </div>
                         <FormControl variant="outlined" style={{ width: '30%' }}>
-                            <InputLabel id="demo-simple-select-outlined-label"/>
+                            <InputLabel id="demo-simple-select-outlined-label" />
                             <Select
                                 id="demo-simple-select-outlined"
                                 value={age}
@@ -224,7 +226,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                             onClick={() => history.push('/proposals/new')}
                         >
                             <SvgIcon component={DeligateIcon}
-                                     style={{ fontSize: '20px', height: '25px', marginRight: '5px' }}/>
+                                style={{ fontSize: '20px', height: '25px', marginRight: '5px' }} />
                             delegate funds
                         </Button>
                         <Button
@@ -234,7 +236,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                             onClick={() => history.push('/proposals/new')}
                         >
                             <SvgIcon component={SpendIcon}
-                                     style={{ fontSize: '20px', height: '25px', marginRight: '5px' }}/>
+                                style={{ fontSize: '20px', height: '25px', marginRight: '5px' }} />
                             spend funds
                         </Button>
                         <Button
@@ -243,7 +245,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                             className="btn"
                             onClick={() => history.push('/proposals/new')}
                         >
-                            <Description style={{ fontSize: '20px', marginRight: '5px' }}/>
+                            <Description style={{ fontSize: '20px', marginRight: '5px' }} />
                             text proposal
                         </Button>
                         <Button
@@ -252,7 +254,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                             className="btn"
                             onClick={() => history.push('/proposals/new')}
                         >
-                            <SettingsRounded style={{ fontSize: '20px', marginRight: '5px' }}/>
+                            <SettingsRounded style={{ fontSize: '20px', marginRight: '5px' }} />
                             custom proposal
                         </Button>
                     </div>
@@ -270,7 +272,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                             {rows.map((row) => (
                                 <StyledTableRow key={row.number}>
                                     <StyledTableCell align="left" style={{ width: '30%' }}>{row.date}</StyledTableCell>
-                                    <StyledTableCell align="left">{row.status}</StyledTableCell>
+                                    <StyledTableCell align="left"><span className={`${status.marker} orange`}>{row.status}</span></StyledTableCell>
                                     <StyledTableCell align="left">{row.number}</StyledTableCell>
                                     <StyledTableCell align="left">{row.desc}</StyledTableCell>
                                 </StyledTableRow>

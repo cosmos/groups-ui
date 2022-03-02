@@ -32,6 +32,12 @@ export class ProposalsStore {
     }
 
     createProposal = async (group: Group): Promise<BroadcastTxResponse| null> => {
+        const mockMsgs = [this.encodeTextProposal({
+            title: "Testing",
+            description: "Test desc"
+        })]
+        const mockMetaData = "testing abc"
+
         const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
         const me = key.bech32Address
 
@@ -39,12 +45,16 @@ export class ProposalsStore {
         const exec = Exec.EXEC_TRY
 
         const msg: MsgCreateProposal = {
-            address: group.info.admin,
+            // TODO replace with fetching group policy address
+            // this is group policy address hardcoded for testing
+            address: "regen1m73npu5jn89syq23568a44ymrj7za9qa7mxgh0",
             proposers: group.members.map((m) => m.member.address),
-            msgs: this.newProposal.msgs,
+            msgs: mockMsgs,
             exec,
-            metadata: this.newProposal.metadata
+            metadata: toUint8Array(mockMetaData)
         }
+
+        console.log("msg", msg)
 
         const msgAny = {
             typeUrl: GroupProposalsUrls.MsgCreateProposal,

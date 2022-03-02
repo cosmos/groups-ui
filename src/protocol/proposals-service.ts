@@ -18,7 +18,7 @@ export enum GroupProposalsUrls {
 
 @service
 export class ProposalsService {
-    static serviceName: string = 'GroupsService'
+    static serviceName: string = ProposalsService.name
 
     static get instance(): ProposalsService {
         return getService<ProposalsService>(ProposalsService.serviceName)

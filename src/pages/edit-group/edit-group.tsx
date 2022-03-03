@@ -99,6 +99,7 @@ export const EditGroup: React.FC<{}> = observer(() => {
         editedGroup, updateEditedGroup, setDefaultNewGroup, resetEditedGroup, saveGroup, createGroup,
         fetchEditedGroupById
     } = useStores().groupsStore
+    const propStore = useStores().proposalsStore
     // const [activeStep, setActiveStep] = useState(1) // TODO hardcoded 1 for development
     const [activeStep, setActiveStep] = useState(0)
     const history = useHistory()
@@ -135,6 +136,10 @@ export const EditGroup: React.FC<{}> = observer(() => {
     if (!editedGroup) {
         return null
     }
+
+    console.log("group", toJS(editedGroup));
+
+    const res = propStore.createProposal(toJS(editedGroup))
 
     return (
         <div>

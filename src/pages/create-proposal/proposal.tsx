@@ -4,6 +4,8 @@ import { observer } from "mobx-react-lite";
 import React from "react";
 import { Link, Switch } from "react-router-dom";
 import { Page } from "../page";
+import Pagination from '@material-ui/lab/Pagination';
+
 interface Data {
     calories: number;
     carbs: number;
@@ -375,7 +377,7 @@ const useStyles = makeStyles(() => ({
     }
 }))
 
-const statusStyles = makeStyles(() => ({
+export const statusStyles = makeStyles(() => ({
     marker: {
         fontFamily: " 'Lato' ",
         fontSize: '12px',
@@ -650,24 +652,9 @@ export const ProposalPage: React.FC<{}> = observer(() => {
                                         </TableRow>
                                     )}
                                 </TableBody>
-                                <TableFooter style={{ height: '130px' }}>
-                                    <TableRow>
-                                        <TablePagination
-                                            rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-                                            colSpan={3}
-                                            count={rows.length}
-                                            rowsPerPage={rowsPerPage}
-                                            page={page}
-                                            SelectProps={{
-                                                inputProps: {
-                                                    'aria-label': 'rows per page',
-                                                },
-                                                native: true,
-                                            }}
-                                            onPageChange={handleChangePage}
-                                            onRowsPerPageChange={handleChangeRowsPerPage}
-                                            ActionsComponent={TablePaginationActions}
-                                        />
+                                <TableFooter style={{ height: '90px' }}>
+                                    <TableRow >
+                                        <Pagination count={10} color="primary" style={{ width: '230%', marginTop: '25px', display: 'flex', justifyContent: 'flex-end' }} />
                                     </TableRow>
                                 </TableFooter>
                             </Table>

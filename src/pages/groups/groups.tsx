@@ -128,7 +128,7 @@ export const Groups: React.FC<{}> = observer(() => {
                     </TableBody>
                 </Table>
             </Paper>
-            { loading && <div>{'loading ...'}</div> }
+            {loading && <div>{'loading ...'}</div>}
             <br />
             <br />
             {/*<pre style={{ maxWidth: 400, overflowX: 'scroll' }}>*/}

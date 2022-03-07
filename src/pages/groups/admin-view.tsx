@@ -1,5 +1,6 @@
 import React from 'react'
 import {
+    Box,
     Button,
     FormControl,
     InputLabel,
@@ -13,6 +14,7 @@ import {
     TableCell,
     TableHead,
     TableRow,
+    TableSortLabel,
     withStyles
 } from '@material-ui/core'
 import { ChatBubbleOutline, Description, SettingsRounded } from '@material-ui/icons'
@@ -23,6 +25,12 @@ import { Link, useHistory, useParams } from 'react-router-dom'
 import { Page } from '../page'
 import { statusStyles } from '../create-proposal/proposal'
 
+interface Data {
+    date: string;
+    status: string;
+    number: string;
+    desc: string;
+}
 
 export const useStyles = makeStyles(() => ({
     root: {
@@ -113,6 +121,17 @@ export const useStyles = makeStyles(() => ({
 
 }))
 
+function createData(
+    date: string,
+    status: string,
+    number: string,
+    desc: string,
+): Data {
+    return {
+        date, status, number, desc
+    };
+}
+
 const StyledTableCell = withStyles(() => ({
     head: {
         padding: '23px 40px',
@@ -127,6 +146,120 @@ const StyledTableCell = withStyles(() => ({
     }
 }))(TableCell)
 
+function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
+    if (b[orderBy] < a[orderBy]) {
+        return -1;
+    }
+    if (b[orderBy] > a[orderBy]) {
+        return 1;
+    }
+    return 0;
+}
+
+type Order = 'asc' | 'desc';
+
+function getComparator<Key extends keyof any>(
+    order: Order,
+    orderBy: Key,
+): (
+        a: { [key in Key]: number | string },
+        b: { [key in Key]: number | string },
+    ) => number {
+    return order === 'desc'
+        ? (a, b) => descendingComparator(a, b, orderBy)
+        : (a, b) => -descendingComparator(a, b, orderBy);
+}
+
+function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) {
+    const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
+    stabilizedThis.sort((a, b) => {
+        const order = comparator(a[0], b[0]);
+        if (order !== 0) {
+            return order;
+        }
+        return a[1] - b[1];
+    });
+    return stabilizedThis.map((el) => el[0]);
+}
+
+interface HeadCell {
+    disablePadding: boolean;
+    id: keyof Data;
+    label: string;
+    numeric: boolean;
+}
+
+const headCells: readonly HeadCell[] = [
+    {
+        id: 'date',
+        numeric: false,
+        disablePadding: true,
+        label: 'date',
+    },
+    {
+        id: 'status',
+        numeric: true,
+        disablePadding: false,
+        label: 'name',
+    },
+    {
+        id: 'number',
+        numeric: true,
+        disablePadding: false,
+        label: '',
+    },
+    {
+        id: 'desc',
+        numeric: true,
+        disablePadding: false,
+        label: '',
+    },
+];
+
+interface EnhancedTableProps {
+    numSelected: number;
+    onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
+    onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    order: Order;
+    orderBy: string;
+    rowCount: number;
+}
+
+function EnhancedTableHead(props: EnhancedTableProps) {
+    const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
+        props;
+    const createSortHandler =
+        (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
+            onRequestSort(event, property);
+        };
+
+    return (
+        <TableHead>
+            <TableRow>
+                {headCells.map((headCell) => (
+                    <StyledTableCell
+                        key={headCell.id}
+                        sortDirection={orderBy === headCell.id ? order : false}
+                    >
+                        <TableSortLabel
+                            active={orderBy === headCell.id}
+                            direction={orderBy === headCell.id ? order : 'asc'}
+                            onClick={createSortHandler(headCell.id)}
+                        >
+                            {headCell.label}
+                            {orderBy === headCell.id ? (
+                                <Box component="span">
+
+                                </Box>
+                            ) : null}
+                        </TableSortLabel>
+                    </StyledTableCell>
+                ))}
+            </TableRow>
+        </TableHead>
+    );
+}
+
 const StyledTableRow = withStyles((theme) => ({
     root: {
         textAlign: 'left',
@@ -135,10 +268,6 @@ const StyledTableRow = withStyles((theme) => ({
         }
     }
 }))(TableRow)
-
-function createData(date, status, number, desc) {
-    return { date, status, number, desc }
-}
 
 const rows = [
     createData('62.12.2021', 'unfinalized', `#1`, 'sometext in description'),
@@ -159,6 +288,31 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
     const [age, setAge] = React.useState('')
     const history = useHistory()
 
+    const [order, setOrder] = React.useState<Order>('asc');
+    const [orderBy, setOrderBy] = React.useState<keyof Data>('date');
+    const [selected, setSelected] = React.useState<readonly string[]>([]);
+    const [page, setPage] = React.useState(0);
+    const [dense, setDense] = React.useState(false);
+    const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+    const handleRequestSort = (
+        event: React.MouseEvent<unknown>,
+        property: keyof Data,
+    ) => {
+        const isAsc = orderBy === property && order === 'asc';
+        setOrder(isAsc ? 'desc' : 'asc');
+        setOrderBy(property);
+    };
+
+    const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.checked) {
+            const newSelecteds = rows.map((n) => n.desc);
+            setSelected(newSelecteds);
+            return;
+        }
+        setSelected([]);
+    };
+
     const pathParams: any = useParams()
     const groupId = pathParams.id === 'new' ? -1 : Number(pathParams.id)
 
@@ -169,6 +323,9 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
     const classes = useStyles()
     const table = tableStyles()
     const status = statusStyles()
+
+    const emptyRows =
+        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
     return (
         <Page>
@@ -262,13 +419,55 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                 <Paper elevation={2}>
                     <h3 style={{ padding: '40px' }}>Proposed Actions</h3>
                     <Table className={table.table} aria-label="customized table">
-                        <TableHead>
-                            <TableRow>
-                                <StyledTableCell>Date</StyledTableCell>
-                                <StyledTableCell align="left">Name</StyledTableCell>
-                            </TableRow>
-                        </TableHead>
+                        <EnhancedTableHead
+                            numSelected={selected.length}
+                            order={order}
+                            orderBy={orderBy}
+                            onSelectAllClick={handleSelectAllClick}
+                            onRequestSort={handleRequestSort}
+                            rowCount={rows.length}
+                        />
                         <TableBody>
+                            {stableSort(rows, getComparator(order, orderBy))
+                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                .map((row, index) => {
+                                    // const isItemSelected = isSelected(row.date);
+                                    const labelId = `enhanced-table-checkbox-${index}`;
+
+                                    return (
+                                        <StyledTableRow
+                                            hover
+                                            role="checkbox"
+                                            tabIndex={-1}
+                                            key={row.date}
+                                        >
+                                            <StyledTableCell
+                                                align="left"
+                                                style={{ width: '30%' }}
+                                                component="th"
+                                                id={labelId}
+                                                scope="row"
+                                                padding="none"
+                                            >
+                                                {row.date}
+                                            </StyledTableCell>
+                                            <StyledTableCell align="left"><span className={`${status.marker} orange`}>{row.status}</span></StyledTableCell>
+                                            <StyledTableCell align="left">{row.number}</StyledTableCell>
+                                            <StyledTableCell align="left">{row.desc}</StyledTableCell>
+                                        </StyledTableRow>
+                                    );
+                                })}
+                            {emptyRows > 0 && (
+                                <TableRow
+                                    style={{
+                                        height: (dense ? 33 : 53) * emptyRows,
+                                    }}
+                                >
+                                    <TableCell colSpan={6} />
+                                </TableRow>
+                            )}
+                        </TableBody>
+                        {/* <TableBody>
                             {rows.map((row) => (
                                 <StyledTableRow key={row.number}>
                                     <StyledTableCell align="left" style={{ width: '30%' }}>{row.date}</StyledTableCell>
@@ -277,7 +476,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                                     <StyledTableCell align="left">{row.desc}</StyledTableCell>
                                 </StyledTableRow>
                             ))}
-                        </TableBody>
+                        </TableBody> */}
                     </Table>
                 </Paper>
 

@@ -139,7 +139,7 @@ export const EditGroup: React.FC<{}> = observer(() => {
 
     console.log("group", toJS(editedGroup));
 
-    const res = propStore.createProposal(toJS(editedGroup))
+    // const res = propStore.createProposal(toJS(editedGroup))
 
     return (
         <div>

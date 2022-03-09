@@ -5,6 +5,12 @@ import React from "react";
 import { Link, Switch } from "react-router-dom";
 import { Page } from "../page";
 import Pagination from '@material-ui/lab/Pagination';
+import { Doughnut } from 'react-chartjs-2';
+import { Chart, ArcElement } from 'chart.js';
+import { registerables } from "chart.js";
+Chart.register(...registerables);
+// Chart.register(ArcElement);
+// Chart.register(Doughnut);
 
 interface Data {
     calories: number;
@@ -540,7 +546,26 @@ export const ProposalPage: React.FC<{}> = observer(() => {
                             <h3>Voting group:</h3>
                             <p style={{ marginLeft: '10px' }}>Foo Dev Team</p>
                         </div>
-                        <p style={{ marginBottom: '30px' }}>Voting closes Nov 29zth 2021, 12:00:35 AM</p>
+                        <Doughnut data={
+                            {
+                                labels: [
+                                    'No',
+                                    'Abstain',
+                                    'Yes'
+                                ],
+                                datasets: [{
+                                    label: 'My First Dataset',
+                                    data: [25.1, 4.9, 65],
+                                    backgroundColor: [
+                                        '#F2B5A8',
+                                        '#FFE7AD',
+                                        '#B9E1C7'
+                                    ],
+                                    hoverOffset: 5
+                                }]
+                            }
+                        } />
+                        <p style={{ marginBottom: '30px', marginTop: '40px' }}>Voting closes Nov 29zth 2021, 12:00:35 AM</p>
                         <div style={{ width: '100%' }}>
                             <div className={classes.btnBox}>
                                 <Button variant="outlined" className={`${status.button} green`}>

@@ -37,6 +37,12 @@ export interface GrantAuthorization {
   expiration: Date | undefined;
 }
 
+/** GrantQueueItem contains the list of TypeURL of a sdk.Msg. */
+export interface GrantQueueItem {
+  /** msg_type_urls contains the list of TypeURL of a sdk.Msg. */
+  msg_type_urls: string[];
+}
+
 const baseGenericAuthorization: object = { msg: "" };
 
 export const GenericAuthorization = {
@@ -266,6 +272,65 @@ export const GrantAuthorization = {
         ? Any.fromPartial(object.authorization)
         : undefined;
     message.expiration = object.expiration ?? undefined;
+    return message;
+  },
+};
+
+const baseGrantQueueItem: object = { msg_type_urls: "" };
+
+export const GrantQueueItem = {
+  encode(
+    message: GrantQueueItem,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    for (const v of message.msg_type_urls) {
+      writer.uint32(10).string(v!);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): GrantQueueItem {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseGrantQueueItem } as GrantQueueItem;
+    message.msg_type_urls = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.msg_type_urls.push(reader.string());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GrantQueueItem {
+    const message = { ...baseGrantQueueItem } as GrantQueueItem;
+    message.msg_type_urls = (object.msg_type_urls ?? []).map((e: any) =>
+      String(e)
+    );
+    return message;
+  },
+
+  toJSON(message: GrantQueueItem): unknown {
+    const obj: any = {};
+    if (message.msg_type_urls) {
+      obj.msg_type_urls = message.msg_type_urls.map((e) => e);
+    } else {
+      obj.msg_type_urls = [];
+    }
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<GrantQueueItem>, I>>(
+    object: I
+  ): GrantQueueItem {
+    const message = { ...baseGrantQueueItem } as GrantQueueItem;
+    message.msg_type_urls = object.msg_type_urls?.map((e) => e) || [];
     return message;
   },
 };

@@ -10,7 +10,9 @@ import {
     TableCell,
     TableFooter,
     TableHead,
-    TableRow, TableSortLabel, TextField,
+    TableRow,
+    TableSortLabel,
+    TextField,
     useTheme,
     withStyles
 } from '@material-ui/core'
@@ -22,7 +24,6 @@ import { Link, useHistory, useParams } from 'react-router-dom'
 import { Page } from '../page'
 import { useStores } from '../../shared-state/repo'
 import { Routes } from '../../routes'
-import { toUint8Array } from '../../shared-state/groups-store'
 import { GroupMember } from '../../generated/cosmos/group/v1beta1/types'
 import Pagination from '@material-ui/lab/Pagination'
 
@@ -418,14 +419,14 @@ export const GroupDetails: React.FC<{}> = observer(() => {
                                                 members: [
                                                     ...editedGroup.members,
                                                     {
-                                                        group_id: editedGroup.info.group_id,
+                                                        group_id: editedGroup.info.id,
                                                         member: {
                                                             address: newMember,
                                                             weight: "1",
                                                             added_at: new Date(),
-                                                            metadata: toUint8Array(JSON.stringify({
+                                                            metadata: JSON.stringify({
                                                                 name: ''
-                                                            }))
+                                                            })
                                                         }
                                                     }
                                                 ]

@@ -28,8 +28,8 @@ export interface EventUpdateGroupPolicy {
   address: string;
 }
 
-/** EventCreateProposal is an event emitted when a proposal is created. */
-export interface EventCreateProposal {
+/** EventSubmitProposal is an event emitted when a proposal is created. */
+export interface EventSubmitProposal {
   /** proposal_id is the unique ID of the proposal. */
   proposal_id: number;
 }
@@ -50,6 +50,14 @@ export interface EventVote {
 export interface EventExec {
   /** proposal_id is the unique ID of the proposal. */
   proposal_id: number;
+}
+
+/** EventLeaveGroup is an event emitted when group member leaves the group. */
+export interface EventLeaveGroup {
+  /** group_id is the unique ID of the group. */
+  group_id: number;
+  /** address is the account address of the group member. */
+  address: string;
 }
 
 const baseEventCreateGroup: object = { group_id: 0 };
@@ -280,11 +288,11 @@ export const EventUpdateGroupPolicy = {
   },
 };
 
-const baseEventCreateProposal: object = { proposal_id: 0 };
+const baseEventSubmitProposal: object = { proposal_id: 0 };
 
-export const EventCreateProposal = {
+export const EventSubmitProposal = {
   encode(
-    message: EventCreateProposal,
+    message: EventSubmitProposal,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.proposal_id !== 0) {
@@ -293,10 +301,10 @@ export const EventCreateProposal = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): EventCreateProposal {
+  decode(input: _m0.Reader | Uint8Array, length?: number): EventSubmitProposal {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseEventCreateProposal } as EventCreateProposal;
+    const message = { ...baseEventSubmitProposal } as EventSubmitProposal;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -311,8 +319,8 @@ export const EventCreateProposal = {
     return message;
   },
 
-  fromJSON(object: any): EventCreateProposal {
-    const message = { ...baseEventCreateProposal } as EventCreateProposal;
+  fromJSON(object: any): EventSubmitProposal {
+    const message = { ...baseEventSubmitProposal } as EventSubmitProposal;
     message.proposal_id =
       object.proposal_id !== undefined && object.proposal_id !== null
         ? Number(object.proposal_id)
@@ -320,17 +328,17 @@ export const EventCreateProposal = {
     return message;
   },
 
-  toJSON(message: EventCreateProposal): unknown {
+  toJSON(message: EventSubmitProposal): unknown {
     const obj: any = {};
     message.proposal_id !== undefined &&
       (obj.proposal_id = Math.round(message.proposal_id));
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<EventCreateProposal>, I>>(
+  fromPartial<I extends Exact<DeepPartial<EventSubmitProposal>, I>>(
     object: I
-  ): EventCreateProposal {
-    const message = { ...baseEventCreateProposal } as EventCreateProposal;
+  ): EventSubmitProposal {
+    const message = { ...baseEventSubmitProposal } as EventSubmitProposal;
     message.proposal_id = object.proposal_id ?? 0;
     return message;
   },
@@ -503,6 +511,74 @@ export const EventExec = {
   ): EventExec {
     const message = { ...baseEventExec } as EventExec;
     message.proposal_id = object.proposal_id ?? 0;
+    return message;
+  },
+};
+
+const baseEventLeaveGroup: object = { group_id: 0, address: "" };
+
+export const EventLeaveGroup = {
+  encode(
+    message: EventLeaveGroup,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.group_id !== 0) {
+      writer.uint32(8).uint64(message.group_id);
+    }
+    if (message.address !== "") {
+      writer.uint32(18).string(message.address);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): EventLeaveGroup {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseEventLeaveGroup } as EventLeaveGroup;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.group_id = longToNumber(reader.uint64() as Long);
+          break;
+        case 2:
+          message.address = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): EventLeaveGroup {
+    const message = { ...baseEventLeaveGroup } as EventLeaveGroup;
+    message.group_id =
+      object.group_id !== undefined && object.group_id !== null
+        ? Number(object.group_id)
+        : 0;
+    message.address =
+      object.address !== undefined && object.address !== null
+        ? String(object.address)
+        : "";
+    return message;
+  },
+
+  toJSON(message: EventLeaveGroup): unknown {
+    const obj: any = {};
+    message.group_id !== undefined &&
+      (obj.group_id = Math.round(message.group_id));
+    message.address !== undefined && (obj.address = message.address);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<EventLeaveGroup>, I>>(
+    object: I
+  ): EventLeaveGroup {
+    const message = { ...baseEventLeaveGroup } as EventLeaveGroup;
+    message.group_id = object.group_id ?? 0;
+    message.address = object.address ?? "";
     return message;
   },
 };

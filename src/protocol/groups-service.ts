@@ -19,7 +19,7 @@ import {
 
 @service
 export class GroupsService {
-    static serviceName: string = 'GroupsService'
+    static serviceName: string = GroupsService.name
 
     static get instance(): GroupsService {
         return getService<GroupsService>(GroupsService.serviceName)
@@ -33,7 +33,7 @@ export class GroupsService {
 
     applyChainInfo = async (chainInfo: ChainInfo): Promise<void> => {
         this.cosmosClient.registry.register(
-            "/regen.group.v1alpha1.MsgCreateGroup",
+            `/${protobufPackage}.MsgCreateGroup`,
             MsgCreateGroup
         )
         this.cosmosClient.registry.register(
@@ -82,7 +82,7 @@ export class GroupsService {
 
     groupMembers = async (groupId: number): Promise<GroupMember[]> => {
         const res = await this.cosmosClient.lcdClientGet(
-            `/regen/group/v1alpha1/groups/${groupId}/members`
+            `/cosmos/group/v1beta1/groups/${groupId}/members`
         ) as QueryGroupMembersResponse
         return res.members
     }
@@ -91,7 +91,7 @@ export class GroupsService {
 function normalizeBackendGroup(g: GroupInfo): GroupInfo { // it's grpc - Long numbers are strings, so we convert them here
     return {
         ...g,
-        group_id: Number(g.group_id),
+        id: Number(g.id),
         version: Number(g.version)
     }
 }

@@ -23,7 +23,7 @@ export interface MsgSubmitProposal {
   initial_deposit: Coin[];
   proposer: string;
   /** metadata is any arbitrary metadata attached to the proposal. */
-  metadata: Uint8Array;
+  metadata: string;
 }
 
 /** MsgSubmitProposalResponse defines the Msg/SubmitProposal response type. */
@@ -50,6 +50,7 @@ export interface MsgVote {
   proposal_id: number;
   voter: string;
   option: VoteOption;
+  metadata: string;
 }
 
 /** MsgVoteResponse defines the Msg/Vote response type. */
@@ -60,6 +61,7 @@ export interface MsgVoteWeighted {
   proposal_id: number;
   voter: string;
   options: WeightedVoteOption[];
+  metadata: string;
 }
 
 /** MsgVoteWeightedResponse defines the Msg/VoteWeighted response type. */
@@ -75,7 +77,7 @@ export interface MsgDeposit {
 /** MsgDepositResponse defines the Msg/Deposit response type. */
 export interface MsgDepositResponse {}
 
-const baseMsgSubmitProposal: object = { proposer: "" };
+const baseMsgSubmitProposal: object = { proposer: "", metadata: "" };
 
 export const MsgSubmitProposal = {
   encode(
@@ -91,8 +93,8 @@ export const MsgSubmitProposal = {
     if (message.proposer !== "") {
       writer.uint32(26).string(message.proposer);
     }
-    if (message.metadata.length !== 0) {
-      writer.uint32(34).bytes(message.metadata);
+    if (message.metadata !== "") {
+      writer.uint32(34).string(message.metadata);
     }
     return writer;
   },
@@ -103,7 +105,6 @@ export const MsgSubmitProposal = {
     const message = { ...baseMsgSubmitProposal } as MsgSubmitProposal;
     message.messages = [];
     message.initial_deposit = [];
-    message.metadata = new Uint8Array();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -117,7 +118,7 @@ export const MsgSubmitProposal = {
           message.proposer = reader.string();
           break;
         case 4:
-          message.metadata = reader.bytes();
+          message.metadata = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -139,8 +140,8 @@ export const MsgSubmitProposal = {
         : "";
     message.metadata =
       object.metadata !== undefined && object.metadata !== null
-        ? bytesFromBase64(object.metadata)
-        : new Uint8Array();
+        ? String(object.metadata)
+        : "";
     return message;
   },
 
@@ -161,10 +162,7 @@ export const MsgSubmitProposal = {
       obj.initial_deposit = [];
     }
     message.proposer !== undefined && (obj.proposer = message.proposer);
-    message.metadata !== undefined &&
-      (obj.metadata = base64FromBytes(
-        message.metadata !== undefined ? message.metadata : new Uint8Array()
-      ));
+    message.metadata !== undefined && (obj.metadata = message.metadata);
     return obj;
   },
 
@@ -176,7 +174,7 @@ export const MsgSubmitProposal = {
     message.initial_deposit =
       object.initial_deposit?.map((e) => Coin.fromPartial(e)) || [];
     message.proposer = object.proposer ?? "";
-    message.metadata = object.metadata ?? new Uint8Array();
+    message.metadata = object.metadata ?? "";
     return message;
   },
 };
@@ -372,7 +370,12 @@ export const MsgExecLegacyContentResponse = {
   },
 };
 
-const baseMsgVote: object = { proposal_id: 0, voter: "", option: 0 };
+const baseMsgVote: object = {
+  proposal_id: 0,
+  voter: "",
+  option: 0,
+  metadata: "",
+};
 
 export const MsgVote = {
   encode(
@@ -387,6 +390,9 @@ export const MsgVote = {
     }
     if (message.option !== 0) {
       writer.uint32(24).int32(message.option);
+    }
+    if (message.metadata !== "") {
+      writer.uint32(34).string(message.metadata);
     }
     return writer;
   },
@@ -406,6 +412,9 @@ export const MsgVote = {
           break;
         case 3:
           message.option = reader.int32() as any;
+          break;
+        case 4:
+          message.metadata = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -429,6 +438,10 @@ export const MsgVote = {
       object.option !== undefined && object.option !== null
         ? voteOptionFromJSON(object.option)
         : 0;
+    message.metadata =
+      object.metadata !== undefined && object.metadata !== null
+        ? String(object.metadata)
+        : "";
     return message;
   },
 
@@ -439,6 +452,7 @@ export const MsgVote = {
     message.voter !== undefined && (obj.voter = message.voter);
     message.option !== undefined &&
       (obj.option = voteOptionToJSON(message.option));
+    message.metadata !== undefined && (obj.metadata = message.metadata);
     return obj;
   },
 
@@ -447,6 +461,7 @@ export const MsgVote = {
     message.proposal_id = object.proposal_id ?? 0;
     message.voter = object.voter ?? "";
     message.option = object.option ?? 0;
+    message.metadata = object.metadata ?? "";
     return message;
   },
 };
@@ -494,7 +509,7 @@ export const MsgVoteResponse = {
   },
 };
 
-const baseMsgVoteWeighted: object = { proposal_id: 0, voter: "" };
+const baseMsgVoteWeighted: object = { proposal_id: 0, voter: "", metadata: "" };
 
 export const MsgVoteWeighted = {
   encode(
@@ -509,6 +524,9 @@ export const MsgVoteWeighted = {
     }
     for (const v of message.options) {
       WeightedVoteOption.encode(v!, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.metadata !== "") {
+      writer.uint32(34).string(message.metadata);
     }
     return writer;
   },
@@ -532,6 +550,9 @@ export const MsgVoteWeighted = {
             WeightedVoteOption.decode(reader, reader.uint32())
           );
           break;
+        case 4:
+          message.metadata = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -553,6 +574,10 @@ export const MsgVoteWeighted = {
     message.options = (object.options ?? []).map((e: any) =>
       WeightedVoteOption.fromJSON(e)
     );
+    message.metadata =
+      object.metadata !== undefined && object.metadata !== null
+        ? String(object.metadata)
+        : "";
     return message;
   },
 
@@ -568,6 +593,7 @@ export const MsgVoteWeighted = {
     } else {
       obj.options = [];
     }
+    message.metadata !== undefined && (obj.metadata = message.metadata);
     return obj;
   },
 
@@ -579,6 +605,7 @@ export const MsgVoteWeighted = {
     message.voter = object.voter ?? "";
     message.options =
       object.options?.map((e) => WeightedVoteOption.fromPartial(e)) || [];
+    message.metadata = object.metadata ?? "";
     return message;
   },
 };
@@ -864,29 +891,6 @@ var globalThis: any = (() => {
   if (typeof global !== "undefined") return global;
   throw "Unable to locate global object";
 })();
-
-const atob: (b64: string) => string =
-  globalThis.atob ||
-  ((b64) => globalThis.Buffer.from(b64, "base64").toString("binary"));
-function bytesFromBase64(b64: string): Uint8Array {
-  const bin = atob(b64);
-  const arr = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; ++i) {
-    arr[i] = bin.charCodeAt(i);
-  }
-  return arr;
-}
-
-const btoa: (bin: string) => string =
-  globalThis.btoa ||
-  ((bin) => globalThis.Buffer.from(bin, "binary").toString("base64"));
-function base64FromBytes(arr: Uint8Array): string {
-  const bin: string[] = [];
-  for (const byte of arr) {
-    bin.push(String.fromCharCode(byte));
-  }
-  return btoa(bin.join(""));
-}
 
 type Builtin =
   | Date

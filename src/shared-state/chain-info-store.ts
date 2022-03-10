@@ -27,28 +27,39 @@ function getDefaultChainInfo(): ChainInfo {
     return {
         rpc: `http://${window.location.hostname}:26657`,
         rest: `http://${window.location.hostname}:1317`,
-        chainId: "test",
-        chainName: "GROUPS-UI-COSMOS_SDK-TEST",
+        // rpc: `http://cosmos-test-2.adoriasoft.link:26657`,
+        // rest: `http://cosmos-test-2.adoriasoft.link:1317`,
+        // chainId: "test",
+        chainId: "cosmoswithgroups",
+        // chainName: "GROUPS-UI-REGEN-TEST",
+        chainName: "GROUPS-UI-SDK-TEST",
         stakeCurrency: {
-            coinDenom: "UREGEN",
-            coinMinimalDenom: "uregen",
+            // coinDenom: "UREGEN",
+            coinDenom: "STAKE",
+            // coinMinimalDenom: "uregen",
+            coinMinimalDenom: "stake",
             coinDecimals: 6
         },
         bip44: {
             coinType: 118
         },
-        bech32Config: Bech32Address.defaultBech32Config("regen"),
+        // bech32Config: Bech32Address.defaultBech32Config("regen"),
+        bech32Config: Bech32Address.defaultBech32Config("cosmos"),
         currencies: [
             {
-                coinDenom: "UREGEN",
-                coinMinimalDenom: "uregen",
+                // coinDenom: "UREGEN",
+                coinDenom: "STAKE",
+                // coinMinimalDenom: "uregen",
+                coinMinimalDenom: "stake",
                 coinDecimals: 6
             }
         ],
         feeCurrencies: [
             {
-                coinDenom: "UREGEN",
-                coinMinimalDenom: "uregen",
+                // coinDenom: "UREGEN",
+                coinDenom: "STAKE",
+                // coinMinimalDenom: "uregen",
+                coinMinimalDenom: "stake",
                 coinDecimals: 6
             }
         ],

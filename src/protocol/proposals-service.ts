@@ -1,20 +1,14 @@
 import { getService, service } from './services'
 import { ChainInfo } from '@keplr-wallet/types'
-import { MsgCreateProposal, MsgExec, MsgVote } from '../generated/regen/group/v1alpha1/tx'
 import { CosmosClient } from './cosmos-client'
-import { Proposal, Vote } from '../generated/regen/group/v1alpha1/types'
+import { Proposal, Vote } from '../generated/cosmos/group/v1beta1/types'
 import {
     QueryProposalResponse,
-    QueryProposalsByGroupAccountResponse,
+    QueryProposalsByGroupPolicyResponse,
     QueryVoteByProposalVoterResponse,
     QueryVotesByProposalResponse
-} from '../generated/regen/group/v1alpha1/query'
-
-export enum GroupProposalsUrls {
-    MsgCreateProposal = "/regen.group.v1alpha1.MsgCreateProposal",
-    MsgVote = "/regen.group.v1alpha1.MsgVote",
-    MsgExec = "/regen.group.v1alpha1.MsgExec"
-}
+} from '../generated/cosmos/group/v1beta1/query'
+import { MsgExec, MsgSubmitProposal, MsgVote, protobufPackage } from '../generated/cosmos/group/v1beta1/tx'
 
 @service
 export class ProposalsService {
@@ -32,30 +26,30 @@ export class ProposalsService {
 
     applyChainInfo = async (chainInfo: ChainInfo): Promise<void> => {
         this.cosmosClient.registry.register(
-            GroupProposalsUrls.MsgCreateProposal,
-            MsgCreateProposal
+            `/${protobufPackage}.MsgSubmitProposal`,
+            MsgSubmitProposal
         )
         this.cosmosClient.registry.register(
-            GroupProposalsUrls.MsgVote,
-            MsgVote
+            `/${protobufPackage}.MsgVote`,
+            MsgVote,
         )
         this.cosmosClient.registry.register(
-            GroupProposalsUrls.MsgExec,
-            MsgExec
+            `/${protobufPackage}.MsgExec`,
+            MsgExec,
         )
     }
 
     proposalById = async (proposalId: number): Promise<Proposal> => {
         const res = await this.cosmosClient.lcdClientGet(
-            `/regen/group/v1alpha1/proposals/${proposalId}`
+            `/cosmos/group/v1beta1/proposal/${proposalId}`
         ) as QueryProposalResponse
         return res.proposal
     }
 
     proposalsByGroupAccount = async (accountAddress: string): Promise<Proposal[]> => {
         const res = await this.cosmosClient.lcdClientGet(
-            `/regen/group/v1alpha1/group-accounts/${accountAddress}/proposals`
-        ) as QueryProposalsByGroupAccountResponse
+            `/cosmos/group/v1beta1/proposals_by_group_policy/${accountAddress}`
+        ) as QueryProposalsByGroupPolicyResponse
 
         // TODO check pagination field later
         console.log("proposals pagination", res.pagination)
@@ -65,21 +59,21 @@ export class ProposalsService {
 
     voteByProposalVoter = async (proposalId: number, voterAddress: string): Promise<Vote> => {
         const res = await this.cosmosClient.lcdClientGet(
-            `/regen/group/v1alpha1/proposals/${proposalId}/votes/${voterAddress}`
+            `/cosmos/group/v1beta1/vote_by_proposal_voter/${proposalId}/${voterAddress}`
         ) as QueryVoteByProposalVoterResponse
         return res.vote
     }
 
     votesByProposal = async (proposalId: number): Promise<Vote[]> => {
         const res = await this.cosmosClient.lcdClientGet(
-            `/regen/group/v1alpha1/proposals/${proposalId}/votes`
+            `/cosmos/group/v1beta1/votes_by_proposal/${proposalId}`
         ) as QueryVotesByProposalResponse
         return res.votes
     }
 
     votesByVoter = async (voterAddress: string): Promise<Vote[]> => {
         const res = await this.cosmosClient.lcdClientGet(
-            `/regen/group/v1alpha1/voters/${voterAddress}`
+            `/cosmos/group/v1beta1/votes_by_voter/${voterAddress}`
         ) as QueryVotesByProposalResponse
         return res.votes
     }

@@ -7,57 +7,218 @@ import { Any } from "../../../google/protobuf/any";
 
 export const protobufPackage = "cosmos.group.v1beta1";
 
-/** Choice defines available types of choices for voting. */
-export enum Choice {
-  /** CHOICE_UNSPECIFIED - CHOICE_UNSPECIFIED defines a no-op voting choice. */
-  CHOICE_UNSPECIFIED = 0,
-  /** CHOICE_NO - CHOICE_NO defines a no voting choice. */
-  CHOICE_NO = 1,
-  /** CHOICE_YES - CHOICE_YES defines a yes voting choice. */
-  CHOICE_YES = 2,
-  /** CHOICE_ABSTAIN - CHOICE_ABSTAIN defines an abstaining voting choice. */
-  CHOICE_ABSTAIN = 3,
-  /** CHOICE_VETO - CHOICE_VETO defines a voting choice with veto. */
-  CHOICE_VETO = 4,
+/** VoteOption enumerates the valid vote options for a given proposal. */
+export enum VoteOption {
+  /** VOTE_OPTION_UNSPECIFIED - VOTE_OPTION_UNSPECIFIED defines a no-op vote option. */
+  VOTE_OPTION_UNSPECIFIED = 0,
+  /** VOTE_OPTION_YES - VOTE_OPTION_YES defines a yes vote option. */
+  VOTE_OPTION_YES = 1,
+  /** VOTE_OPTION_ABSTAIN - VOTE_OPTION_ABSTAIN defines an abstain vote option. */
+  VOTE_OPTION_ABSTAIN = 2,
+  /** VOTE_OPTION_NO - VOTE_OPTION_NO defines a no vote option. */
+  VOTE_OPTION_NO = 3,
+  /** VOTE_OPTION_NO_WITH_VETO - VOTE_OPTION_NO_WITH_VETO defines a no with veto vote option. */
+  VOTE_OPTION_NO_WITH_VETO = 4,
   UNRECOGNIZED = -1,
 }
 
-export function choiceFromJSON(object: any): Choice {
+export function voteOptionFromJSON(object: any): VoteOption {
   switch (object) {
     case 0:
-    case "CHOICE_UNSPECIFIED":
-      return Choice.CHOICE_UNSPECIFIED;
+    case "VOTE_OPTION_UNSPECIFIED":
+      return VoteOption.VOTE_OPTION_UNSPECIFIED;
     case 1:
-    case "CHOICE_NO":
-      return Choice.CHOICE_NO;
+    case "VOTE_OPTION_YES":
+      return VoteOption.VOTE_OPTION_YES;
     case 2:
-    case "CHOICE_YES":
-      return Choice.CHOICE_YES;
+    case "VOTE_OPTION_ABSTAIN":
+      return VoteOption.VOTE_OPTION_ABSTAIN;
     case 3:
-    case "CHOICE_ABSTAIN":
-      return Choice.CHOICE_ABSTAIN;
+    case "VOTE_OPTION_NO":
+      return VoteOption.VOTE_OPTION_NO;
     case 4:
-    case "CHOICE_VETO":
-      return Choice.CHOICE_VETO;
+    case "VOTE_OPTION_NO_WITH_VETO":
+      return VoteOption.VOTE_OPTION_NO_WITH_VETO;
     case -1:
     case "UNRECOGNIZED":
     default:
-      return Choice.UNRECOGNIZED;
+      return VoteOption.UNRECOGNIZED;
   }
 }
 
-export function choiceToJSON(object: Choice): string {
+export function voteOptionToJSON(object: VoteOption): string {
   switch (object) {
-    case Choice.CHOICE_UNSPECIFIED:
-      return "CHOICE_UNSPECIFIED";
-    case Choice.CHOICE_NO:
-      return "CHOICE_NO";
-    case Choice.CHOICE_YES:
-      return "CHOICE_YES";
-    case Choice.CHOICE_ABSTAIN:
-      return "CHOICE_ABSTAIN";
-    case Choice.CHOICE_VETO:
-      return "CHOICE_VETO";
+    case VoteOption.VOTE_OPTION_UNSPECIFIED:
+      return "VOTE_OPTION_UNSPECIFIED";
+    case VoteOption.VOTE_OPTION_YES:
+      return "VOTE_OPTION_YES";
+    case VoteOption.VOTE_OPTION_ABSTAIN:
+      return "VOTE_OPTION_ABSTAIN";
+    case VoteOption.VOTE_OPTION_NO:
+      return "VOTE_OPTION_NO";
+    case VoteOption.VOTE_OPTION_NO_WITH_VETO:
+      return "VOTE_OPTION_NO_WITH_VETO";
+    default:
+      return "UNKNOWN";
+  }
+}
+
+/** ProposalStatus defines proposal statuses. */
+export enum ProposalStatus {
+  /** PROPOSAL_STATUS_UNSPECIFIED - An empty value is invalid and not allowed. */
+  PROPOSAL_STATUS_UNSPECIFIED = 0,
+  /** PROPOSAL_STATUS_SUBMITTED - Initial status of a proposal when persisted. */
+  PROPOSAL_STATUS_SUBMITTED = 1,
+  /** PROPOSAL_STATUS_CLOSED - Final status of a proposal when the final tally was executed. */
+  PROPOSAL_STATUS_CLOSED = 2,
+  /** PROPOSAL_STATUS_ABORTED - Final status of a proposal when the group was modified before the final tally. */
+  PROPOSAL_STATUS_ABORTED = 3,
+  /**
+   * PROPOSAL_STATUS_WITHDRAWN - A proposal can be deleted before the voting start time by the owner. When this happens the final status
+   * is Withdrawn.
+   */
+  PROPOSAL_STATUS_WITHDRAWN = 4,
+  UNRECOGNIZED = -1,
+}
+
+export function proposalStatusFromJSON(object: any): ProposalStatus {
+  switch (object) {
+    case 0:
+    case "PROPOSAL_STATUS_UNSPECIFIED":
+      return ProposalStatus.PROPOSAL_STATUS_UNSPECIFIED;
+    case 1:
+    case "PROPOSAL_STATUS_SUBMITTED":
+      return ProposalStatus.PROPOSAL_STATUS_SUBMITTED;
+    case 2:
+    case "PROPOSAL_STATUS_CLOSED":
+      return ProposalStatus.PROPOSAL_STATUS_CLOSED;
+    case 3:
+    case "PROPOSAL_STATUS_ABORTED":
+      return ProposalStatus.PROPOSAL_STATUS_ABORTED;
+    case 4:
+    case "PROPOSAL_STATUS_WITHDRAWN":
+      return ProposalStatus.PROPOSAL_STATUS_WITHDRAWN;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return ProposalStatus.UNRECOGNIZED;
+  }
+}
+
+export function proposalStatusToJSON(object: ProposalStatus): string {
+  switch (object) {
+    case ProposalStatus.PROPOSAL_STATUS_UNSPECIFIED:
+      return "PROPOSAL_STATUS_UNSPECIFIED";
+    case ProposalStatus.PROPOSAL_STATUS_SUBMITTED:
+      return "PROPOSAL_STATUS_SUBMITTED";
+    case ProposalStatus.PROPOSAL_STATUS_CLOSED:
+      return "PROPOSAL_STATUS_CLOSED";
+    case ProposalStatus.PROPOSAL_STATUS_ABORTED:
+      return "PROPOSAL_STATUS_ABORTED";
+    case ProposalStatus.PROPOSAL_STATUS_WITHDRAWN:
+      return "PROPOSAL_STATUS_WITHDRAWN";
+    default:
+      return "UNKNOWN";
+  }
+}
+
+/** ProposalResult defines types of proposal results. */
+export enum ProposalResult {
+  /** PROPOSAL_RESULT_UNSPECIFIED - An empty value is invalid and not allowed */
+  PROPOSAL_RESULT_UNSPECIFIED = 0,
+  /** PROPOSAL_RESULT_UNFINALIZED - Until a final tally has happened the status is unfinalized */
+  PROPOSAL_RESULT_UNFINALIZED = 1,
+  /** PROPOSAL_RESULT_ACCEPTED - Final result of the tally */
+  PROPOSAL_RESULT_ACCEPTED = 2,
+  /** PROPOSAL_RESULT_REJECTED - Final result of the tally */
+  PROPOSAL_RESULT_REJECTED = 3,
+  UNRECOGNIZED = -1,
+}
+
+export function proposalResultFromJSON(object: any): ProposalResult {
+  switch (object) {
+    case 0:
+    case "PROPOSAL_RESULT_UNSPECIFIED":
+      return ProposalResult.PROPOSAL_RESULT_UNSPECIFIED;
+    case 1:
+    case "PROPOSAL_RESULT_UNFINALIZED":
+      return ProposalResult.PROPOSAL_RESULT_UNFINALIZED;
+    case 2:
+    case "PROPOSAL_RESULT_ACCEPTED":
+      return ProposalResult.PROPOSAL_RESULT_ACCEPTED;
+    case 3:
+    case "PROPOSAL_RESULT_REJECTED":
+      return ProposalResult.PROPOSAL_RESULT_REJECTED;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return ProposalResult.UNRECOGNIZED;
+  }
+}
+
+export function proposalResultToJSON(object: ProposalResult): string {
+  switch (object) {
+    case ProposalResult.PROPOSAL_RESULT_UNSPECIFIED:
+      return "PROPOSAL_RESULT_UNSPECIFIED";
+    case ProposalResult.PROPOSAL_RESULT_UNFINALIZED:
+      return "PROPOSAL_RESULT_UNFINALIZED";
+    case ProposalResult.PROPOSAL_RESULT_ACCEPTED:
+      return "PROPOSAL_RESULT_ACCEPTED";
+    case ProposalResult.PROPOSAL_RESULT_REJECTED:
+      return "PROPOSAL_RESULT_REJECTED";
+    default:
+      return "UNKNOWN";
+  }
+}
+
+/** ProposalExecutorResult defines types of proposal executor results. */
+export enum ProposalExecutorResult {
+  /** PROPOSAL_EXECUTOR_RESULT_UNSPECIFIED - An empty value is not allowed. */
+  PROPOSAL_EXECUTOR_RESULT_UNSPECIFIED = 0,
+  /** PROPOSAL_EXECUTOR_RESULT_NOT_RUN - We have not yet run the executor. */
+  PROPOSAL_EXECUTOR_RESULT_NOT_RUN = 1,
+  /** PROPOSAL_EXECUTOR_RESULT_SUCCESS - The executor was successful and proposed action updated state. */
+  PROPOSAL_EXECUTOR_RESULT_SUCCESS = 2,
+  /** PROPOSAL_EXECUTOR_RESULT_FAILURE - The executor returned an error and proposed action didn't update state. */
+  PROPOSAL_EXECUTOR_RESULT_FAILURE = 3,
+  UNRECOGNIZED = -1,
+}
+
+export function proposalExecutorResultFromJSON(
+  object: any
+): ProposalExecutorResult {
+  switch (object) {
+    case 0:
+    case "PROPOSAL_EXECUTOR_RESULT_UNSPECIFIED":
+      return ProposalExecutorResult.PROPOSAL_EXECUTOR_RESULT_UNSPECIFIED;
+    case 1:
+    case "PROPOSAL_EXECUTOR_RESULT_NOT_RUN":
+      return ProposalExecutorResult.PROPOSAL_EXECUTOR_RESULT_NOT_RUN;
+    case 2:
+    case "PROPOSAL_EXECUTOR_RESULT_SUCCESS":
+      return ProposalExecutorResult.PROPOSAL_EXECUTOR_RESULT_SUCCESS;
+    case 3:
+    case "PROPOSAL_EXECUTOR_RESULT_FAILURE":
+      return ProposalExecutorResult.PROPOSAL_EXECUTOR_RESULT_FAILURE;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return ProposalExecutorResult.UNRECOGNIZED;
+  }
+}
+
+export function proposalExecutorResultToJSON(
+  object: ProposalExecutorResult
+): string {
+  switch (object) {
+    case ProposalExecutorResult.PROPOSAL_EXECUTOR_RESULT_UNSPECIFIED:
+      return "PROPOSAL_EXECUTOR_RESULT_UNSPECIFIED";
+    case ProposalExecutorResult.PROPOSAL_EXECUTOR_RESULT_NOT_RUN:
+      return "PROPOSAL_EXECUTOR_RESULT_NOT_RUN";
+    case ProposalExecutorResult.PROPOSAL_EXECUTOR_RESULT_SUCCESS:
+      return "PROPOSAL_EXECUTOR_RESULT_SUCCESS";
+    case ProposalExecutorResult.PROPOSAL_EXECUTOR_RESULT_FAILURE:
+      return "PROPOSAL_EXECUTOR_RESULT_FAILURE";
     default:
       return "UNKNOWN";
   }
@@ -73,7 +234,7 @@ export interface Member {
   /** weight is the member's voting weight that should be greater than 0. */
   weight: string;
   /** metadata is any arbitrary metadata to attached to the member. */
-  metadata: Uint8Array;
+  metadata: string;
   /** added_at is a timestamp specifying when a member was added. */
   added_at: Date | undefined;
 }
@@ -88,32 +249,49 @@ export interface Members {
 export interface ThresholdDecisionPolicy {
   /** threshold is the minimum weighted sum of yes votes that must be met or exceeded for a proposal to succeed. */
   threshold: string;
-  /**
-   * timeout is the duration from submission of a proposal to the end of voting period
-   * Within this times votes and exec messages can be submitted.
-   */
-  timeout: Duration | undefined;
+  /** windows defines the different windows for voting and execution. */
+  windows: DecisionPolicyWindows | undefined;
 }
 
 /** PercentageDecisionPolicy implements the DecisionPolicy interface */
 export interface PercentageDecisionPolicy {
   /** percentage is the minimum percentage the weighted sum of yes votes must meet for a proposal to succeed. */
   percentage: string;
+  /** windows defines the different windows for voting and execution. */
+  windows: DecisionPolicyWindows | undefined;
+}
+
+/** DecisionPolicyWindows defines the different windows for voting and execution. */
+export interface DecisionPolicyWindows {
   /**
-   * timeout is the duration from submission of a proposal to the end of voting period
-   * Within these times votes and exec messages can be submitted.
+   * voting_period is the duration from submission of a proposal to the end of voting period
+   * Within this times votes can be submitted with MsgVote.
    */
-  timeout: Duration | undefined;
+  voting_period: Duration | undefined;
+  /**
+   * min_execution_period is the minimum duration after the proposal submission
+   * where members can start sending MsgExec. This means that the window for
+   * sending a MsgExec transaction is:
+   * `[ submission + min_execution_period ; submission + voting_period + max_execution_period]`
+   * where max_execution_period is a app-specific config, defined in the keeper.
+   * If not set, min_execution_period will default to 0.
+   *
+   * Please make sure to set a `min_execution_period` that is smaller than
+   * `voting_period + max_execution_period`, or else the above execution window
+   * is empty, meaning that all proposals created with this decision policy
+   * won't be able to be executed.
+   */
+  min_execution_period: Duration | undefined;
 }
 
 /** GroupInfo represents the high-level on-chain information for a group. */
 export interface GroupInfo {
-  /** group_id is the unique ID of the group. */
-  group_id: number;
+  /** id is the unique ID of the group. */
+  id: number;
   /** admin is the account address of the group's admin. */
   admin: string;
   /** metadata is any arbitrary metadata to attached to the group. */
-  metadata: Uint8Array;
+  metadata: string;
   /**
    * version is used to track changes to a group's membership structure that
    * would break existing proposals. Whenever any members weight is changed,
@@ -144,7 +322,7 @@ export interface GroupPolicyInfo {
   /** admin is the account address of the group admin. */
   admin: string;
   /** metadata is any arbitrary metadata to attached to the group policy. */
-  metadata: Uint8Array;
+  metadata: string;
   /**
    * version is used to track changes to a group's GroupPolicyInfo structure that
    * would create a different result on a running proposal.
@@ -163,16 +341,16 @@ export interface GroupPolicyInfo {
  * passes as well as some optional metadata associated with the proposal.
  */
 export interface Proposal {
-  /** proposal_id is the unique id of the proposal. */
-  proposal_id: number;
+  /** id is the unique id of the proposal. */
+  id: number;
   /** address is the account address of group policy. */
   address: string;
   /** metadata is any arbitrary metadata to attached to the proposal. */
-  metadata: Uint8Array;
+  metadata: string;
   /** proposers are the account addresses of the proposers. */
   proposers: string[];
-  /** submitted_at is a timestamp specifying when a proposal was submitted. */
-  submitted_at: Date | undefined;
+  /** submit_time is a timestamp specifying when a proposal was submitted. */
+  submit_time: Date | undefined;
   /**
    * group_version tracks the version of the group that this proposal corresponds to.
    * When group membership is changed, existing proposals from previous group versions will become invalid.
@@ -183,198 +361,44 @@ export interface Proposal {
    * When a decision policy is changed, existing proposals from previous policy versions will become invalid.
    */
   group_policy_version: number;
-  /** Status represents the high level position in the life cycle of the proposal. Initial value is Submitted. */
-  status: Proposal_Status;
+  /** status represents the high level position in the life cycle of the proposal. Initial value is Submitted. */
+  status: ProposalStatus;
   /**
    * result is the final result based on the votes and election rule. Initial value is unfinalized.
    * The result is persisted so that clients can always rely on this state and not have to replicate the logic.
    */
-  result: Proposal_Result;
-  /** vote_state contains the sums of all weighted votes for this proposal. */
-  vote_state: Tally | undefined;
+  result: ProposalResult;
   /**
-   * timeout is the timestamp of the block where the proposal execution times out. Header times of the votes and
-   * execution messages must be before this end time to be included in the election. After the timeout timestamp the
-   * proposal can not be executed anymore and should be considered pending delete.
+   * final_tally_result contains the sums of all weighted votes for this
+   * proposal for each vote option, after tallying. When querying a proposal
+   * via gRPC, this field is not populated until the proposal's voting period
+   * has ended.
    */
-  timeout: Date | undefined;
+  final_tally_result: TallyResult | undefined;
+  /**
+   * voting_period_end is the timestamp before which voting must be done.
+   * Unless a successfull MsgExec is called before (to execute a proposal whose
+   * tally is successful before the voting period ends), tallying will be done
+   * at this point, and the `final_tally_result`, as well
+   * as `status` and `result` fields will be accordingly updated.
+   */
+  voting_period_end: Date | undefined;
   /** executor_result is the final result based on the votes and election rule. Initial value is NotRun. */
-  executor_result: Proposal_ExecutorResult;
-  /** msgs is a list of Msgs that will be executed if the proposal passes. */
-  msgs: Any[];
+  executor_result: ProposalExecutorResult;
+  /** messages is a list of Msgs that will be executed if the proposal passes. */
+  messages: Any[];
 }
 
-/** Status defines proposal statuses. */
-export enum Proposal_Status {
-  /** STATUS_UNSPECIFIED - An empty value is invalid and not allowed. */
-  STATUS_UNSPECIFIED = 0,
-  /** STATUS_SUBMITTED - Initial status of a proposal when persisted. */
-  STATUS_SUBMITTED = 1,
-  /** STATUS_CLOSED - Final status of a proposal when the final tally was executed. */
-  STATUS_CLOSED = 2,
-  /** STATUS_ABORTED - Final status of a proposal when the group was modified before the final tally. */
-  STATUS_ABORTED = 3,
-  /**
-   * STATUS_WITHDRAWN - A proposal can be deleted before the voting start time by the owner. When this happens the final status
-   * is Withdrawn.
-   */
-  STATUS_WITHDRAWN = 4,
-  UNRECOGNIZED = -1,
-}
-
-export function proposal_StatusFromJSON(object: any): Proposal_Status {
-  switch (object) {
-    case 0:
-    case "STATUS_UNSPECIFIED":
-      return Proposal_Status.STATUS_UNSPECIFIED;
-    case 1:
-    case "STATUS_SUBMITTED":
-      return Proposal_Status.STATUS_SUBMITTED;
-    case 2:
-    case "STATUS_CLOSED":
-      return Proposal_Status.STATUS_CLOSED;
-    case 3:
-    case "STATUS_ABORTED":
-      return Proposal_Status.STATUS_ABORTED;
-    case 4:
-    case "STATUS_WITHDRAWN":
-      return Proposal_Status.STATUS_WITHDRAWN;
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return Proposal_Status.UNRECOGNIZED;
-  }
-}
-
-export function proposal_StatusToJSON(object: Proposal_Status): string {
-  switch (object) {
-    case Proposal_Status.STATUS_UNSPECIFIED:
-      return "STATUS_UNSPECIFIED";
-    case Proposal_Status.STATUS_SUBMITTED:
-      return "STATUS_SUBMITTED";
-    case Proposal_Status.STATUS_CLOSED:
-      return "STATUS_CLOSED";
-    case Proposal_Status.STATUS_ABORTED:
-      return "STATUS_ABORTED";
-    case Proposal_Status.STATUS_WITHDRAWN:
-      return "STATUS_WITHDRAWN";
-    default:
-      return "UNKNOWN";
-  }
-}
-
-/** Result defines types of proposal results. */
-export enum Proposal_Result {
-  /** RESULT_UNSPECIFIED - An empty value is invalid and not allowed */
-  RESULT_UNSPECIFIED = 0,
-  /** RESULT_UNFINALIZED - Until a final tally has happened the status is unfinalized */
-  RESULT_UNFINALIZED = 1,
-  /** RESULT_ACCEPTED - Final result of the tally */
-  RESULT_ACCEPTED = 2,
-  /** RESULT_REJECTED - Final result of the tally */
-  RESULT_REJECTED = 3,
-  UNRECOGNIZED = -1,
-}
-
-export function proposal_ResultFromJSON(object: any): Proposal_Result {
-  switch (object) {
-    case 0:
-    case "RESULT_UNSPECIFIED":
-      return Proposal_Result.RESULT_UNSPECIFIED;
-    case 1:
-    case "RESULT_UNFINALIZED":
-      return Proposal_Result.RESULT_UNFINALIZED;
-    case 2:
-    case "RESULT_ACCEPTED":
-      return Proposal_Result.RESULT_ACCEPTED;
-    case 3:
-    case "RESULT_REJECTED":
-      return Proposal_Result.RESULT_REJECTED;
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return Proposal_Result.UNRECOGNIZED;
-  }
-}
-
-export function proposal_ResultToJSON(object: Proposal_Result): string {
-  switch (object) {
-    case Proposal_Result.RESULT_UNSPECIFIED:
-      return "RESULT_UNSPECIFIED";
-    case Proposal_Result.RESULT_UNFINALIZED:
-      return "RESULT_UNFINALIZED";
-    case Proposal_Result.RESULT_ACCEPTED:
-      return "RESULT_ACCEPTED";
-    case Proposal_Result.RESULT_REJECTED:
-      return "RESULT_REJECTED";
-    default:
-      return "UNKNOWN";
-  }
-}
-
-/** ExecutorResult defines types of proposal executor results. */
-export enum Proposal_ExecutorResult {
-  /** EXECUTOR_RESULT_UNSPECIFIED - An empty value is not allowed. */
-  EXECUTOR_RESULT_UNSPECIFIED = 0,
-  /** EXECUTOR_RESULT_NOT_RUN - We have not yet run the executor. */
-  EXECUTOR_RESULT_NOT_RUN = 1,
-  /** EXECUTOR_RESULT_SUCCESS - The executor was successful and proposed action updated state. */
-  EXECUTOR_RESULT_SUCCESS = 2,
-  /** EXECUTOR_RESULT_FAILURE - The executor returned an error and proposed action didn't update state. */
-  EXECUTOR_RESULT_FAILURE = 3,
-  UNRECOGNIZED = -1,
-}
-
-export function proposal_ExecutorResultFromJSON(
-  object: any
-): Proposal_ExecutorResult {
-  switch (object) {
-    case 0:
-    case "EXECUTOR_RESULT_UNSPECIFIED":
-      return Proposal_ExecutorResult.EXECUTOR_RESULT_UNSPECIFIED;
-    case 1:
-    case "EXECUTOR_RESULT_NOT_RUN":
-      return Proposal_ExecutorResult.EXECUTOR_RESULT_NOT_RUN;
-    case 2:
-    case "EXECUTOR_RESULT_SUCCESS":
-      return Proposal_ExecutorResult.EXECUTOR_RESULT_SUCCESS;
-    case 3:
-    case "EXECUTOR_RESULT_FAILURE":
-      return Proposal_ExecutorResult.EXECUTOR_RESULT_FAILURE;
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return Proposal_ExecutorResult.UNRECOGNIZED;
-  }
-}
-
-export function proposal_ExecutorResultToJSON(
-  object: Proposal_ExecutorResult
-): string {
-  switch (object) {
-    case Proposal_ExecutorResult.EXECUTOR_RESULT_UNSPECIFIED:
-      return "EXECUTOR_RESULT_UNSPECIFIED";
-    case Proposal_ExecutorResult.EXECUTOR_RESULT_NOT_RUN:
-      return "EXECUTOR_RESULT_NOT_RUN";
-    case Proposal_ExecutorResult.EXECUTOR_RESULT_SUCCESS:
-      return "EXECUTOR_RESULT_SUCCESS";
-    case Proposal_ExecutorResult.EXECUTOR_RESULT_FAILURE:
-      return "EXECUTOR_RESULT_FAILURE";
-    default:
-      return "UNKNOWN";
-  }
-}
-
-/** Tally represents the sum of weighted votes. */
-export interface Tally {
+/** TallyResult represents the sum of weighted votes for each vote option. */
+export interface TallyResult {
   /** yes_count is the weighted sum of yes votes. */
   yes_count: string;
-  /** no_count is the weighted sum of no votes. */
-  no_count: string;
-  /** abstain_count is the weighted sum of abstainers */
+  /** abstain_count is the weighted sum of abstainers. */
   abstain_count: string;
-  /** veto_count is the weighted sum of vetoes. */
-  veto_count: string;
+  /** no is the weighted sum of no votes. */
+  no_count: string;
+  /** no_with_veto_count is the weighted sum of veto. */
+  no_with_veto_count: string;
 }
 
 /** Vote represents a vote for a proposal. */
@@ -383,15 +407,15 @@ export interface Vote {
   proposal_id: number;
   /** voter is the account address of the voter. */
   voter: string;
-  /** choice is the voter's choice on the proposal. */
-  choice: Choice;
+  /** option is the voter's choice on the proposal. */
+  option: VoteOption;
   /** metadata is any arbitrary metadata to attached to the vote. */
-  metadata: Uint8Array;
-  /** submitted_at is the timestamp when the vote was submitted. */
-  submitted_at: Date | undefined;
+  metadata: string;
+  /** submit_time is the timestamp when the vote was submitted. */
+  submit_time: Date | undefined;
 }
 
-const baseMember: object = { address: "", weight: "" };
+const baseMember: object = { address: "", weight: "", metadata: "" };
 
 export const Member = {
   encode(
@@ -404,8 +428,8 @@ export const Member = {
     if (message.weight !== "") {
       writer.uint32(18).string(message.weight);
     }
-    if (message.metadata.length !== 0) {
-      writer.uint32(26).bytes(message.metadata);
+    if (message.metadata !== "") {
+      writer.uint32(26).string(message.metadata);
     }
     if (message.added_at !== undefined) {
       Timestamp.encode(
@@ -420,7 +444,6 @@ export const Member = {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseMember } as Member;
-    message.metadata = new Uint8Array();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -431,7 +454,7 @@ export const Member = {
           message.weight = reader.string();
           break;
         case 3:
-          message.metadata = reader.bytes();
+          message.metadata = reader.string();
           break;
         case 4:
           message.added_at = fromTimestamp(
@@ -458,8 +481,8 @@ export const Member = {
         : "";
     message.metadata =
       object.metadata !== undefined && object.metadata !== null
-        ? bytesFromBase64(object.metadata)
-        : new Uint8Array();
+        ? String(object.metadata)
+        : "";
     message.added_at =
       object.added_at !== undefined && object.added_at !== null
         ? fromJsonTimestamp(object.added_at)
@@ -471,10 +494,7 @@ export const Member = {
     const obj: any = {};
     message.address !== undefined && (obj.address = message.address);
     message.weight !== undefined && (obj.weight = message.weight);
-    message.metadata !== undefined &&
-      (obj.metadata = base64FromBytes(
-        message.metadata !== undefined ? message.metadata : new Uint8Array()
-      ));
+    message.metadata !== undefined && (obj.metadata = message.metadata);
     message.added_at !== undefined &&
       (obj.added_at = message.added_at.toISOString());
     return obj;
@@ -484,7 +504,7 @@ export const Member = {
     const message = { ...baseMember } as Member;
     message.address = object.address ?? "";
     message.weight = object.weight ?? "";
-    message.metadata = object.metadata ?? new Uint8Array();
+    message.metadata = object.metadata ?? "";
     message.added_at = object.added_at ?? undefined;
     return message;
   },
@@ -559,8 +579,11 @@ export const ThresholdDecisionPolicy = {
     if (message.threshold !== "") {
       writer.uint32(10).string(message.threshold);
     }
-    if (message.timeout !== undefined) {
-      Duration.encode(message.timeout, writer.uint32(18).fork()).ldelim();
+    if (message.windows !== undefined) {
+      DecisionPolicyWindows.encode(
+        message.windows,
+        writer.uint32(18).fork()
+      ).ldelim();
     }
     return writer;
   },
@@ -581,7 +604,10 @@ export const ThresholdDecisionPolicy = {
           message.threshold = reader.string();
           break;
         case 2:
-          message.timeout = Duration.decode(reader, reader.uint32());
+          message.windows = DecisionPolicyWindows.decode(
+            reader,
+            reader.uint32()
+          );
           break;
         default:
           reader.skipType(tag & 7);
@@ -599,9 +625,9 @@ export const ThresholdDecisionPolicy = {
       object.threshold !== undefined && object.threshold !== null
         ? String(object.threshold)
         : "";
-    message.timeout =
-      object.timeout !== undefined && object.timeout !== null
-        ? Duration.fromJSON(object.timeout)
+    message.windows =
+      object.windows !== undefined && object.windows !== null
+        ? DecisionPolicyWindows.fromJSON(object.windows)
         : undefined;
     return message;
   },
@@ -609,9 +635,9 @@ export const ThresholdDecisionPolicy = {
   toJSON(message: ThresholdDecisionPolicy): unknown {
     const obj: any = {};
     message.threshold !== undefined && (obj.threshold = message.threshold);
-    message.timeout !== undefined &&
-      (obj.timeout = message.timeout
-        ? Duration.toJSON(message.timeout)
+    message.windows !== undefined &&
+      (obj.windows = message.windows
+        ? DecisionPolicyWindows.toJSON(message.windows)
         : undefined);
     return obj;
   },
@@ -623,9 +649,9 @@ export const ThresholdDecisionPolicy = {
       ...baseThresholdDecisionPolicy,
     } as ThresholdDecisionPolicy;
     message.threshold = object.threshold ?? "";
-    message.timeout =
-      object.timeout !== undefined && object.timeout !== null
-        ? Duration.fromPartial(object.timeout)
+    message.windows =
+      object.windows !== undefined && object.windows !== null
+        ? DecisionPolicyWindows.fromPartial(object.windows)
         : undefined;
     return message;
   },
@@ -641,8 +667,11 @@ export const PercentageDecisionPolicy = {
     if (message.percentage !== "") {
       writer.uint32(10).string(message.percentage);
     }
-    if (message.timeout !== undefined) {
-      Duration.encode(message.timeout, writer.uint32(18).fork()).ldelim();
+    if (message.windows !== undefined) {
+      DecisionPolicyWindows.encode(
+        message.windows,
+        writer.uint32(18).fork()
+      ).ldelim();
     }
     return writer;
   },
@@ -663,7 +692,10 @@ export const PercentageDecisionPolicy = {
           message.percentage = reader.string();
           break;
         case 2:
-          message.timeout = Duration.decode(reader, reader.uint32());
+          message.windows = DecisionPolicyWindows.decode(
+            reader,
+            reader.uint32()
+          );
           break;
         default:
           reader.skipType(tag & 7);
@@ -681,9 +713,9 @@ export const PercentageDecisionPolicy = {
       object.percentage !== undefined && object.percentage !== null
         ? String(object.percentage)
         : "";
-    message.timeout =
-      object.timeout !== undefined && object.timeout !== null
-        ? Duration.fromJSON(object.timeout)
+    message.windows =
+      object.windows !== undefined && object.windows !== null
+        ? DecisionPolicyWindows.fromJSON(object.windows)
         : undefined;
     return message;
   },
@@ -691,9 +723,9 @@ export const PercentageDecisionPolicy = {
   toJSON(message: PercentageDecisionPolicy): unknown {
     const obj: any = {};
     message.percentage !== undefined && (obj.percentage = message.percentage);
-    message.timeout !== undefined &&
-      (obj.timeout = message.timeout
-        ? Duration.toJSON(message.timeout)
+    message.windows !== undefined &&
+      (obj.windows = message.windows
+        ? DecisionPolicyWindows.toJSON(message.windows)
         : undefined);
     return obj;
   },
@@ -705,17 +737,108 @@ export const PercentageDecisionPolicy = {
       ...basePercentageDecisionPolicy,
     } as PercentageDecisionPolicy;
     message.percentage = object.percentage ?? "";
-    message.timeout =
-      object.timeout !== undefined && object.timeout !== null
-        ? Duration.fromPartial(object.timeout)
+    message.windows =
+      object.windows !== undefined && object.windows !== null
+        ? DecisionPolicyWindows.fromPartial(object.windows)
+        : undefined;
+    return message;
+  },
+};
+
+const baseDecisionPolicyWindows: object = {};
+
+export const DecisionPolicyWindows = {
+  encode(
+    message: DecisionPolicyWindows,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.voting_period !== undefined) {
+      Duration.encode(message.voting_period, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.min_execution_period !== undefined) {
+      Duration.encode(
+        message.min_execution_period,
+        writer.uint32(18).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): DecisionPolicyWindows {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseDecisionPolicyWindows } as DecisionPolicyWindows;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.voting_period = Duration.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.min_execution_period = Duration.decode(
+            reader,
+            reader.uint32()
+          );
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DecisionPolicyWindows {
+    const message = { ...baseDecisionPolicyWindows } as DecisionPolicyWindows;
+    message.voting_period =
+      object.voting_period !== undefined && object.voting_period !== null
+        ? Duration.fromJSON(object.voting_period)
+        : undefined;
+    message.min_execution_period =
+      object.min_execution_period !== undefined &&
+      object.min_execution_period !== null
+        ? Duration.fromJSON(object.min_execution_period)
+        : undefined;
+    return message;
+  },
+
+  toJSON(message: DecisionPolicyWindows): unknown {
+    const obj: any = {};
+    message.voting_period !== undefined &&
+      (obj.voting_period = message.voting_period
+        ? Duration.toJSON(message.voting_period)
+        : undefined);
+    message.min_execution_period !== undefined &&
+      (obj.min_execution_period = message.min_execution_period
+        ? Duration.toJSON(message.min_execution_period)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<DecisionPolicyWindows>, I>>(
+    object: I
+  ): DecisionPolicyWindows {
+    const message = { ...baseDecisionPolicyWindows } as DecisionPolicyWindows;
+    message.voting_period =
+      object.voting_period !== undefined && object.voting_period !== null
+        ? Duration.fromPartial(object.voting_period)
+        : undefined;
+    message.min_execution_period =
+      object.min_execution_period !== undefined &&
+      object.min_execution_period !== null
+        ? Duration.fromPartial(object.min_execution_period)
         : undefined;
     return message;
   },
 };
 
 const baseGroupInfo: object = {
-  group_id: 0,
+  id: 0,
   admin: "",
+  metadata: "",
   version: 0,
   total_weight: "",
 };
@@ -725,14 +848,14 @@ export const GroupInfo = {
     message: GroupInfo,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.group_id !== 0) {
-      writer.uint32(8).uint64(message.group_id);
+    if (message.id !== 0) {
+      writer.uint32(8).uint64(message.id);
     }
     if (message.admin !== "") {
       writer.uint32(18).string(message.admin);
     }
-    if (message.metadata.length !== 0) {
-      writer.uint32(26).bytes(message.metadata);
+    if (message.metadata !== "") {
+      writer.uint32(26).string(message.metadata);
     }
     if (message.version !== 0) {
       writer.uint32(32).uint64(message.version);
@@ -753,18 +876,17 @@ export const GroupInfo = {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseGroupInfo } as GroupInfo;
-    message.metadata = new Uint8Array();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.group_id = longToNumber(reader.uint64() as Long);
+          message.id = longToNumber(reader.uint64() as Long);
           break;
         case 2:
           message.admin = reader.string();
           break;
         case 3:
-          message.metadata = reader.bytes();
+          message.metadata = reader.string();
           break;
         case 4:
           message.version = longToNumber(reader.uint64() as Long);
@@ -787,18 +909,16 @@ export const GroupInfo = {
 
   fromJSON(object: any): GroupInfo {
     const message = { ...baseGroupInfo } as GroupInfo;
-    message.group_id =
-      object.group_id !== undefined && object.group_id !== null
-        ? Number(object.group_id)
-        : 0;
+    message.id =
+      object.id !== undefined && object.id !== null ? Number(object.id) : 0;
     message.admin =
       object.admin !== undefined && object.admin !== null
         ? String(object.admin)
         : "";
     message.metadata =
       object.metadata !== undefined && object.metadata !== null
-        ? bytesFromBase64(object.metadata)
-        : new Uint8Array();
+        ? String(object.metadata)
+        : "";
     message.version =
       object.version !== undefined && object.version !== null
         ? Number(object.version)
@@ -816,13 +936,9 @@ export const GroupInfo = {
 
   toJSON(message: GroupInfo): unknown {
     const obj: any = {};
-    message.group_id !== undefined &&
-      (obj.group_id = Math.round(message.group_id));
+    message.id !== undefined && (obj.id = Math.round(message.id));
     message.admin !== undefined && (obj.admin = message.admin);
-    message.metadata !== undefined &&
-      (obj.metadata = base64FromBytes(
-        message.metadata !== undefined ? message.metadata : new Uint8Array()
-      ));
+    message.metadata !== undefined && (obj.metadata = message.metadata);
     message.version !== undefined &&
       (obj.version = Math.round(message.version));
     message.total_weight !== undefined &&
@@ -836,9 +952,9 @@ export const GroupInfo = {
     object: I
   ): GroupInfo {
     const message = { ...baseGroupInfo } as GroupInfo;
-    message.group_id = object.group_id ?? 0;
+    message.id = object.id ?? 0;
     message.admin = object.admin ?? "";
-    message.metadata = object.metadata ?? new Uint8Array();
+    message.metadata = object.metadata ?? "";
     message.version = object.version ?? 0;
     message.total_weight = object.total_weight ?? "";
     message.created_at = object.created_at ?? undefined;
@@ -922,6 +1038,7 @@ const baseGroupPolicyInfo: object = {
   address: "",
   group_id: 0,
   admin: "",
+  metadata: "",
   version: 0,
 };
 
@@ -939,8 +1056,8 @@ export const GroupPolicyInfo = {
     if (message.admin !== "") {
       writer.uint32(26).string(message.admin);
     }
-    if (message.metadata.length !== 0) {
-      writer.uint32(34).bytes(message.metadata);
+    if (message.metadata !== "") {
+      writer.uint32(34).string(message.metadata);
     }
     if (message.version !== 0) {
       writer.uint32(40).uint64(message.version);
@@ -961,7 +1078,6 @@ export const GroupPolicyInfo = {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseGroupPolicyInfo } as GroupPolicyInfo;
-    message.metadata = new Uint8Array();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -975,7 +1091,7 @@ export const GroupPolicyInfo = {
           message.admin = reader.string();
           break;
         case 4:
-          message.metadata = reader.bytes();
+          message.metadata = reader.string();
           break;
         case 5:
           message.version = longToNumber(reader.uint64() as Long);
@@ -1012,8 +1128,8 @@ export const GroupPolicyInfo = {
         : "";
     message.metadata =
       object.metadata !== undefined && object.metadata !== null
-        ? bytesFromBase64(object.metadata)
-        : new Uint8Array();
+        ? String(object.metadata)
+        : "";
     message.version =
       object.version !== undefined && object.version !== null
         ? Number(object.version)
@@ -1035,10 +1151,7 @@ export const GroupPolicyInfo = {
     message.group_id !== undefined &&
       (obj.group_id = Math.round(message.group_id));
     message.admin !== undefined && (obj.admin = message.admin);
-    message.metadata !== undefined &&
-      (obj.metadata = base64FromBytes(
-        message.metadata !== undefined ? message.metadata : new Uint8Array()
-      ));
+    message.metadata !== undefined && (obj.metadata = message.metadata);
     message.version !== undefined &&
       (obj.version = Math.round(message.version));
     message.decision_policy !== undefined &&
@@ -1057,7 +1170,7 @@ export const GroupPolicyInfo = {
     message.address = object.address ?? "";
     message.group_id = object.group_id ?? 0;
     message.admin = object.admin ?? "";
-    message.metadata = object.metadata ?? new Uint8Array();
+    message.metadata = object.metadata ?? "";
     message.version = object.version ?? 0;
     message.decision_policy =
       object.decision_policy !== undefined && object.decision_policy !== null
@@ -1069,8 +1182,9 @@ export const GroupPolicyInfo = {
 };
 
 const baseProposal: object = {
-  proposal_id: 0,
+  id: 0,
   address: "",
+  metadata: "",
   proposers: "",
   group_version: 0,
   group_policy_version: 0,
@@ -1084,21 +1198,21 @@ export const Proposal = {
     message: Proposal,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.proposal_id !== 0) {
-      writer.uint32(8).uint64(message.proposal_id);
+    if (message.id !== 0) {
+      writer.uint32(8).uint64(message.id);
     }
     if (message.address !== "") {
       writer.uint32(18).string(message.address);
     }
-    if (message.metadata.length !== 0) {
-      writer.uint32(26).bytes(message.metadata);
+    if (message.metadata !== "") {
+      writer.uint32(26).string(message.metadata);
     }
     for (const v of message.proposers) {
       writer.uint32(34).string(v!);
     }
-    if (message.submitted_at !== undefined) {
+    if (message.submit_time !== undefined) {
       Timestamp.encode(
-        toTimestamp(message.submitted_at),
+        toTimestamp(message.submit_time),
         writer.uint32(42).fork()
       ).ldelim();
     }
@@ -1114,19 +1228,22 @@ export const Proposal = {
     if (message.result !== 0) {
       writer.uint32(72).int32(message.result);
     }
-    if (message.vote_state !== undefined) {
-      Tally.encode(message.vote_state, writer.uint32(82).fork()).ldelim();
+    if (message.final_tally_result !== undefined) {
+      TallyResult.encode(
+        message.final_tally_result,
+        writer.uint32(82).fork()
+      ).ldelim();
     }
-    if (message.timeout !== undefined) {
+    if (message.voting_period_end !== undefined) {
       Timestamp.encode(
-        toTimestamp(message.timeout),
+        toTimestamp(message.voting_period_end),
         writer.uint32(90).fork()
       ).ldelim();
     }
     if (message.executor_result !== 0) {
       writer.uint32(96).int32(message.executor_result);
     }
-    for (const v of message.msgs) {
+    for (const v of message.messages) {
       Any.encode(v!, writer.uint32(106).fork()).ldelim();
     }
     return writer;
@@ -1137,25 +1254,24 @@ export const Proposal = {
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseProposal } as Proposal;
     message.proposers = [];
-    message.msgs = [];
-    message.metadata = new Uint8Array();
+    message.messages = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.proposal_id = longToNumber(reader.uint64() as Long);
+          message.id = longToNumber(reader.uint64() as Long);
           break;
         case 2:
           message.address = reader.string();
           break;
         case 3:
-          message.metadata = reader.bytes();
+          message.metadata = reader.string();
           break;
         case 4:
           message.proposers.push(reader.string());
           break;
         case 5:
-          message.submitted_at = fromTimestamp(
+          message.submit_time = fromTimestamp(
             Timestamp.decode(reader, reader.uint32())
           );
           break;
@@ -1172,10 +1288,13 @@ export const Proposal = {
           message.result = reader.int32() as any;
           break;
         case 10:
-          message.vote_state = Tally.decode(reader, reader.uint32());
+          message.final_tally_result = TallyResult.decode(
+            reader,
+            reader.uint32()
+          );
           break;
         case 11:
-          message.timeout = fromTimestamp(
+          message.voting_period_end = fromTimestamp(
             Timestamp.decode(reader, reader.uint32())
           );
           break;
@@ -1183,7 +1302,7 @@ export const Proposal = {
           message.executor_result = reader.int32() as any;
           break;
         case 13:
-          message.msgs.push(Any.decode(reader, reader.uint32()));
+          message.messages.push(Any.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -1195,22 +1314,20 @@ export const Proposal = {
 
   fromJSON(object: any): Proposal {
     const message = { ...baseProposal } as Proposal;
-    message.proposal_id =
-      object.proposal_id !== undefined && object.proposal_id !== null
-        ? Number(object.proposal_id)
-        : 0;
+    message.id =
+      object.id !== undefined && object.id !== null ? Number(object.id) : 0;
     message.address =
       object.address !== undefined && object.address !== null
         ? String(object.address)
         : "";
     message.metadata =
       object.metadata !== undefined && object.metadata !== null
-        ? bytesFromBase64(object.metadata)
-        : new Uint8Array();
+        ? String(object.metadata)
+        : "";
     message.proposers = (object.proposers ?? []).map((e: any) => String(e));
-    message.submitted_at =
-      object.submitted_at !== undefined && object.submitted_at !== null
-        ? fromJsonTimestamp(object.submitted_at)
+    message.submit_time =
+      object.submit_time !== undefined && object.submit_time !== null
+        ? fromJsonTimestamp(object.submit_time)
         : undefined;
     message.group_version =
       object.group_version !== undefined && object.group_version !== null
@@ -1223,120 +1340,124 @@ export const Proposal = {
         : 0;
     message.status =
       object.status !== undefined && object.status !== null
-        ? proposal_StatusFromJSON(object.status)
+        ? proposalStatusFromJSON(object.status)
         : 0;
     message.result =
       object.result !== undefined && object.result !== null
-        ? proposal_ResultFromJSON(object.result)
+        ? proposalResultFromJSON(object.result)
         : 0;
-    message.vote_state =
-      object.vote_state !== undefined && object.vote_state !== null
-        ? Tally.fromJSON(object.vote_state)
+    message.final_tally_result =
+      object.final_tally_result !== undefined &&
+      object.final_tally_result !== null
+        ? TallyResult.fromJSON(object.final_tally_result)
         : undefined;
-    message.timeout =
-      object.timeout !== undefined && object.timeout !== null
-        ? fromJsonTimestamp(object.timeout)
+    message.voting_period_end =
+      object.voting_period_end !== undefined &&
+      object.voting_period_end !== null
+        ? fromJsonTimestamp(object.voting_period_end)
         : undefined;
     message.executor_result =
       object.executor_result !== undefined && object.executor_result !== null
-        ? proposal_ExecutorResultFromJSON(object.executor_result)
+        ? proposalExecutorResultFromJSON(object.executor_result)
         : 0;
-    message.msgs = (object.msgs ?? []).map((e: any) => Any.fromJSON(e));
+    message.messages = (object.messages ?? []).map((e: any) => Any.fromJSON(e));
     return message;
   },
 
   toJSON(message: Proposal): unknown {
     const obj: any = {};
-    message.proposal_id !== undefined &&
-      (obj.proposal_id = Math.round(message.proposal_id));
+    message.id !== undefined && (obj.id = Math.round(message.id));
     message.address !== undefined && (obj.address = message.address);
-    message.metadata !== undefined &&
-      (obj.metadata = base64FromBytes(
-        message.metadata !== undefined ? message.metadata : new Uint8Array()
-      ));
+    message.metadata !== undefined && (obj.metadata = message.metadata);
     if (message.proposers) {
       obj.proposers = message.proposers.map((e) => e);
     } else {
       obj.proposers = [];
     }
-    message.submitted_at !== undefined &&
-      (obj.submitted_at = message.submitted_at.toISOString());
+    message.submit_time !== undefined &&
+      (obj.submit_time = message.submit_time.toISOString());
     message.group_version !== undefined &&
       (obj.group_version = Math.round(message.group_version));
     message.group_policy_version !== undefined &&
       (obj.group_policy_version = Math.round(message.group_policy_version));
     message.status !== undefined &&
-      (obj.status = proposal_StatusToJSON(message.status));
+      (obj.status = proposalStatusToJSON(message.status));
     message.result !== undefined &&
-      (obj.result = proposal_ResultToJSON(message.result));
-    message.vote_state !== undefined &&
-      (obj.vote_state = message.vote_state
-        ? Tally.toJSON(message.vote_state)
+      (obj.result = proposalResultToJSON(message.result));
+    message.final_tally_result !== undefined &&
+      (obj.final_tally_result = message.final_tally_result
+        ? TallyResult.toJSON(message.final_tally_result)
         : undefined);
-    message.timeout !== undefined &&
-      (obj.timeout = message.timeout.toISOString());
+    message.voting_period_end !== undefined &&
+      (obj.voting_period_end = message.voting_period_end.toISOString());
     message.executor_result !== undefined &&
-      (obj.executor_result = proposal_ExecutorResultToJSON(
+      (obj.executor_result = proposalExecutorResultToJSON(
         message.executor_result
       ));
-    if (message.msgs) {
-      obj.msgs = message.msgs.map((e) => (e ? Any.toJSON(e) : undefined));
+    if (message.messages) {
+      obj.messages = message.messages.map((e) =>
+        e ? Any.toJSON(e) : undefined
+      );
     } else {
-      obj.msgs = [];
+      obj.messages = [];
     }
     return obj;
   },
 
   fromPartial<I extends Exact<DeepPartial<Proposal>, I>>(object: I): Proposal {
     const message = { ...baseProposal } as Proposal;
-    message.proposal_id = object.proposal_id ?? 0;
+    message.id = object.id ?? 0;
     message.address = object.address ?? "";
-    message.metadata = object.metadata ?? new Uint8Array();
+    message.metadata = object.metadata ?? "";
     message.proposers = object.proposers?.map((e) => e) || [];
-    message.submitted_at = object.submitted_at ?? undefined;
+    message.submit_time = object.submit_time ?? undefined;
     message.group_version = object.group_version ?? 0;
     message.group_policy_version = object.group_policy_version ?? 0;
     message.status = object.status ?? 0;
     message.result = object.result ?? 0;
-    message.vote_state =
-      object.vote_state !== undefined && object.vote_state !== null
-        ? Tally.fromPartial(object.vote_state)
+    message.final_tally_result =
+      object.final_tally_result !== undefined &&
+      object.final_tally_result !== null
+        ? TallyResult.fromPartial(object.final_tally_result)
         : undefined;
-    message.timeout = object.timeout ?? undefined;
+    message.voting_period_end = object.voting_period_end ?? undefined;
     message.executor_result = object.executor_result ?? 0;
-    message.msgs = object.msgs?.map((e) => Any.fromPartial(e)) || [];
+    message.messages = object.messages?.map((e) => Any.fromPartial(e)) || [];
     return message;
   },
 };
 
-const baseTally: object = {
+const baseTallyResult: object = {
   yes_count: "",
-  no_count: "",
   abstain_count: "",
-  veto_count: "",
+  no_count: "",
+  no_with_veto_count: "",
 };
 
-export const Tally = {
-  encode(message: Tally, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const TallyResult = {
+  encode(
+    message: TallyResult,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.yes_count !== "") {
       writer.uint32(10).string(message.yes_count);
     }
-    if (message.no_count !== "") {
-      writer.uint32(18).string(message.no_count);
-    }
     if (message.abstain_count !== "") {
-      writer.uint32(26).string(message.abstain_count);
+      writer.uint32(18).string(message.abstain_count);
     }
-    if (message.veto_count !== "") {
-      writer.uint32(34).string(message.veto_count);
+    if (message.no_count !== "") {
+      writer.uint32(26).string(message.no_count);
+    }
+    if (message.no_with_veto_count !== "") {
+      writer.uint32(34).string(message.no_with_veto_count);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): Tally {
+  decode(input: _m0.Reader | Uint8Array, length?: number): TallyResult {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseTally } as Tally;
+    const message = { ...baseTallyResult } as TallyResult;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1344,13 +1465,13 @@ export const Tally = {
           message.yes_count = reader.string();
           break;
         case 2:
-          message.no_count = reader.string();
-          break;
-        case 3:
           message.abstain_count = reader.string();
           break;
+        case 3:
+          message.no_count = reader.string();
+          break;
         case 4:
-          message.veto_count = reader.string();
+          message.no_with_veto_count = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -1360,48 +1481,52 @@ export const Tally = {
     return message;
   },
 
-  fromJSON(object: any): Tally {
-    const message = { ...baseTally } as Tally;
+  fromJSON(object: any): TallyResult {
+    const message = { ...baseTallyResult } as TallyResult;
     message.yes_count =
       object.yes_count !== undefined && object.yes_count !== null
         ? String(object.yes_count)
-        : "";
-    message.no_count =
-      object.no_count !== undefined && object.no_count !== null
-        ? String(object.no_count)
         : "";
     message.abstain_count =
       object.abstain_count !== undefined && object.abstain_count !== null
         ? String(object.abstain_count)
         : "";
-    message.veto_count =
-      object.veto_count !== undefined && object.veto_count !== null
-        ? String(object.veto_count)
+    message.no_count =
+      object.no_count !== undefined && object.no_count !== null
+        ? String(object.no_count)
+        : "";
+    message.no_with_veto_count =
+      object.no_with_veto_count !== undefined &&
+      object.no_with_veto_count !== null
+        ? String(object.no_with_veto_count)
         : "";
     return message;
   },
 
-  toJSON(message: Tally): unknown {
+  toJSON(message: TallyResult): unknown {
     const obj: any = {};
     message.yes_count !== undefined && (obj.yes_count = message.yes_count);
-    message.no_count !== undefined && (obj.no_count = message.no_count);
     message.abstain_count !== undefined &&
       (obj.abstain_count = message.abstain_count);
-    message.veto_count !== undefined && (obj.veto_count = message.veto_count);
+    message.no_count !== undefined && (obj.no_count = message.no_count);
+    message.no_with_veto_count !== undefined &&
+      (obj.no_with_veto_count = message.no_with_veto_count);
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<Tally>, I>>(object: I): Tally {
-    const message = { ...baseTally } as Tally;
+  fromPartial<I extends Exact<DeepPartial<TallyResult>, I>>(
+    object: I
+  ): TallyResult {
+    const message = { ...baseTallyResult } as TallyResult;
     message.yes_count = object.yes_count ?? "";
-    message.no_count = object.no_count ?? "";
     message.abstain_count = object.abstain_count ?? "";
-    message.veto_count = object.veto_count ?? "";
+    message.no_count = object.no_count ?? "";
+    message.no_with_veto_count = object.no_with_veto_count ?? "";
     return message;
   },
 };
 
-const baseVote: object = { proposal_id: 0, voter: "", choice: 0 };
+const baseVote: object = { proposal_id: 0, voter: "", option: 0, metadata: "" };
 
 export const Vote = {
   encode(message: Vote, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
@@ -1411,15 +1536,15 @@ export const Vote = {
     if (message.voter !== "") {
       writer.uint32(18).string(message.voter);
     }
-    if (message.choice !== 0) {
-      writer.uint32(24).int32(message.choice);
+    if (message.option !== 0) {
+      writer.uint32(24).int32(message.option);
     }
-    if (message.metadata.length !== 0) {
-      writer.uint32(34).bytes(message.metadata);
+    if (message.metadata !== "") {
+      writer.uint32(34).string(message.metadata);
     }
-    if (message.submitted_at !== undefined) {
+    if (message.submit_time !== undefined) {
       Timestamp.encode(
-        toTimestamp(message.submitted_at),
+        toTimestamp(message.submit_time),
         writer.uint32(42).fork()
       ).ldelim();
     }
@@ -1430,7 +1555,6 @@ export const Vote = {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseVote } as Vote;
-    message.metadata = new Uint8Array();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1441,13 +1565,13 @@ export const Vote = {
           message.voter = reader.string();
           break;
         case 3:
-          message.choice = reader.int32() as any;
+          message.option = reader.int32() as any;
           break;
         case 4:
-          message.metadata = reader.bytes();
+          message.metadata = reader.string();
           break;
         case 5:
-          message.submitted_at = fromTimestamp(
+          message.submit_time = fromTimestamp(
             Timestamp.decode(reader, reader.uint32())
           );
           break;
@@ -1469,17 +1593,17 @@ export const Vote = {
       object.voter !== undefined && object.voter !== null
         ? String(object.voter)
         : "";
-    message.choice =
-      object.choice !== undefined && object.choice !== null
-        ? choiceFromJSON(object.choice)
+    message.option =
+      object.option !== undefined && object.option !== null
+        ? voteOptionFromJSON(object.option)
         : 0;
     message.metadata =
       object.metadata !== undefined && object.metadata !== null
-        ? bytesFromBase64(object.metadata)
-        : new Uint8Array();
-    message.submitted_at =
-      object.submitted_at !== undefined && object.submitted_at !== null
-        ? fromJsonTimestamp(object.submitted_at)
+        ? String(object.metadata)
+        : "";
+    message.submit_time =
+      object.submit_time !== undefined && object.submit_time !== null
+        ? fromJsonTimestamp(object.submit_time)
         : undefined;
     return message;
   },
@@ -1489,13 +1613,11 @@ export const Vote = {
     message.proposal_id !== undefined &&
       (obj.proposal_id = Math.round(message.proposal_id));
     message.voter !== undefined && (obj.voter = message.voter);
-    message.choice !== undefined && (obj.choice = choiceToJSON(message.choice));
-    message.metadata !== undefined &&
-      (obj.metadata = base64FromBytes(
-        message.metadata !== undefined ? message.metadata : new Uint8Array()
-      ));
-    message.submitted_at !== undefined &&
-      (obj.submitted_at = message.submitted_at.toISOString());
+    message.option !== undefined &&
+      (obj.option = voteOptionToJSON(message.option));
+    message.metadata !== undefined && (obj.metadata = message.metadata);
+    message.submit_time !== undefined &&
+      (obj.submit_time = message.submit_time.toISOString());
     return obj;
   },
 
@@ -1503,9 +1625,9 @@ export const Vote = {
     const message = { ...baseVote } as Vote;
     message.proposal_id = object.proposal_id ?? 0;
     message.voter = object.voter ?? "";
-    message.choice = object.choice ?? 0;
-    message.metadata = object.metadata ?? new Uint8Array();
-    message.submitted_at = object.submitted_at ?? undefined;
+    message.option = object.option ?? 0;
+    message.metadata = object.metadata ?? "";
+    message.submit_time = object.submit_time ?? undefined;
     return message;
   },
 };
@@ -1520,29 +1642,6 @@ var globalThis: any = (() => {
   if (typeof global !== "undefined") return global;
   throw "Unable to locate global object";
 })();
-
-const atob: (b64: string) => string =
-  globalThis.atob ||
-  ((b64) => globalThis.Buffer.from(b64, "base64").toString("binary"));
-function bytesFromBase64(b64: string): Uint8Array {
-  const bin = atob(b64);
-  const arr = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; ++i) {
-    arr[i] = bin.charCodeAt(i);
-  }
-  return arr;
-}
-
-const btoa: (bin: string) => string =
-  globalThis.btoa ||
-  ((bin) => globalThis.Buffer.from(bin, "binary").toString("base64"));
-function base64FromBytes(arr: Uint8Array): string {
-  const bin: string[] = [];
-  for (const byte of arr) {
-    bin.push(String.fromCharCode(byte));
-  }
-  return btoa(bin.join(""));
-}
 
 type Builtin =
   | Date

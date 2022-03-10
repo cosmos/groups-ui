@@ -7,6 +7,7 @@ import {
   GroupMember,
   Proposal,
   Vote,
+  TallyResult,
 } from "../../../cosmos/group/v1beta1/types";
 import {
   PageRequest,
@@ -191,6 +192,18 @@ export interface QueryGroupsByMemberResponse {
   groups: GroupInfo[];
   /** pagination defines the pagination in the response. */
   pagination: PageResponse | undefined;
+}
+
+/** QueryTallyResultRequest is the Query/TallyResult request type. */
+export interface QueryTallyResultRequest {
+  /** proposal_id is the unique id of a proposal. */
+  proposal_id: number;
+}
+
+/** QueryTallyResultResponse is the Query/TallyResult response type. */
+export interface QueryTallyResultResponse {
+  /** tally defines the requested tally. */
+  tally: TallyResult | undefined;
 }
 
 const baseQueryGroupInfoRequest: object = { group_id: 0 };
@@ -2106,6 +2119,141 @@ export const QueryGroupsByMemberResponse = {
   },
 };
 
+const baseQueryTallyResultRequest: object = { proposal_id: 0 };
+
+export const QueryTallyResultRequest = {
+  encode(
+    message: QueryTallyResultRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.proposal_id !== 0) {
+      writer.uint32(8).uint64(message.proposal_id);
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): QueryTallyResultRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryTallyResultRequest,
+    } as QueryTallyResultRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.proposal_id = longToNumber(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryTallyResultRequest {
+    const message = {
+      ...baseQueryTallyResultRequest,
+    } as QueryTallyResultRequest;
+    message.proposal_id =
+      object.proposal_id !== undefined && object.proposal_id !== null
+        ? Number(object.proposal_id)
+        : 0;
+    return message;
+  },
+
+  toJSON(message: QueryTallyResultRequest): unknown {
+    const obj: any = {};
+    message.proposal_id !== undefined &&
+      (obj.proposal_id = Math.round(message.proposal_id));
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryTallyResultRequest>, I>>(
+    object: I
+  ): QueryTallyResultRequest {
+    const message = {
+      ...baseQueryTallyResultRequest,
+    } as QueryTallyResultRequest;
+    message.proposal_id = object.proposal_id ?? 0;
+    return message;
+  },
+};
+
+const baseQueryTallyResultResponse: object = {};
+
+export const QueryTallyResultResponse = {
+  encode(
+    message: QueryTallyResultResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.tally !== undefined) {
+      TallyResult.encode(message.tally, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): QueryTallyResultResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryTallyResultResponse,
+    } as QueryTallyResultResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.tally = TallyResult.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryTallyResultResponse {
+    const message = {
+      ...baseQueryTallyResultResponse,
+    } as QueryTallyResultResponse;
+    message.tally =
+      object.tally !== undefined && object.tally !== null
+        ? TallyResult.fromJSON(object.tally)
+        : undefined;
+    return message;
+  },
+
+  toJSON(message: QueryTallyResultResponse): unknown {
+    const obj: any = {};
+    message.tally !== undefined &&
+      (obj.tally = message.tally
+        ? TallyResult.toJSON(message.tally)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryTallyResultResponse>, I>>(
+    object: I
+  ): QueryTallyResultResponse {
+    const message = {
+      ...baseQueryTallyResultResponse,
+    } as QueryTallyResultResponse;
+    message.tally =
+      object.tally !== undefined && object.tally !== null
+        ? TallyResult.fromPartial(object.tally)
+        : undefined;
+    return message;
+  },
+};
+
 /** Query is the cosmos.group.v1beta1 Query service. */
 export interface Query {
   /** GroupInfo queries group info based on group id. */
@@ -2152,6 +2300,10 @@ export interface Query {
   GroupsByMember(
     request: QueryGroupsByMemberRequest
   ): Promise<QueryGroupsByMemberResponse>;
+  /** TallyResult queries the tally of a proposal votes. */
+  TallyResult(
+    request: QueryTallyResultRequest
+  ): Promise<QueryTallyResultResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -2170,6 +2322,7 @@ export class QueryClientImpl implements Query {
     this.VotesByProposal = this.VotesByProposal.bind(this);
     this.VotesByVoter = this.VotesByVoter.bind(this);
     this.GroupsByMember = this.GroupsByMember.bind(this);
+    this.TallyResult = this.TallyResult.bind(this);
   }
   GroupInfo(request: QueryGroupInfoRequest): Promise<QueryGroupInfoResponse> {
     const data = QueryGroupInfoRequest.encode(request).finish();
@@ -2332,6 +2485,20 @@ export class QueryClientImpl implements Query {
     );
     return promise.then((data) =>
       QueryGroupsByMemberResponse.decode(new _m0.Reader(data))
+    );
+  }
+
+  TallyResult(
+    request: QueryTallyResultRequest
+  ): Promise<QueryTallyResultResponse> {
+    const data = QueryTallyResultRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "cosmos.group.v1beta1.Query",
+      "TallyResult",
+      data
+    );
+    return promise.then((data) =>
+      QueryTallyResultResponse.decode(new _m0.Reader(data))
     );
   }
 }

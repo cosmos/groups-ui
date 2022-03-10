@@ -4,7 +4,6 @@ import { useStores } from '../../shared-state/repo'
 import { Button, IconButton, Paper, Step, StepLabel, Stepper, TextField } from '@material-ui/core'
 import { useHistory, useParams } from 'react-router-dom'
 import { Routes } from '../../routes'
-import { toUint8Array } from '../../shared-state/groups-store'
 import { makeStyles } from '@material-ui/core/styles'
 import { Page } from '../page'
 import { Delete } from '@material-ui/icons'
@@ -302,14 +301,14 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                                                 updateEditedGroup({
                                                                     ...editedGroup,
                                                                     members: [...editedGroup.members, {
-                                                                        group_id: editedGroup.info.group_id,
+                                                                        group_id: editedGroup.info.id,
                                                                         member: {
                                                                             address: '',
                                                                             weight: '1',
                                                                             added_at: new Date(),
-                                                                            metadata: toUint8Array(JSON.stringify({
+                                                                            metadata: JSON.stringify({
                                                                                 name: ''
-                                                                            }))
+                                                                            })
                                                                         }
                                                                     }]
                                                                 })
@@ -465,7 +464,7 @@ export const EditGroup: React.FC<{}> = observer(() => {
                             </>
                         )}
                         {activeStep === 2 && (() => {
-                            if (editedGroup.info.group_id === -1) {
+                            if (editedGroup.info.id === -1) {
                                 return (
                                     <div>
                                         <div className={classes.title}>

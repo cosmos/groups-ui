@@ -62,13 +62,6 @@ export interface PrimaryKeyDescriptor {
    * contain one field of that is of type uint64.
    */
   auto_increment: boolean;
-  /**
-   * references specifies that this primary key references the primary key
-   * of another table. See the documentation for the SecondaryIndexDescriptor.references
-   * field for more details. An additional constraint placed on primary keys
-   * which reference another table is that those references cannot be circular.
-   */
-  references: string;
 }
 
 /** PrimaryKeyDescriptor describes a table secondary index. */
@@ -93,17 +86,6 @@ export interface SecondaryIndexDescriptor {
   id: number;
   /** unique specifies that this an unique index. */
   unique: boolean;
-  /**
-   * references specifies that this index references another table defined in the same
-   * proto file. Currently references are not support to tables with composite
-   * primary keys, therefore fields must reference one field and its type must
-   * be the same type as the primary key field of the referenced table.
-   * References to tables in defined by different proto files are not supported
-   * to avoid tight coupling of dependencies. Beyond validating that the reference
-   * is valid key constraints are currently not enforced, but references should
-   * be used by clients to perform automatic joins.
-   */
-  references: string;
 }
 
 /** TableDescriptor describes an ORM singleton table which has at most one instance. */
@@ -214,11 +196,7 @@ export const TableDescriptor = {
   },
 };
 
-const basePrimaryKeyDescriptor: object = {
-  fields: "",
-  auto_increment: false,
-  references: "",
-};
+const basePrimaryKeyDescriptor: object = { fields: "", auto_increment: false };
 
 export const PrimaryKeyDescriptor = {
   encode(
@@ -230,9 +208,6 @@ export const PrimaryKeyDescriptor = {
     }
     if (message.auto_increment === true) {
       writer.uint32(16).bool(message.auto_increment);
-    }
-    if (message.references !== "") {
-      writer.uint32(26).string(message.references);
     }
     return writer;
   },
@@ -253,9 +228,6 @@ export const PrimaryKeyDescriptor = {
         case 2:
           message.auto_increment = reader.bool();
           break;
-        case 3:
-          message.references = reader.string();
-          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -274,10 +246,6 @@ export const PrimaryKeyDescriptor = {
       object.auto_increment !== undefined && object.auto_increment !== null
         ? Boolean(object.auto_increment)
         : false;
-    message.references =
-      object.references !== undefined && object.references !== null
-        ? String(object.references)
-        : "";
     return message;
   },
 
@@ -286,7 +254,6 @@ export const PrimaryKeyDescriptor = {
     message.fields !== undefined && (obj.fields = message.fields);
     message.auto_increment !== undefined &&
       (obj.auto_increment = message.auto_increment);
-    message.references !== undefined && (obj.references = message.references);
     return obj;
   },
 
@@ -296,7 +263,6 @@ export const PrimaryKeyDescriptor = {
     const message = { ...basePrimaryKeyDescriptor } as PrimaryKeyDescriptor;
     message.fields = object.fields ?? "";
     message.auto_increment = object.auto_increment ?? false;
-    message.references = object.references ?? "";
     return message;
   },
 };
@@ -305,7 +271,6 @@ const baseSecondaryIndexDescriptor: object = {
   fields: "",
   id: 0,
   unique: false,
-  references: "",
 };
 
 export const SecondaryIndexDescriptor = {
@@ -321,9 +286,6 @@ export const SecondaryIndexDescriptor = {
     }
     if (message.unique === true) {
       writer.uint32(24).bool(message.unique);
-    }
-    if (message.references !== "") {
-      writer.uint32(34).string(message.references);
     }
     return writer;
   },
@@ -349,9 +311,6 @@ export const SecondaryIndexDescriptor = {
         case 3:
           message.unique = reader.bool();
           break;
-        case 4:
-          message.references = reader.string();
-          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -374,10 +333,6 @@ export const SecondaryIndexDescriptor = {
       object.unique !== undefined && object.unique !== null
         ? Boolean(object.unique)
         : false;
-    message.references =
-      object.references !== undefined && object.references !== null
-        ? String(object.references)
-        : "";
     return message;
   },
 
@@ -386,7 +341,6 @@ export const SecondaryIndexDescriptor = {
     message.fields !== undefined && (obj.fields = message.fields);
     message.id !== undefined && (obj.id = Math.round(message.id));
     message.unique !== undefined && (obj.unique = message.unique);
-    message.references !== undefined && (obj.references = message.references);
     return obj;
   },
 
@@ -399,7 +353,6 @@ export const SecondaryIndexDescriptor = {
     message.fields = object.fields ?? "";
     message.id = object.id ?? 0;
     message.unique = object.unique ?? false;
-    message.references = object.references ?? "";
     return message;
   },
 };

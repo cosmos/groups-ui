@@ -1,14 +1,13 @@
 import { action, makeObservable, observable } from 'mobx'
 import { Any } from '../generated/google/protobuf/any'
-import { Exec, MsgCreateProposal, MsgExec, MsgVote } from '../generated/regen/group/v1alpha1/tx'
+import { Exec, MsgExec, MsgSubmitProposal, MsgVote, protobufPackage } from '../generated/cosmos/group/v1beta1/tx'
 import { TextProposal } from '../generated/gov/gov'
 import { ParameterChangeProposal } from '../generated/params/params'
 import { Group, toUint8Array } from './groups-store'
 import { CosmosNodeService } from '../protocol/cosmos-node-service'
-import { GroupProposalsUrls } from '../protocol/proposals-service'
 import { coins } from '@cosmjs/proto-signing'
 import { BroadcastTxResponse } from '@cosmjs/stargate'
-import { Choice } from '../generated/regen/group/v1alpha1/types'
+import { VoteOption } from '../generated/cosmos/group/v1beta1/types'
 
 interface NewProposal {
     // address: string
@@ -44,21 +43,21 @@ export class ProposalsStore {
         // TODO replace hardcode
         const exec = Exec.EXEC_TRY
 
-        const msg: MsgCreateProposal = {
+        const msg: MsgSubmitProposal = {
             // TODO replace with fetching group policy address
             // this is group policy address hardcoded for testing
             address: "regen1m73npu5jn89syq23568a44ymrj7za9qa7mxgh0",
             proposers: group.members.map((m) => m.member.address),
-            msgs: mockMsgs,
+            messages: mockMsgs,
             exec,
-            metadata: toUint8Array(mockMetaData)
+            metadata: mockMetaData,
         }
 
         console.log("msg", msg)
 
         const msgAny = {
-            typeUrl: GroupProposalsUrls.MsgCreateProposal,
-            value: MsgCreateProposal.encode(msg).finish()
+            typeUrl: `/${protobufPackage}.MsgSubmitProposal`,
+            value: MsgSubmitProposal.encode(msg).finish()
         }
 
         const fee = {
@@ -82,7 +81,7 @@ export class ProposalsStore {
     }
 
     // Later may add choice and metadata to store, if needed for multiple components
-    voteProposal = async (proposalId: number, choice: Choice, metadata: any) => {
+    voteProposal = async (proposalId: number, voteOption: VoteOption, metadata: string) => {
         const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
         const me = key.bech32Address
 
@@ -91,14 +90,14 @@ export class ProposalsStore {
 
         const msg: MsgVote = {
             proposal_id: proposalId,
-            choice,
+            option: voteOption,
             voter: me,
-            metadata: toUint8Array(metadata),
+            metadata: metadata,
             exec
         }
 
         const msgAny = {
-            typeUrl: GroupProposalsUrls.MsgVote,
+            typeUrl: `/${protobufPackage}.MsgVote`,
             value: MsgVote.encode(msg).finish()
         }
 
@@ -127,7 +126,7 @@ export class ProposalsStore {
         }
 
         const msgAny = {
-            typeUrl: GroupProposalsUrls.MsgExec,
+            typeUrl: `/${protobufPackage}.MsgExec`,
             value: MsgExec.encode(msg).finish()
         }
 

@@ -1,159 +1,140 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { FileDescriptorSet } from "../../../google/protobuf/descriptor";
 
 export const protobufPackage = "cosmos.orm.v1alpha1";
 
-/**
- * SchemaDescriptor describes an ORM schema that contains all the information
- * needed for a dynamic client to decode the stored data.
- */
-export interface SchemaDescriptor {
+/** StorageType */
+export enum StorageType {
   /**
-   * files is the set of all FileDescriptorProto's needed to decode the stored data.
-   * A schema imposes the constraint that every file and every table within that
-   * schema have at most one instance in the store.
+   * STORAGE_TYPE_DEFAULT_UNSPECIFIED - STORAGE_TYPE_DEFAULT_UNSPECIFIED indicates the persistent
+   * KV-storage where primary key entries are stored in merkle-tree
+   * backed commitment storage and indexes and seqs are stored in
+   * fast index storage. Note that the Cosmos SDK before store/v2
+   * does not support this.
    */
-  files: FileDescriptorSet | undefined;
-  /** modules is the set of modules in the schema. */
-  modules: SchemaDescriptor_ModuleEntry[];
+  STORAGE_TYPE_DEFAULT_UNSPECIFIED = 0,
+  /**
+   * STORAGE_TYPE_MEMORY - STORAGE_TYPE_MEMORY indicates in-memory storage that will be
+   * reloaded every time an app restarts. Tables with this type of storage
+   * will by default be ignored when importing and exporting a module's
+   * state from JSON.
+   */
+  STORAGE_TYPE_MEMORY = 1,
+  /**
+   * STORAGE_TYPE_TRANSIENT - STORAGE_TYPE_TRANSIENT indicates transient storage that is reset
+   * at the end of every block. Tables with this type of storage
+   * will by default be ignored when importing and exporting a module's
+   * state from JSON.
+   */
+  STORAGE_TYPE_TRANSIENT = 2,
+  /**
+   * STORAGE_TYPE_INDEX - STORAGE_TYPE_INDEX indicates persistent storage which is not backed
+   * by a merkle-tree and won't affect the app hash. Note that the Cosmos SDK
+   * before store/v2 does not support this.
+   */
+  STORAGE_TYPE_INDEX = 3,
+  /**
+   * STORAGE_TYPE_COMMITMENT - STORAGE_TYPE_INDEX indicates persistent storage which is backed by
+   * a merkle-tree. With this type of storage, both primary and index keys
+   * will affect the app hash and this is generally less efficient
+   * than using STORAGE_TYPE_DEFAULT_UNSPECIFIED which separates index
+   * keys into index storage. Note that modules built with the
+   * Cosmos SDK before store/v2 must specify STORAGE_TYPE_COMMITMENT
+   * instead of STORAGE_TYPE_DEFAULT_UNSPECIFIED or STORAGE_TYPE_INDEX
+   * because this is the only type of persistent storage available.
+   */
+  STORAGE_TYPE_COMMITMENT = 4,
+  UNRECOGNIZED = -1,
 }
 
-/** ModuleEntry describes a single module's schema. */
-export interface SchemaDescriptor_ModuleEntry {
-  /**
-   * name is the name of the module. In the multi-store model this name is
-   * used to locate the module's store.
-   */
-  name: string;
+export function storageTypeFromJSON(object: any): StorageType {
+  switch (object) {
+    case 0:
+    case "STORAGE_TYPE_DEFAULT_UNSPECIFIED":
+      return StorageType.STORAGE_TYPE_DEFAULT_UNSPECIFIED;
+    case 1:
+    case "STORAGE_TYPE_MEMORY":
+      return StorageType.STORAGE_TYPE_MEMORY;
+    case 2:
+    case "STORAGE_TYPE_TRANSIENT":
+      return StorageType.STORAGE_TYPE_TRANSIENT;
+    case 3:
+    case "STORAGE_TYPE_INDEX":
+      return StorageType.STORAGE_TYPE_INDEX;
+    case 4:
+    case "STORAGE_TYPE_COMMITMENT":
+      return StorageType.STORAGE_TYPE_COMMITMENT;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return StorageType.UNRECOGNIZED;
+  }
+}
+
+export function storageTypeToJSON(object: StorageType): string {
+  switch (object) {
+    case StorageType.STORAGE_TYPE_DEFAULT_UNSPECIFIED:
+      return "STORAGE_TYPE_DEFAULT_UNSPECIFIED";
+    case StorageType.STORAGE_TYPE_MEMORY:
+      return "STORAGE_TYPE_MEMORY";
+    case StorageType.STORAGE_TYPE_TRANSIENT:
+      return "STORAGE_TYPE_TRANSIENT";
+    case StorageType.STORAGE_TYPE_INDEX:
+      return "STORAGE_TYPE_INDEX";
+    case StorageType.STORAGE_TYPE_COMMITMENT:
+      return "STORAGE_TYPE_COMMITMENT";
+    default:
+      return "UNKNOWN";
+  }
+}
+
+/** ModuleSchemaDescriptor describe's a module's ORM schema. */
+export interface ModuleSchemaDescriptor {
+  schema_file: ModuleSchemaDescriptor_FileEntry[];
   /**
    * prefix is an optional prefix that precedes all keys in this module's
    * store.
    */
   prefix: Uint8Array;
-  /** files describes the schema files used in this module. */
-  files: SchemaDescriptor_FileEntry[];
 }
 
 /** FileEntry describes an ORM file used in a module. */
-export interface SchemaDescriptor_FileEntry {
+export interface ModuleSchemaDescriptor_FileEntry {
   /**
    * id is a prefix that will be varint encoded and prepended to all the
    * table keys specified in the file's tables.
    */
   id: number;
   /**
-   * file_name is the name of a file in the FileDescriptor set that contains
-   * table definitions.
+   * proto_file_name is the name of a file .proto in that contains
+   * table definitions. The .proto file must be in a package that the
+   * module has referenced using cosmos.app.v1.ModuleDescriptor.use_package.
    */
-  file_name: string;
+  proto_file_name: string;
+  /**
+   * storage_type optionally indicates the type of storage this file's
+   * tables should used. If it is left unspecified, the default KV-storage
+   * of the app will be used.
+   */
+  storage_type: StorageType;
 }
 
-const baseSchemaDescriptor: object = {};
+const baseModuleSchemaDescriptor: object = {};
 
-export const SchemaDescriptor = {
+export const ModuleSchemaDescriptor = {
   encode(
-    message: SchemaDescriptor,
+    message: ModuleSchemaDescriptor,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.files !== undefined) {
-      FileDescriptorSet.encode(
-        message.files,
+    for (const v of message.schema_file) {
+      ModuleSchemaDescriptor_FileEntry.encode(
+        v!,
         writer.uint32(10).fork()
       ).ldelim();
     }
-    for (const v of message.modules) {
-      SchemaDescriptor_ModuleEntry.encode(
-        v!,
-        writer.uint32(18).fork()
-      ).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): SchemaDescriptor {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseSchemaDescriptor } as SchemaDescriptor;
-    message.modules = [];
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.files = FileDescriptorSet.decode(reader, reader.uint32());
-          break;
-        case 2:
-          message.modules.push(
-            SchemaDescriptor_ModuleEntry.decode(reader, reader.uint32())
-          );
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): SchemaDescriptor {
-    const message = { ...baseSchemaDescriptor } as SchemaDescriptor;
-    message.files =
-      object.files !== undefined && object.files !== null
-        ? FileDescriptorSet.fromJSON(object.files)
-        : undefined;
-    message.modules = (object.modules ?? []).map((e: any) =>
-      SchemaDescriptor_ModuleEntry.fromJSON(e)
-    );
-    return message;
-  },
-
-  toJSON(message: SchemaDescriptor): unknown {
-    const obj: any = {};
-    message.files !== undefined &&
-      (obj.files = message.files
-        ? FileDescriptorSet.toJSON(message.files)
-        : undefined);
-    if (message.modules) {
-      obj.modules = message.modules.map((e) =>
-        e ? SchemaDescriptor_ModuleEntry.toJSON(e) : undefined
-      );
-    } else {
-      obj.modules = [];
-    }
-    return obj;
-  },
-
-  fromPartial<I extends Exact<DeepPartial<SchemaDescriptor>, I>>(
-    object: I
-  ): SchemaDescriptor {
-    const message = { ...baseSchemaDescriptor } as SchemaDescriptor;
-    message.files =
-      object.files !== undefined && object.files !== null
-        ? FileDescriptorSet.fromPartial(object.files)
-        : undefined;
-    message.modules =
-      object.modules?.map((e) => SchemaDescriptor_ModuleEntry.fromPartial(e)) ||
-      [];
-    return message;
-  },
-};
-
-const baseSchemaDescriptor_ModuleEntry: object = { name: "" };
-
-export const SchemaDescriptor_ModuleEntry = {
-  encode(
-    message: SchemaDescriptor_ModuleEntry,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    if (message.name !== "") {
-      writer.uint32(10).string(message.name);
-    }
     if (message.prefix.length !== 0) {
       writer.uint32(18).bytes(message.prefix);
-    }
-    for (const v of message.files) {
-      SchemaDescriptor_FileEntry.encode(v!, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
@@ -161,27 +142,22 @@ export const SchemaDescriptor_ModuleEntry = {
   decode(
     input: _m0.Reader | Uint8Array,
     length?: number
-  ): SchemaDescriptor_ModuleEntry {
+  ): ModuleSchemaDescriptor {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseSchemaDescriptor_ModuleEntry,
-    } as SchemaDescriptor_ModuleEntry;
-    message.files = [];
+    const message = { ...baseModuleSchemaDescriptor } as ModuleSchemaDescriptor;
+    message.schema_file = [];
     message.prefix = new Uint8Array();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.name = reader.string();
+          message.schema_file.push(
+            ModuleSchemaDescriptor_FileEntry.decode(reader, reader.uint32())
+          );
           break;
         case 2:
           message.prefix = reader.bytes();
-          break;
-        case 3:
-          message.files.push(
-            SchemaDescriptor_FileEntry.decode(reader, reader.uint32())
-          );
           break;
         default:
           reader.skipType(tag & 7);
@@ -191,67 +167,66 @@ export const SchemaDescriptor_ModuleEntry = {
     return message;
   },
 
-  fromJSON(object: any): SchemaDescriptor_ModuleEntry {
-    const message = {
-      ...baseSchemaDescriptor_ModuleEntry,
-    } as SchemaDescriptor_ModuleEntry;
-    message.name =
-      object.name !== undefined && object.name !== null
-        ? String(object.name)
-        : "";
+  fromJSON(object: any): ModuleSchemaDescriptor {
+    const message = { ...baseModuleSchemaDescriptor } as ModuleSchemaDescriptor;
+    message.schema_file = (object.schema_file ?? []).map((e: any) =>
+      ModuleSchemaDescriptor_FileEntry.fromJSON(e)
+    );
     message.prefix =
       object.prefix !== undefined && object.prefix !== null
         ? bytesFromBase64(object.prefix)
         : new Uint8Array();
-    message.files = (object.files ?? []).map((e: any) =>
-      SchemaDescriptor_FileEntry.fromJSON(e)
-    );
     return message;
   },
 
-  toJSON(message: SchemaDescriptor_ModuleEntry): unknown {
+  toJSON(message: ModuleSchemaDescriptor): unknown {
     const obj: any = {};
-    message.name !== undefined && (obj.name = message.name);
+    if (message.schema_file) {
+      obj.schema_file = message.schema_file.map((e) =>
+        e ? ModuleSchemaDescriptor_FileEntry.toJSON(e) : undefined
+      );
+    } else {
+      obj.schema_file = [];
+    }
     message.prefix !== undefined &&
       (obj.prefix = base64FromBytes(
         message.prefix !== undefined ? message.prefix : new Uint8Array()
       ));
-    if (message.files) {
-      obj.files = message.files.map((e) =>
-        e ? SchemaDescriptor_FileEntry.toJSON(e) : undefined
-      );
-    } else {
-      obj.files = [];
-    }
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<SchemaDescriptor_ModuleEntry>, I>>(
+  fromPartial<I extends Exact<DeepPartial<ModuleSchemaDescriptor>, I>>(
     object: I
-  ): SchemaDescriptor_ModuleEntry {
-    const message = {
-      ...baseSchemaDescriptor_ModuleEntry,
-    } as SchemaDescriptor_ModuleEntry;
-    message.name = object.name ?? "";
+  ): ModuleSchemaDescriptor {
+    const message = { ...baseModuleSchemaDescriptor } as ModuleSchemaDescriptor;
+    message.schema_file =
+      object.schema_file?.map((e) =>
+        ModuleSchemaDescriptor_FileEntry.fromPartial(e)
+      ) || [];
     message.prefix = object.prefix ?? new Uint8Array();
-    message.files =
-      object.files?.map((e) => SchemaDescriptor_FileEntry.fromPartial(e)) || [];
     return message;
   },
 };
 
-const baseSchemaDescriptor_FileEntry: object = { id: 0, file_name: "" };
+const baseModuleSchemaDescriptor_FileEntry: object = {
+  id: 0,
+  proto_file_name: "",
+  storage_type: 0,
+};
 
-export const SchemaDescriptor_FileEntry = {
+export const ModuleSchemaDescriptor_FileEntry = {
   encode(
-    message: SchemaDescriptor_FileEntry,
+    message: ModuleSchemaDescriptor_FileEntry,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.id !== 0) {
       writer.uint32(8).uint32(message.id);
     }
-    if (message.file_name !== "") {
-      writer.uint32(18).string(message.file_name);
+    if (message.proto_file_name !== "") {
+      writer.uint32(18).string(message.proto_file_name);
+    }
+    if (message.storage_type !== 0) {
+      writer.uint32(24).int32(message.storage_type);
     }
     return writer;
   },
@@ -259,12 +234,12 @@ export const SchemaDescriptor_FileEntry = {
   decode(
     input: _m0.Reader | Uint8Array,
     length?: number
-  ): SchemaDescriptor_FileEntry {
+  ): ModuleSchemaDescriptor_FileEntry {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseSchemaDescriptor_FileEntry,
-    } as SchemaDescriptor_FileEntry;
+      ...baseModuleSchemaDescriptor_FileEntry,
+    } as ModuleSchemaDescriptor_FileEntry;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -272,7 +247,10 @@ export const SchemaDescriptor_FileEntry = {
           message.id = reader.uint32();
           break;
         case 2:
-          message.file_name = reader.string();
+          message.proto_file_name = reader.string();
+          break;
+        case 3:
+          message.storage_type = reader.int32() as any;
           break;
         default:
           reader.skipType(tag & 7);
@@ -282,34 +260,42 @@ export const SchemaDescriptor_FileEntry = {
     return message;
   },
 
-  fromJSON(object: any): SchemaDescriptor_FileEntry {
+  fromJSON(object: any): ModuleSchemaDescriptor_FileEntry {
     const message = {
-      ...baseSchemaDescriptor_FileEntry,
-    } as SchemaDescriptor_FileEntry;
+      ...baseModuleSchemaDescriptor_FileEntry,
+    } as ModuleSchemaDescriptor_FileEntry;
     message.id =
       object.id !== undefined && object.id !== null ? Number(object.id) : 0;
-    message.file_name =
-      object.file_name !== undefined && object.file_name !== null
-        ? String(object.file_name)
+    message.proto_file_name =
+      object.proto_file_name !== undefined && object.proto_file_name !== null
+        ? String(object.proto_file_name)
         : "";
+    message.storage_type =
+      object.storage_type !== undefined && object.storage_type !== null
+        ? storageTypeFromJSON(object.storage_type)
+        : 0;
     return message;
   },
 
-  toJSON(message: SchemaDescriptor_FileEntry): unknown {
+  toJSON(message: ModuleSchemaDescriptor_FileEntry): unknown {
     const obj: any = {};
     message.id !== undefined && (obj.id = Math.round(message.id));
-    message.file_name !== undefined && (obj.file_name = message.file_name);
+    message.proto_file_name !== undefined &&
+      (obj.proto_file_name = message.proto_file_name);
+    message.storage_type !== undefined &&
+      (obj.storage_type = storageTypeToJSON(message.storage_type));
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<SchemaDescriptor_FileEntry>, I>>(
-    object: I
-  ): SchemaDescriptor_FileEntry {
+  fromPartial<
+    I extends Exact<DeepPartial<ModuleSchemaDescriptor_FileEntry>, I>
+  >(object: I): ModuleSchemaDescriptor_FileEntry {
     const message = {
-      ...baseSchemaDescriptor_FileEntry,
-    } as SchemaDescriptor_FileEntry;
+      ...baseModuleSchemaDescriptor_FileEntry,
+    } as ModuleSchemaDescriptor_FileEntry;
     message.id = object.id ?? 0;
-    message.file_name = object.file_name ?? "";
+    message.proto_file_name = object.proto_file_name ?? "";
+    message.storage_type = object.storage_type ?? 0;
     return message;
   },
 };

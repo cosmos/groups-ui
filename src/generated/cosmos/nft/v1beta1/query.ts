@@ -995,7 +995,10 @@ export interface Query {
   Owner(request: QueryOwnerRequest): Promise<QueryOwnerResponse>;
   /** Supply queries the number of NFTs from the given class, same as totalSupply of ERC721. */
   Supply(request: QuerySupplyRequest): Promise<QuerySupplyResponse>;
-  /** NFTs queries all NFTs of a given class or owner,choose at least one of the two, similar to tokenByIndex in ERC721Enumerable */
+  /**
+   * NFTs queries all NFTs of a given class or owner,choose at least one of the two, similar to tokenByIndex in
+   * ERC721Enumerable
+   */
   NFTs(request: QueryNFTsRequest): Promise<QueryNFTsResponse>;
   /** NFT queries an NFT based on its class and id. */
   NFT(request: QueryNFTRequest): Promise<QueryNFTResponse>;

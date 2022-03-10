@@ -176,6 +176,11 @@ export interface Proposal {
   proposal_id: number;
   content: Any | undefined;
   status: ProposalStatus;
+  /**
+   * final_tally_result is the final tally result of the proposal. When
+   * querying a proposal via gRPC, this field is not populated until the
+   * proposal's voting period has ended.
+   */
   final_tally_result: TallyResult | undefined;
   submit_time: Date | undefined;
   deposit_end_time: Date | undefined;

@@ -1,6 +1,7 @@
 import React, { createContext } from 'react'
 import { GroupsStore } from './groups-store'
 import { ChainInfoStore } from './chain-info-store'
+import { ProposalsStore } from './proposals-store'
 
 // import { configure } from "mobx"
 // configure({
@@ -14,7 +15,8 @@ import { ChainInfoStore } from './chain-info-store'
 
 export const stores = {
     chainInfoStore: new ChainInfoStore(),
-    groupsStore: new GroupsStore()
+    groupsStore: new GroupsStore(),
+    proposalsStore: new ProposalsStore()
 }
 
 window['stores'] = stores // for debug

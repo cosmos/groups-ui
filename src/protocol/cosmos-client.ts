@@ -81,7 +81,7 @@ export class CosmosClient {
                 }
             )
 
-            console.log('this.stargateClient.getChainId()', await this.stargateClient.getChainId())
+            // console.log('this.stargateClient.getChainId()', await this.stargateClient.getChainId())
         }, 0)
 
         this.lcdClient = LcdClient.withExtensions(

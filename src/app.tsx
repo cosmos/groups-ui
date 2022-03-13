@@ -18,7 +18,7 @@ import { EditGroup } from './pages/edit-group/edit-group'
 export const App: React.FC = () => {
     return (
         <Router>
-            <Nav/>
+            <Nav />
             <Switch>
                 <Route exact path={Routes.ROOT}>
                     <span>home</span>
@@ -26,25 +26,28 @@ export const App: React.FC = () => {
                 </Route>
                 <Route exact path={Routes.GROUPS}>
                     <Page>
-                        <Groups/>
+                        <Groups />
                     </Page>
                 </Route>
                 <Route exact path={Routes.GROUPS_ADMIN_VIEW}>
-                    <GroupAdminView/>
+                    <GroupAdminView />
                 </Route>
                 <Route exact path={Routes.GROUPS_DETAILS}>
-                    <GroupDetails/>
+                    <GroupDetails />
                 </Route>
                 <Route exact path={Routes.GROUPS_EDIT}>
-                     <EditGroup />
+                    <EditGroup />
                 </Route>
                 <Route exact path={Routes.PROPOSALS_EDIT}>
                     <CreateProposal />
                 </Route>
                 <Route exact path={Routes.SETTINGS}>
                     <Page>
-                        <Settings/>
+                        <Settings />
                     </Page>
+                </Route>
+                <Route exact path='/my/component'>
+                    <ProposalPage></ProposalPage>
                 </Route>
             </Switch>
         </Router>

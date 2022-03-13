@@ -1,21 +1,22 @@
 import { action, makeObservable, observable, runInAction, toJS } from 'mobx'
 import { GroupsService } from '../protocol/groups-service'
-import {
-    GroupAccountInfo,
-    GroupInfo,
-    GroupMember,
-    ThresholdDecisionPolicy
-} from '../generated/regen/group/v1alpha1/types'
 import { CosmosNodeService } from '../protocol/cosmos-node-service'
 import { coins } from '@cosmjs/launchpad'
+import { cloneDeep, isEqual } from 'lodash'
+import { BroadcastTxResponse } from '@cosmjs/stargate/build/stargateclient'
 import {
-    MsgCreateGroup, MsgCreateGroupAccount,
+    GroupInfo,
+    GroupMember,
+    GroupPolicyInfo,
+    ThresholdDecisionPolicy
+} from '../generated/cosmos/group/v1beta1/types'
+import {
+    MsgCreateGroup,
+    MsgCreateGroupPolicy,
     MsgUpdateGroupMembers,
     MsgUpdateGroupMetadata,
     protobufPackage
-} from '../generated/regen/group/v1alpha1/tx'
-import { cloneDeep, isEqual } from 'lodash'
-import { BroadcastTxResponse } from '@cosmjs/stargate/build/stargateclient'
+} from '../generated/cosmos/group/v1beta1/tx'
 
 // {"name": "bla", "description": "blabbl", "created": 1640599686655, "lastEdited": 1640599686655, "linkToForum": "", "other": "blabla"}
 interface GroupMetadata {
@@ -62,8 +63,8 @@ export class GroupsStore {
         await Promise.all(groupInfoItems.map(g => {
             return (async () => {
                 const results = await Promise.all([
-                    GroupsService.instance.groupMembers(g.group_id),
-                    GroupsService.instance.groupAccounts(g.group_id)
+                    GroupsService.instance.groupMembers(g.id),
+                    GroupsService.instance.groupPolicies(g.id)
                 ])
 
                 groups.push({
@@ -89,8 +90,8 @@ export class GroupsStore {
         }
 
         const results = await Promise.all([
-            GroupsService.instance.groupMembers(groupInfo.group_id),
-            GroupsService.instance.groupAccounts(groupInfo.group_id)
+            GroupsService.instance.groupMembers(groupInfo.id),
+            GroupsService.instance.groupPolicies(groupInfo.id)
         ])
 
         const editedGroup = {
@@ -120,19 +121,21 @@ export class GroupsStore {
         runInAction(() => {
             this.editedGroup = {
                 info: {
-                    group_id: -1,
+                    id: -1,
                     admin: me,
                     version: 1,
-                    total_weight: '1'
+                    total_weight: '1',
+                    created_at: new Date()
                 },
                 members: [{
                     group_id: -1,
                     member: {
                         address: me,
                         weight: '1',
-                        metadata: toUint8Array(JSON.stringify({
+                        metadata: JSON.stringify({
                             name: 'me'
-                        }))
+                        }),
+                        added_at: new Date()
                     }
                 }],
                 policy: [
@@ -165,11 +168,11 @@ export class GroupsStore {
         const msg1: MsgCreateGroup = {
             admin: this.editedGroup.info.admin,
             members: this.editedGroup.members.map(m => m.member),
-            metadata: toUint8Array(JSON.stringify({
+            metadata: JSON.stringify({
                 ...this.editedGroup.metadata,
                 created: Date.now(),
                 lastEdited: Date.now()
-            }))
+            })
         }
         const msgAny1 = {
             typeUrl: `/${protobufPackage}.MsgCreateGroup`,
@@ -186,19 +189,22 @@ export class GroupsStore {
         const result1 = await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny1], fee1)
         results.push(result1)
 
-        const createdGroupId = Number(JSON.parse(result1.rawLog)[0].events.find(e => e.type === "regen.group.v1alpha1.EventCreateGroup").attributes[0].value.replaceAll('"', ""))
+        const createdGroupId = Number(JSON.parse(result1.rawLog)[0].events.find(e => e.type === 'cosmos.group.v1beta1.EventCreateGroup').attributes[0].value.replaceAll('"', ''))
 
         // const createdGroupId = 13 // TODO hardcode
         console.log('createdGroupId', createdGroupId)
 
-        const msg2: MsgCreateGroupAccount = {
+        const msg2: MsgCreateGroupPolicy = {
             admin: this.editedGroup.info.admin,
             group_id: createdGroupId,
-            metadata: toUint8Array(JSON.stringify({
+            // metadata: toUint8Array(JSON.stringify({
+            //     foo: 'bar'
+            // })),
+            metadata: JSON.stringify({
                 foo: 'bar'
-            })),
+            }),
             decision_policy: {
-                type_url: '/regen.group.v1alpha1.ThresholdDecisionPolicy',
+                type_url: '/cosmos.group.v1beta1.ThresholdDecisionPolicy',
                 value: toUint8Array(
                     JSON.stringify({
                         // "@type": "/regen.group.v1alpha1.ThresholdDecisionPolicy",
@@ -210,21 +216,30 @@ export class GroupsStore {
         }
 
         const msgAny2 = {
-            typeUrl: `/${protobufPackage}.MsgCreateGroupAccount`,
-            value: MsgCreateGroupAccount.encode({
+            typeUrl: `/${protobufPackage}.MsgCreateGroupPolicy`,
+            value: MsgCreateGroupPolicy.encode({
                 admin: this.editedGroup.info.admin,
                 group_id: createdGroupId,
-                metadata: toUint8Array(JSON.stringify({
+                // metadata: toUint8Array(JSON.stringify({
+                //     foo: 'bar'
+                // })),
+                metadata: JSON.stringify({
                     foo: 'bar'
-                })),
+                }),
                 decision_policy: {
-                    type_url: '/regen.group.v1alpha1.ThresholdDecisionPolicy',
+                    type_url: '/cosmos.group.v1beta1.ThresholdDecisionPolicy',
                     value: ThresholdDecisionPolicy.encode(
                         {
                             threshold: '1',
-                            timeout: {
-                                seconds: 1,
-                                nanos: 0
+                            windows: {
+                                voting_period: {
+                                    seconds: 1,
+                                    nanos: 0
+                                },
+                                min_execution_period: {
+                                    seconds: 1,
+                                    nanos: 0
+                                }
                             }
                         }
                     ).finish()
@@ -253,11 +268,11 @@ export class GroupsStore {
         if (!isEqual(toJS(this.editedGroup.metadata), this.originalEditedGroup.metadata)) {
             const msg: MsgUpdateGroupMetadata = {
                 admin: this.editedGroup.info.admin,
-                group_id: this.editedGroup.info.group_id,
-                metadata: toUint8Array(JSON.stringify({
+                group_id: this.editedGroup.info.id,
+                metadata: JSON.stringify({
                     ...this.editedGroup.metadata,
                     lastEdited: Date.now()
-                }))
+                })
             }
             const msgAny = {
                 typeUrl: `/${protobufPackage}.MsgUpdateGroupMetadata`,
@@ -275,10 +290,11 @@ export class GroupsStore {
         if (!isEqual(toJS(this.editedGroup.members), this.originalEditedGroup.members)) {
             const msg: MsgUpdateGroupMembers = {
                 admin: this.editedGroup.info.admin,
-                group_id: this.editedGroup.info.group_id,
+                group_id: this.editedGroup.info.id,
                 member_updates: this.editedGroup.members.map(m => ({ // TODO to delete member one should set its weight to 0
                     address: m.member.address,
                     weight: m.member.weight,
+                    added_at: m.member.added_at,
                     metadata: m.member.metadata
                 }))
             }
@@ -302,14 +318,18 @@ export class GroupsStore {
     }
 }
 
-export function toUint8Array(str: string): Uint8Array {
+export function
+
+toUint8Array(str: string): Uint8Array {
     if (!('TextEncoder' in window))
         alert('Sorry, this browser does not support TextEncoder...')
 
     return new TextEncoder().encode(str)
 }
 
-function toGroupPolicy(groupAccounts: GroupAccountInfo[]): GroupPolicy[] {
+function
+
+toGroupPolicy(groupAccounts: GroupPolicyInfo[]): GroupPolicy[] {
     // console.log(groupAccounts[0].decision_policy) // TODO
 
     return [

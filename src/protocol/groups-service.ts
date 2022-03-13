@@ -1,24 +1,25 @@
 import { getService, service } from './services'
 import { ChainInfo } from '@keplr-wallet/types'
+import { CosmosClient } from './cosmos-client'
 import {
-    MsgCreateGroup, MsgCreateGroupAccount, MsgUpdateGroupAccountDecisionPolicy,
+    MsgCreateGroup,
+    MsgCreateGroupPolicy,
     MsgUpdateGroupMembers,
     MsgUpdateGroupMetadata,
+    MsgUpdateGroupPolicyDecisionPolicy,
     protobufPackage
-} from '../generated/regen/group/v1alpha1/tx'
-import { CosmosClient } from './cosmos-client'
-import { GroupAccountInfo, GroupInfo, GroupMember } from '../generated/regen/group/v1alpha1/types'
+} from '../generated/cosmos/group/v1beta1/tx'
+import { GroupInfo, GroupMember, GroupPolicyInfo } from '../generated/cosmos/group/v1beta1/types'
 import {
-    QueryGroupAccountInfoResponse,
-    QueryGroupAccountsByGroupResponse,
     QueryGroupInfoResponse,
     QueryGroupMembersResponse,
+    QueryGroupPoliciesByGroupResponse,
     QueryGroupsByAdminResponse
-} from '../generated/regen/group/v1alpha1/query'
+} from '../generated/cosmos/group/v1beta1/query'
 
 @service
 export class GroupsService {
-    static serviceName: string = 'GroupsService'
+    static serviceName: string = GroupsService.name
 
     static get instance(): GroupsService {
         return getService<GroupsService>(GroupsService.serviceName)
@@ -32,7 +33,7 @@ export class GroupsService {
 
     applyChainInfo = async (chainInfo: ChainInfo): Promise<void> => {
         this.cosmosClient.registry.register(
-            "/regen.group.v1alpha1.MsgCreateGroup",
+            `/${protobufPackage}.MsgCreateGroup`,
             MsgCreateGroup
         )
         this.cosmosClient.registry.register(
@@ -44,25 +45,25 @@ export class GroupsService {
             MsgUpdateGroupMembers
         )
         this.cosmosClient.registry.register(
-            `/${protobufPackage}.MsgCreateGroupAccount`,
-            MsgCreateGroupAccount
+            `/${protobufPackage}.MsgCreateGroupPolicy`,
+            MsgCreateGroupPolicy
         )
         this.cosmosClient.registry.register(
-            `/${protobufPackage}.MsgUpdateGroupAccountDecisionPolicy`,
-            MsgUpdateGroupAccountDecisionPolicy
+            `/${protobufPackage}.MsgUpdateGroupPolicyDecisionPolicy`,
+            MsgUpdateGroupPolicyDecisionPolicy
         )
     }
 
     groupsByAdmin = async (admin: string): Promise<GroupInfo[]> => {
         const res = await this.cosmosClient.lcdClientGet(
-            `/regen/group/v1alpha1/groups/admins/${admin}`
+            `/cosmos/group/v1beta1/groups_by_admin/${admin}`
         ) as QueryGroupsByAdminResponse
         return res.groups.map(normalizeBackendGroup)
     }
 
     groupById = async (groupId: number): Promise<GroupInfo> => {
         const res = await this.cosmosClient.lcdClientGet(
-            `/regen/group/v1alpha1/groups/${groupId}/info`
+            `/cosmos/group/v1beta1/group_info/${groupId}`
         ) as QueryGroupInfoResponse
 
         if (!res.info) {
@@ -72,32 +73,25 @@ export class GroupsService {
         return normalizeBackendGroup(res.info)
     }
 
-    groupAccounts = async (groupId: number): Promise<GroupAccountInfo[]> => {
+    groupPolicies = async (groupId: number): Promise<GroupPolicyInfo[]> => {
         const res = await this.cosmosClient.lcdClientGet(
-            `/regen/group/v1alpha1/groups/${groupId}/accounts`
-        ) as QueryGroupAccountsByGroupResponse
-        return res.group_accounts
+            `/cosmos/group/v1beta1/group_policies_by_group/${groupId}`
+        ) as QueryGroupPoliciesByGroupResponse
+        return res.group_policies
     }
 
     groupMembers = async (groupId: number): Promise<GroupMember[]> => {
         const res = await this.cosmosClient.lcdClientGet(
-            `/regen/group/v1alpha1/groups/${groupId}/members`
+            `/cosmos/group/v1beta1/group_members/${groupId}`
         ) as QueryGroupMembersResponse
         return res.members
-    }
-
-    groupInfoByGroupAddress = async (groupAddress: string): Promise<GroupAccountInfo> => {
-        const res = await this.cosmosClient.lcdClientGet(
-            `/regen/group/v1alpha1/groups/accounts/${groupAddress}`
-        ) as QueryGroupAccountInfoResponse
-        return res.info
     }
 }
 
 function normalizeBackendGroup(g: GroupInfo): GroupInfo { // it's grpc - Long numbers are strings, so we convert them here
     return {
         ...g,
-        group_id: Number(g.group_id),
+        id: Number(g.id),
         version: Number(g.version)
     }
 }

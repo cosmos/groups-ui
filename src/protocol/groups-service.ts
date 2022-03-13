@@ -82,7 +82,7 @@ export class GroupsService {
 
     groupMembers = async (groupId: number): Promise<GroupMember[]> => {
         const res = await this.cosmosClient.lcdClientGet(
-            `/cosmos/group/v1beta1/groups/${groupId}/members`
+            `/cosmos/group/v1beta1/group_members/${groupId}`
         ) as QueryGroupMembersResponse
         return res.members
     }

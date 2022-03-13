@@ -1,8 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useStores } from '../../shared-state/repo'
-import { Button, makeStyles, Paper, Table, TableBody, TableCell, TableHead, TableRow, withStyles } from '@material-ui/core'
-import { Routes } from '../../routes'
+import {
+    Button,
+    makeStyles,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableRow,
+    withStyles
+} from '@material-ui/core'
 import { Link } from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
@@ -26,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
     },
 
     headCell: {
-        fontWeight: 700,
+        fontWeight: 700
     },
 
     nameCol: {
@@ -37,8 +46,8 @@ const useStyles = makeStyles((theme) => ({
 
     col: {
         fontSize: '16px',
-        fontFamily: " 'Lato', sans-serif ",
-        padding: '48px 16px',
+        fontFamily: ' \'Lato\', sans-serif ',
+        padding: '48px 16px'
         // width: '20%'
     },
 
@@ -57,9 +66,9 @@ const StyledTableRow = withStyles((theme) => ({
     root: {
         textAlign: 'left',
         '&:nth-of-type(odd)': {
-            backgroundColor: '#FAFAFA',
-        },
-    },
+            backgroundColor: '#FAFAFA'
+        }
+    }
 }))(TableRow)
 
 export const Groups: React.FC<{}> = observer(() => {
@@ -78,11 +87,11 @@ export const Groups: React.FC<{}> = observer(() => {
                 marginTop: '24px',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'space-between',
+                justifyContent: 'space-between'
             }}>
                 <div style={{
                     fontWeight: 900,
-                    fontSize: '38px',
+                    fontSize: '38px'
                 }}>
                     Groups
                 </div>
@@ -97,7 +106,7 @@ export const Groups: React.FC<{}> = observer(() => {
             </div>
 
             <Paper style={{
-                marginTop: '48px',
+                marginTop: '48px'
             }}>
                 <Table>
                     <TableHead className={tableStyle.tableHead}>
@@ -106,31 +115,42 @@ export const Groups: React.FC<{}> = observer(() => {
                             <TableCell className={tableStyle.headCell}>Created</TableCell>
                             <TableCell className={tableStyle.headCell}>Last edited</TableCell>
                             {/* <TableCell className={tableStyle.col}>Description</TableCell> */}
-                            <TableCell className={tableStyle.headCell}>Number of <br /> members</TableCell>
-                            <TableCell className={tableStyle.headCell}>Your <br /> membership type</TableCell>
-                            <TableCell />
+                            <TableCell className={tableStyle.headCell}>Number of <br/> members</TableCell>
+                            <TableCell className={tableStyle.headCell}>Your <br/> membership type</TableCell>
+                            <TableCell/>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {groups.map(group => (
-                            <StyledTableRow key={group.info.group_id} className={tableStyle.tableItem}>
+                            <StyledTableRow key={group.info.id} className={tableStyle.tableItem}>
                                 <TableCell component="th" scope="row" className={tableStyle.nameCol}>
                                     {group.metadata.name}
                                 </TableCell>
-                                <TableCell className={tableStyle.col}>{new Date(group.metadata.created).toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</TableCell>
-                                <TableCell className={tableStyle.col}>{new Date(group.metadata.lastEdited).toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</TableCell>
+                                <TableCell
+                                    className={tableStyle.col}>{new Date(group.metadata.created).toLocaleString('en-US', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric'
+                                })}</TableCell>
+                                <TableCell
+                                    className={tableStyle.col}>{new Date(group.metadata.lastEdited).toLocaleString('en-US', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric'
+                                })}</TableCell>
                                 {/* <TableCell align="right">{group.metadata.description}</TableCell> */}
                                 <TableCell className={tableStyle.col}>{(group.members || []).length}</TableCell>
                                 <TableCell className={tableStyle.col}>TODO</TableCell>
-                                <TableCell className={tableStyle.col}><Link to={`/groups/${group.info.group_id}/admin-view`}>Admin View</Link></TableCell>
+                                <TableCell className={tableStyle.col}><Link to={`/groups/${group.info.id}/admin-view`}>Admin
+                                    View</Link></TableCell>
                             </StyledTableRow>
                         ))}
                     </TableBody>
                 </Table>
             </Paper>
             {loading && <div>{'loading ...'}</div>}
-            <br />
-            <br />
+            <br/>
+            <br/>
             {/*<pre style={{ maxWidth: 400, overflowX: 'scroll' }}>*/}
             {/*    {JSON.stringify(groups, null, 2)}*/}
             {/*</pre>*/}

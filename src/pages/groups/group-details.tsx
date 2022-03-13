@@ -10,7 +10,9 @@ import {
     TableCell,
     TableFooter,
     TableHead,
-    TableRow, TableSortLabel, TextField,
+    TableRow,
+    TableSortLabel,
+    TextField,
     useTheme,
     withStyles
 } from '@material-ui/core'
@@ -22,6 +24,7 @@ import { Link, useHistory, useParams } from 'react-router-dom'
 import { Page } from '../page'
 import { useStores } from '../../shared-state/repo'
 import { Routes } from '../../routes'
+import { GroupMember } from '../../generated/cosmos/group/v1beta1/types'
 import Pagination from '@material-ui/lab/Pagination'
 
 const useStyles1 = makeStyles((theme) => ({
@@ -223,10 +226,10 @@ const tableStyles = makeStyles({
     }
 })
 
-
 export const GroupDetails: React.FC<{}> = observer(() => {
-    const { editedGroup, resetEditedGroup, fetchEditedGroupById } = useStores().groupsStore
-    const [membersEditMode, setMembersEditMode] = useState(false)
+    const { originalEditedGroup, editedGroup, resetEditedGroup, fetchEditedGroupById, updateEditedGroup } = useStores().groupsStore
+    // const [membersEditMode, setMembersEditMode] = useState(false)
+    const [membersEditMode, setMembersEditMode] = useState(true) // TODO
     const [newMember, setNewMember] = useState('')
 
     const history = useHistory()
@@ -292,6 +295,47 @@ export const GroupDetails: React.FC<{}> = observer(() => {
         )
     }
 
+    const originalMembersMap = new Map<string, GroupMember>(originalEditedGroup.members.map(m => [m.member.address, m]))
+    const membersMap = new Map<string, GroupMember>(editedGroup.members.map(m => [m.member.address, m]))
+
+    type memberStatus = 'unChanged' | 'changed' | 'newDeleted' | 'newAdded'
+    const members: Array<{
+        address: string
+        weight: number
+        status: memberStatus
+    }> = []
+
+    editedGroup.members.forEach(m => {
+        const status = ((): memberStatus => {
+            const original = originalMembersMap.get(m.member.address)
+            if (!original) {
+                return  'newAdded'
+            }
+
+            if (original.member.weight !== m.member.weight) {
+                return 'changed'
+            }
+
+            return 'unChanged'
+
+        })()
+        members.push({
+            address: m.member.address,
+            weight: Number(m.member.weight),
+            status
+        })
+    })
+
+    originalEditedGroup.members.forEach(m => {
+        const member = membersMap.get(m.member.address)
+        if (!member) {
+            members.push({
+                address: m.member.address,
+                weight: Number(m.member.weight),
+                status: 'newDeleted'
+            })
+        }
+    })
 
     return (
         <Page>
@@ -352,7 +396,8 @@ export const GroupDetails: React.FC<{}> = observer(() => {
                         <h2 style={{ padding: '40px', fontWeight: 900 }}>Members</h2>
                         {membersEditMode ? (
                             <div style={{
-                                display: 'flex'
+                                display: 'flex',
+                                paddingRight: '24px'
                             }}>
                                 <TextField
                                     fullWidth
@@ -360,30 +405,51 @@ export const GroupDetails: React.FC<{}> = observer(() => {
                                     value={newMember}
                                     onChange={e => setNewMember(e.target.value)}
                                 />
-                                <Button
-                                    variant="outlined"
-                                    color="primary"
-                                    className="tableBtn"
-                                    onClick={console.log}
-                                >
-                                    Add member
-                                </Button>
-                                <Button
-                                    variant="outlined"
-                                    color="primary"
-                                    className="tableBtn"
-                                    onClick={console.log}
-                                >
-                                    Cancel Changes
-                                </Button>
-                                <Button
-                                    variant="outlined"
-                                    color="primary"
-                                    className="tableBtn"
-                                    onClick={console.log}
-                                >
-                                    Save Changes
-                                </Button>
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    marginLeft: '16px'
+                                }}>
+                                    <Button
+                                        variant="outlined"
+                                        color="primary"
+                                        onClick={() => {
+                                            updateEditedGroup({
+                                                ...editedGroup,
+                                                members: [
+                                                    ...editedGroup.members,
+                                                    {
+                                                        group_id: editedGroup.info.id,
+                                                        member: {
+                                                            address: newMember,
+                                                            weight: "1",
+                                                            added_at: new Date(),
+                                                            metadata: JSON.stringify({
+                                                                name: ''
+                                                            })
+                                                        }
+                                                    }
+                                                ]
+                                            })
+                                        }}
+                                    >
+                                        Add
+                                    </Button>
+                                    <Button
+                                        variant="text"
+                                        color="primary"
+                                        onClick={console.log}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        variant="outlined"
+                                        color="primary"
+                                        onClick={console.log}
+                                    >
+                                        Save
+                                    </Button>
+                                </div>
                             </div>
                         ) : (
                             <Button
@@ -402,6 +468,7 @@ export const GroupDetails: React.FC<{}> = observer(() => {
                                 <StyledTableCell>Address</StyledTableCell>
                                 <StyledTableCell align="left">voting weight</StyledTableCell>
                                 <StyledTableCell align="left">date added</StyledTableCell>
+                                <StyledTableCell align="left">status (todo change with buttons and css)</StyledTableCell>
                             </TableRow>
                         </TableHead> */}
                         <EnhancedTableHead
@@ -412,21 +479,25 @@ export const GroupDetails: React.FC<{}> = observer(() => {
                             rowCount={editedGroup.members.length}
                         />
                         <TableBody>
-                            {editedGroup.members.map((m, i) => {
+                            {members.map((m, i) => {
                                 return (
-                                    <StyledTableRow key={m.member.address}>
+                                    <StyledTableRow key={m.address}>
                                         <StyledTableCell align="left" style={{
                                             width: '15%',
                                             padding: '28px 40px'
-                                        }}>{m.member.address}</StyledTableCell>
+                                        }}>{m.address}</StyledTableCell>
                                         <StyledTableCell align="left" style={{
                                             width: '15%',
                                             padding: '28px 40px'
-                                        }}>{m.member.weight}</StyledTableCell>
+                                        }}>{m.weight}</StyledTableCell>
                                         <StyledTableCell align="left" style={{
                                             width: '30%',
                                             padding: '28px 40px'
                                         }}>{'TODO Date added'}</StyledTableCell>
+                                        <StyledTableCell align="left" style={{
+                                            width: '30%',
+                                            padding: '28px 40px'
+                                        }}>{m.status}</StyledTableCell>
                                     </StyledTableRow>
                                 )
                             })}

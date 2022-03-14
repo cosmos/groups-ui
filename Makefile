@@ -4,10 +4,24 @@ CHAIN_HOME=$(HOME)/.simd
 ALICE=cosmos1kdzkazludrnmnzchcxgs6znsjph5ugx4rhljrh
 USER2=cosmos106ljn6kds9vegaux0w4jnend97fdm50yec59vq
 NOW=$(shell date +%s%3N)
+UNAME=$(shell uname)
+
+ifeq ($(UNAME), Linux)
+	sed=sed -i
+endif
+ifeq ($(UNAME), Darwin)
+	sed=sed -i ""
+endif
 
 .PHONY: help
 help:
-	@echo "download https://github.com/cosmos/cosmos-sdk -> git checkout v0.46.0-alpha3 -> make build -> mv build/simd $HOME/go/bin/"
+ifeq ($(UNAME), Linux)
+	@echo "git clone https://github.com/cosmos/cosmos-sdk -> git checkout v0.46.0-alpha3 -> make build -> mv build/simd $HOME/go/bin/"
+endif
+ifeq ($(UNAME), Darwin) # macOS
+	@echo "git clone https://github.com/cosmos/cosmos-sdk -> git checkout v0.46.0-alpha3 -> make build -> sudo mv build/simd /usr/local/go/bin/ -> ln -s /usr/local/go/bin/simd /usr/local/bin/simd"
+endif
+
 
 .PHONY: local-clean
 local-clean:
@@ -26,13 +40,13 @@ local-init: local-clean local-keys
 	simd add-genesis-account alice 10000000000000000000000001stake --home $(CHAIN_HOME) --keyring-backend test
 	simd gentx alice 1000000000stake --chain-id $(CHAIN_ID) --home $(CHAIN_HOME) --keyring-backend test --keyring-dir $(CHAIN_HOME)
 	simd collect-gentxs --home $(CHAIN_HOME)
-	sed -i "s/prometheus = false/prometheus = true/" $(CHAIN_HOME)/config/config.toml
-	sed -i "s/cors-allowed-origins = \[\]/cors_allowed_origins = [\"*\"]/" $(CHAIN_HOME)/config/config.toml
-	sed -i "s/laddr = \"tcp:\/\/127.0.0.1:26657\"/laddr = \"tcp:\/\/0.0.0.0:26657\"/" $(CHAIN_HOME)/config/config.toml
-	cat $(CHAIN_HOME)/config/app.toml | tr '\n' '\r' | sed "s/# Enable defines if the API server should be enabled.\renable = false/# Enable defines if the API server should be enabled.\renable = true/" | tr '\r' '\n' > /tmp/app.toml.tmp && mv /tmp/app.toml.tmp $(CHAIN_HOME)/config/app.toml
-	sed -i "s/swagger = false/swagger = true/" $(CHAIN_HOME)/config/app.toml
-	sed -i "s/enabled-unsafe-cors = false/enabled-unsafe-cors = true/" $(CHAIN_HOME)/config/app.toml
-	sed -i "s/enable-unsafe-cors = false/enable-unsafe-cors = true/" $(CHAIN_HOME)/config/app.toml
+	$(sed) "s/prometheus = false/prometheus = true/" $(CHAIN_HOME)/config/config.toml
+	$(sed) "s/cors-allowed-origins = \[\]/cors_allowed_origins = [\"*\"]/" $(CHAIN_HOME)/config/config.toml
+	$(sed) "s/laddr = \"tcp:\/\/127.0.0.1:26657\"/laddr = \"tcp:\/\/0.0.0.0:26657\"/" $(CHAIN_HOME)/config/config.toml
+	cat $(CHAIN_HOME)/config/app.toml | tr '\n' '\r' | $(sed) "s/# Enable defines if the API server should be enabled.\renable = false/# Enable defines if the API server should be enabled.\renable = true/" | tr '\r' '\n' > /tmp/app.toml.tmp && mv /tmp/app.toml.tmp $(CHAIN_HOME)/config/app.toml
+	$(sed) "s/swagger = false/swagger = true/" $(CHAIN_HOME)/config/app.toml
+	$(sed) "s/enabled-unsafe-cors = false/enabled-unsafe-cors = true/" $(CHAIN_HOME)/config/app.toml
+	$(sed) "s/enable-unsafe-cors = false/enable-unsafe-cors = true/" $(CHAIN_HOME)/config/app.toml
 
 .PHONY: local-start
 local-start:

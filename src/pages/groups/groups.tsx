@@ -15,6 +15,26 @@ import {
 import { Link } from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
+    paper: {
+        marginTop: '48px',
+        borderRadius: '10px',
+        border: '1px solid #D2D5D9',
+        boxSizing: 'border-box',
+        boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)'
+    },
+    createGroupBtn: {
+        background: '#3D7ACF',
+        borderRadius: '2px',
+        fontFamily: 'Mulish',
+        fontStyle: 'normal',
+        fontWeight: 800,
+        fontSize: '18px',
+        lineHeight: '23px',
+        letterSpacing: '1px',
+        textTransform: 'uppercase',
+        color: '#FFFFFF',
+        padding: '3px 25px'
+    },
     createGroupBtn: {
         background: '#3D7ACF',
         borderRadius: '2px',
@@ -129,7 +149,7 @@ export const Groups: React.FC<{}> = observer(() => {
                 </Link>
             </div>
 
-            <Paper style={{marginTop: '48px'}}>
+            <Paper className={tableStyle.paper}>
                 <Table>
                     <TableHead className={tableStyle.tableHead}>
                         <TableRow className={tableStyle.tableRow}>

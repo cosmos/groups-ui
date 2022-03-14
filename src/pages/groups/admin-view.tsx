@@ -49,17 +49,20 @@ export const useStyles = makeStyles(() => ({
         fontFamily: ' \'Lato\', sans-serif  ',
         '& h1': {
             fontWeight: 900,
-            lineHeight: '50px'
-
+            lineHeight: '50px',
+            fontSize: '38px'
         },
         '& .btn': {
-            padding: '3px 45px',
-            fontSize: '16px',
-            fontWeight: 700
+            padding: '9px 45px',
+            fontSize: '18px',
+            fontWeight: 800,
+            backgroundColor: 'white',
+            lineHeight: '23px'
         },
         '& .subtitle': {
-            fontSize: '20px',
-            lineHeight: '33px',
+            fontSize: '22px',
+            lineHeight: '150%',
+            fontWeight: 400,
             color: '#545555'
         },
 
@@ -80,7 +83,8 @@ export const useStyles = makeStyles(() => ({
         fontSize: '18px',
         alignItems: 'center',
         fontFamily: ' \'Lato\', sans-serif ',
-        marginBottom: '35px'
+        marginBottom: '35px',
+        color: '#3D7ACF'
     },
     regen: {
         display: 'flex',
@@ -88,7 +92,9 @@ export const useStyles = makeStyles(() => ({
         marginRight: '28px',
 
         '& h2': {
-            fontWeight: 900
+            fontWeight: 900,
+            fontSize: '32px',
+            lineHeight: '140%'
         },
         '& p': {
             fontSize: '12px',
@@ -106,6 +112,12 @@ export const useStyles = makeStyles(() => ({
         padding: '40px',
         margin: '30px 0',
 
+        '& h3': {
+            fontSize: '24px',
+            fontWeight: 900,
+            lineHeight: '145%'
+        },
+
         '& .actionBtns': {
             marginTop: '23px',
             display: 'flex',
@@ -115,7 +127,45 @@ export const useStyles = makeStyles(() => ({
         '& button': {
             fontSize: '16px',
             fontWeight: 700,
-            width: '23%'
+            width: '23%',
+
+            '& .MuiButton-label': {
+                padding: '0',
+                fontSize: '18px'
+            }
+        },
+
+        '& .icon': {
+            fontSize: '20px',
+            marginRight: '5px',
+            height: '25px'
+        }
+    },
+    proposedActions: {
+        '& h3': {
+            padding: '40px',
+            fontSize: '24px',
+            fontWeight: 900,
+            lineHeight: '145%'
+        },
+        '& .number': {
+            padding: '7px',
+            borderRadius: '3px',
+            fontFamily: 'Mulish',
+            backgroundColor: '#EFEFEF',
+            fontWeight: 800,
+            fontSize: '14px',
+            lineHeight: '18px',
+            letterSpacing: '1px',
+            color: '#545555'
+        },
+        '& .description': {
+            fontFamily: 'Lato',
+            fontWeight: 700,
+            fontSize: '18px',
+            lineHeight: '145%',
+            /* or 26px */
+            color: '#202020'
         }
     }
 
@@ -264,7 +314,7 @@ const StyledTableRow = withStyles((theme) => ({
     root: {
         textAlign: 'left',
         '&:nth-of-type(odd)': {
-            backgroundColor: theme.palette.action.hover
+            backgroundColor: '#FAFAFA'//theme.palette.action.hover
         }
     }
 }))(TableRow)
@@ -334,8 +384,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                     <div className={classes.heroBlock}>
                         <h1>Foo Dev Team</h1>
                         <Link to={`/groups/${groupId}/details`}>
-                            <Button variant="outlined" color="primary" className="btn"
-                                style={{ backgroundColor: 'white' }}>
+                            <Button variant="outlined" color="primary" className="btn">
                                 group details
                             </Button>
                         </Link>
@@ -382,8 +431,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                             className="btn"
                             onClick={() => history.push('/proposals/new')}
                         >
-                            <SvgIcon component={DeligateIcon}
-                                style={{ fontSize: '20px', height: '25px', marginRight: '5px' }} />
+                            <SvgIcon component={DeligateIcon} className="icon"/>
                             delegate funds
                         </Button>
                         <Button
@@ -392,8 +440,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                             className="btn"
                             onClick={() => history.push('/proposals/new')}
                         >
-                            <SvgIcon component={SpendIcon}
-                                style={{ fontSize: '20px', height: '25px', marginRight: '5px' }} />
+                            <SvgIcon component={SpendIcon} className="icon"/>
                             spend funds
                         </Button>
                         <Button
@@ -416,8 +463,8 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                         </Button>
                     </div>
                 </Paper>
-                <Paper elevation={2}>
-                    <h3 style={{ padding: '40px' }}>Proposed Actions</h3>
+                <Paper elevation={2} className={classes.proposedActions}>
+                    <h3>Proposed Actions</h3>
                     <Table className={table.table} aria-label="customized table">
                         <EnhancedTableHead
                             numSelected={selected.length}
@@ -452,8 +499,8 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                                                 {row.date}
                                             </StyledTableCell>
                                             <StyledTableCell align="left"><span className={`${status.marker} orange`}>{row.status}</span></StyledTableCell>
-                                            <StyledTableCell align="left">{row.number}</StyledTableCell>
-                                            <StyledTableCell align="left">{row.desc}</StyledTableCell>
+                                            <StyledTableCell align="left"><span className="number">{row.number}</span></StyledTableCell>
+                                            <StyledTableCell align="left"><span className="description">{row.desc}</span></StyledTableCell>
                                         </StyledTableRow>
                                     );
                                 })}

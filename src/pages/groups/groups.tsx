@@ -15,9 +15,50 @@ import {
 import { Link } from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
+    paper: {
+        marginTop: '48px',
+        borderRadius: '10px',
+        border: '1px solid #D2D5D9',
+        boxSizing: 'border-box',
+        boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)'
+    },
+    createGroupBtn: {
+        background: '#3D7ACF',
+        borderRadius: '2px',
+        fontFamily: 'Mulish',
+        fontStyle: 'normal',
+        fontWeight: 800,
+        fontSize: '18px',
+        lineHeight: '23px',
+        letterSpacing: '1px',
+        textTransform: 'uppercase',
+        color: '#FFFFFF',
+        padding: '3px 25px'
+    },
+    createGroupBtn: {
+        background: '#3D7ACF',
+        borderRadius: '2px',
+        fontFamily: 'Mulish',
+        fontStyle: 'normal',
+        fontWeight: 800,
+        fontSize: '18px',
+        lineHeight: '23px',
+        letterSpacing: '1px',
+        textTransform: 'uppercase',
+        color: '#FFFFFF',
+        padding: '3px 25px'
+    },
     tableHead: {
 
         '& th': {
+            fontFamily: 'Mulish',
+            fontStyle: 'normal',
+            fontWeight: '800',
+            fontSize: '12px',
+            lineHeight: '15px',
+            letterSpacing: '1px',
+            textTransform: 'uppercase',
+            color: '#202020'
             // padding: '0',
             // border: 'none',
             // fontWeight: 800,
@@ -40,14 +81,16 @@ const useStyles = makeStyles((theme) => ({
 
     nameCol: {
         fontWeight: 900,
-        fontSize: '18px'
+        fontSize: '18px',
+        borderBottom: "unset"
         // width: '30%',
     },
 
     col: {
         fontSize: '16px',
         fontFamily: ' \'Lato\', sans-serif ',
-        padding: '48px 16px'
+        padding: '48px 16px',
+        borderBottom: "unset"
         // width: '20%'
     },
 
@@ -97,6 +140,7 @@ export const Groups: React.FC<{}> = observer(() => {
                 </div>
                 <Link to="/groups/new">
                     <Button
+                        className={tableStyle.createGroupBtn}
                         variant="contained"
                         color="primary"
                     >
@@ -105,9 +149,7 @@ export const Groups: React.FC<{}> = observer(() => {
                 </Link>
             </div>
 
-            <Paper style={{
-                marginTop: '48px'
-            }}>
+            <Paper className={tableStyle.paper}>
                 <Table>
                     <TableHead className={tableStyle.tableHead}>
                         <TableRow className={tableStyle.tableRow}>

@@ -18,6 +18,27 @@ const useStyles = makeStyles((theme: Theme) =>
             fontSize: '12px',
             fontWeight: 800,
         },
+        regenChainInput: {
+            fontFamily: 'Mulish',
+            fontStyle: 'normal',
+            fontWeight: 800,
+            fontSize: '12px',
+            lineHeight: '15px',
+            letterSpacing: '1px',
+            textTransform: 'uppercase',
+            color: '#202020',
+            display: 'flex',
+            alignItems: 'center',
+        },
+        userLabel: {
+            fontFamily: 'Lato',
+            fontStyle: 'normal',
+            fontWeight: 400,
+            fontSize: '16px',
+            lineHeight: '150%',
+            color: '#545555',
+            paddingLeft: '40px'
+        },
         menuItem: {
             fontFamily: " 'Lato' ",
             fontWeight: 400,
@@ -99,7 +120,8 @@ export const Nav: React.FC<{}> = observer(() => {
         const fetchData = async () => {
             const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
             console.log('key', key)
-            setUserString(`${key.name}: ${key.bech32Address}`)
+            let shortAddress = key.bech32Address.substring(0, 9) + "…" + key.bech32Address.substring(key.bech32Address.length - 4)
+            setUserString(`${key.name}: ${shortAddress}`)
         }
 
         fetchData()
@@ -117,7 +139,7 @@ export const Nav: React.FC<{}> = observer(() => {
             paddingRight: '24px',
         }}>
             <div style={{
-                maxWidth: '1200px',
+                maxWidth: '1140px',
                 display: 'flex',
                 alignItems: 'center',
                 flex: 1,
@@ -152,7 +174,7 @@ export const Nav: React.FC<{}> = observer(() => {
                 </ul>
                 <div style={{ display: 'flex', alignItems: "center" }}>
                     <FormControl variant="outlined" className={classes.formControl}>
-                        <InputLabel id="demo-simple-select-outlined-label" style={{ textTransform: 'uppercase', color: 'black' }}>regen chain</InputLabel>
+                        <InputLabel id="demo-simple-select-outlined-label" className={classes.regenChainInput}>regen chain</InputLabel>
                         <Select
                             labelId="demo-simple-select-outlined-label"
                             id="demo-simple-select-outlined"
@@ -172,7 +194,7 @@ export const Nav: React.FC<{}> = observer(() => {
                             </MenuItem>
                         </Select>
                     </FormControl>
-                    {userString}
+                    <div className={classes.userLabel}>{userString}</div>
                 </div>
             </div>
             <Modal

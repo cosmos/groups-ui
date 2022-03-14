@@ -15,13 +15,6 @@ import {
 import { Link } from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
-    paper: {
-        marginTop: '48px',
-        borderRadius: '10px',
-        border: '1px solid #D2D5D9',
-        boxSizing: 'border-box',
-        boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)'
-    },
     createGroupBtn: {
         background: '#3D7ACF',
         borderRadius: '2px',
@@ -136,7 +129,7 @@ export const Groups: React.FC<{}> = observer(() => {
                 </Link>
             </div>
 
-            <Paper className={tableStyle.paper}>
+            <Paper style={{marginTop: '48px'}}>
                 <Table>
                     <TableHead className={tableStyle.tableHead}>
                         <TableRow className={tableStyle.tableRow}>

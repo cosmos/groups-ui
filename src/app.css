@@ -205,3 +205,20 @@ code {
 input::-ms-clear {
     display: none;
 }
+
+.MuiButton-root.MuiButton-outlined.MuiButton-outlinedPrimary {
+    color: #3D7ACF;
+    border-color: #3D7ACF;
+}
+
+.MuiPaper-root.MuiPaper-rounded {
+    background: #FFFFFF;
+    border: 1px solid #D2D5D9;
+    box-sizing: border-box;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.MuiTableCell-root.MuiTableCell-body.MuiTableCell-alignLeft {
+    border-bottom: 0;
+}

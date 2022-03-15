@@ -6,7 +6,7 @@
 
 ## Usage
 - `npm ci`
-- `./protocgen.sh`
+- `./protocgen.sh` (generated files are commited, so no need to run it before every usage)
 - `npm run start`
 
 ## Running a cosmos node locally

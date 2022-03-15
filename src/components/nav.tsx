@@ -8,6 +8,7 @@ import './nav.css'
 import { CosmosNodeService } from '../protocol/cosmos-node-service'
 import { Backdrop, Button, createStyles, Fade, FormControl, IconButton, InputLabel, makeStyles, MenuItem, Modal, Paper, Select, TextField, Theme } from '@material-ui/core'
 import { Close } from '@material-ui/icons'
+import {truncateAddress} from "../utils";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -120,8 +121,7 @@ export const Nav: React.FC<{}> = observer(() => {
         const fetchData = async () => {
             const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
             console.log('key', key)
-            let shortAddress = key.bech32Address.substring(0, 9) + "…" + key.bech32Address.substring(key.bech32Address.length - 4)
-            setUserString(`${key.name}: ${shortAddress}`)
+            setUserString(`${key.name}: ${truncateAddress(key.bech32Address)}`)
         }
 
         fetchData()

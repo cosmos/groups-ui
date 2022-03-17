@@ -47,7 +47,7 @@ export const App: React.FC = () => {
                     </Page>
                 </Route>
                 <Route exact path='/my/component'>
-                    <ProposalPage></ProposalPage>
+                    <ProposalPage />
                 </Route>
             </Switch>
         </Router>

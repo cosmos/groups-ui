@@ -12,7 +12,6 @@ import { ParameterChangeProposal } from '../generated/params/params';
 import { Group, toUint8Array } from './groups-store';
 import { CosmosNodeService } from '../protocol/cosmos-node-service';
 import { VoteOption } from '../generated/cosmos/group/v1beta1/types';
-import { GroupProposalsUrls } from '../protocol/proposals-service';
 import { Coin, coins } from '@cosmjs/proto-signing';
 import { BroadcastTxResponse } from '@cosmjs/stargate';
 import { MsgSubmitProposal } from '../generated/gov/tx';
@@ -81,7 +80,7 @@ export class ProposalsStore {
         console.log('msg', msg);
 
         const msgAny = {
-            typeUrl: GroupProposalsUrls.MsgCreateProposal,
+            typeUrl: `/${protobufPackage}.MsgCreateProposal`,
             value: msg,
         };
 

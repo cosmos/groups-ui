@@ -53,18 +53,23 @@ local-start:
 	#simd start --home $(CHAIN_HOME) --grpc-web.enable true --grpc-web.address 0.0.0.0:9091
 	simd start --mode validator --home $(CHAIN_HOME)
 
+.PHONY: query-balance
 query-balance:
 	simd q bank balances $(ALICE) --chain-id $(CHAIN_ID) --home $(CHAIN_HOME)
 	simd q bank balances $(USER2) --chain-id $(CHAIN_ID) --home $(CHAIN_HOME)
 
+.PHONY: keys-list
 keys-list:
 	simd keys list --home $(CHAIN_HOME) --keyring-backend test --keyring-dir $(CHAIN_HOME)
 
+.PHONY: bank-send
 bank-send:
 	simd tx bank send $(ALICE) $(USER2) 1000000000000000stake --chain-id $(CHAIN_ID) --home $(CHAIN_HOME) --keyring-backend test --keyring-dir $(CHAIN_HOME)
 
+.PHONY: create-group
 create-group:
 	simd tx group create-group $(USER2) $$(echo '{"name": "bla1", "description": "blabbl", "created": $(NOW), "lastEdited": $(NOW), "linkToForum": "", "other": "blabla"}' | base64 -w 0) ./testdata/members.json --chain-id $(CHAIN_ID) --keyring-backend test --keyring-dir $(CHAIN_HOME)
 
+.PHONY: query-groups
 query-groups:
 	simd q group groups-by-admin $(USER2)

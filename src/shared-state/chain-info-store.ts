@@ -1,6 +1,7 @@
 import { action, makeObservable, observable } from 'mobx'
 import { ChainInfo } from '@keplr-wallet/types'
 import { Bech32Address } from '@keplr-wallet/cosmos'
+import {applyChainInfo} from "../protocol/services";
 
 export class ChainInfoStore {
     @observable
@@ -11,9 +12,16 @@ export class ChainInfoStore {
     }
 
     @action
-    setChainInfo = (chainInfo: ChainInfo) => {
-        this.chainInfo = chainInfo
-        window.localStorage.setItem("chainInfo", JSON.stringify(chainInfo))
+    setChainInfo = async (chainInfo: ChainInfo) => {
+        try {
+            await applyChainInfo(chainInfo)
+            window.localStorage.setItem("chainInfo", JSON.stringify(chainInfo))
+            this.chainInfo = chainInfo
+        } catch (e) {
+            console.log("Cannot change chain", e)
+            // todo: handle network reject
+            // todo: other errors handling
+        }
     }
 }
 

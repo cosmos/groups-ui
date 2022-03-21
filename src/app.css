@@ -222,3 +222,36 @@ input::-ms-clear {
 .MuiTableCell-root.MuiTableCell-body.MuiTableCell-alignLeft {
     border-bottom: 0;
 }
+
+/** FormGroup **/
+
+.MuiFormGroup-root {
+}
+
+.MuiFormGroup-root .checked {
+    background-color: #FAFAFA;
+}
+
+.MuiRadio-root .MuiIconButton-label {
+    color: #D2D5D9;
+}
+.MuiRadio-colorSecondary.Mui-checked .MuiIconButton-label {
+    color: #3D7ACF;
+}
+
+.MuiTypography-root.MuiFormControlLabel-label.MuiTypography-body1 {
+    font-family: 'Lato';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 145%;
+    color: #000000;
+}
+
+.MuiFormGroup-root label {
+    border: 1px solid #B1CAEC;
+    padding: 5px 15px;
+    margin: 5px 0;
+    border-radius: 4px;
+}
+

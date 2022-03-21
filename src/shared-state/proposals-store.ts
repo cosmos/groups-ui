@@ -1,4 +1,4 @@
-import { action, makeObservable, observable } from 'mobx';
+import { makeObservable, observable } from 'mobx';
 import { Any } from '../generated/google/protobuf/any';
 import {
     Exec,
@@ -17,11 +17,64 @@ import { BroadcastTxResponse } from '@cosmjs/stargate';
 import { MsgSubmitProposal } from '../generated/gov/tx';
 
 interface NewProposal {
+    actions: Action[]
+    name: string
+    description: string
     // address: string
     // proposers: string[]
-    metadata: any;
-    msgs: Any[];
-    exec: Exec;
+    // metadata: any;
+    // msgs: Any[];
+    // exec: Exec;
+}
+
+export enum ActionStateType {
+    DELEGATE = 'DELEGATE',
+    REDELEGATE = 'REDELEGATE',
+    UNDELEGATE = 'UNDELEGATE',
+    CLAIM_REWARD = 'CLAIM_REWARD',
+}
+
+export enum ActionType {
+    STAKE = 'STAKE',
+    TEXT = 'TEXT',
+    SPEND = 'SPEND',
+    PARAMETER_CHANGE = 'PARAMETER_CHANGE',
+    CREATE_ACCOUNT = 'CREATE_ACCOUNT',
+}
+
+// export type StakeProposalType = ProposalType.STAKE_DELEGATE|ProposalType.STAKE_REDELEGATE|ProposalType.STAKE_UNDELEGATE|ProposalType.STAKE_CLAIM_REWARD
+
+export type ActionData = StakeActionData | SpendActionData | TextActionData | ParameterChangeActionData
+
+export interface StakeActionData {
+    type: ActionStateType
+    fromValidatorAddress: string
+    toValidatorAddress: string
+    validatorAddress: string
+    coinDenom: string
+    amount: number
+}
+
+export interface ParameterChangeActionData {
+    module: string
+    parameter: string
+    value: string
+}
+
+export interface SpendActionData {
+    fromValidatorAddress: string
+    toValidatorAddress: string
+    coinDenom: string
+    amount: number
+}
+
+export interface TextActionData {
+    text: string
+}
+
+interface Action {
+    id: symbol
+    data: Partial<ActionData>
 }
 
 enum ProposalTypeUrls {
@@ -31,13 +84,37 @@ enum ProposalTypeUrls {
 
 export class ProposalsStore {
     @observable
-    newProposal: NewProposal = null;
+    newProposal: NewProposal = {
+        actions: [],
+        name: '',
+        description: ''
+    }
 
     constructor() {
         makeObservable(this);
     }
 
-    createProposal = async (
+    addAction = (type: ActionType) => {
+        this.updateAction(Symbol(type), {})
+    }
+
+    // @action
+    updateAction = (id: symbol, data: Partial<ActionData>) => {
+        const action = this.newProposal.actions.find( action => action.id === id)
+
+        if (action) {
+            action.data = {...action.data, ...data}
+        } else {
+            this.newProposal.actions.push({
+                id,
+                data
+            })
+        }
+    }
+
+    createProposal = (group: Group) => {}
+
+    createProposalMock = async (
         group: Group
     ): Promise<BroadcastTxResponse | null> => {
         // TODO remove mocks
@@ -106,11 +183,6 @@ export class ProposalsStore {
         } catch (error) {
             console.log('error creating proposal', error);
         }
-    };
-
-    @action
-    addProposalAction = (action: Any) => {
-        this.newProposal.msgs.push(action);
     };
 
     // Later may add choice and metadata to store, if needed for multiple components
@@ -238,4 +310,43 @@ export class ProposalsStore {
         };
         return encodedProposal;
     };
+
+    // copied from https://github.com/cosmos/composer/blob/475a98e03f3111aff03903f7d29e102c76875491/react/src/components/AdminModule/SubmitProposal/ParameterChangeProposal/ParamChange/ChangeForm.tsx
+    parameters = {
+        auth: [
+            "MaxMemoCharacters",
+            "TxSigLimit",
+            "TxSizeCostPerByte",
+            "SigVerifyCostED25519",
+            "SigVerifyCostSecp256k1"
+        ],
+        bank: ["sendenabled"],
+        gov: ["depositparams", "votingparams", "tallyparams"],
+        staking: ["UnbondingTime", "MaxValidators", "KeyMaxEntries", "HistoricalEntries", "BondDenom"],
+        slashing: [
+            "SignedBlocksWindow",
+            "MinSignedPerWindow",
+            "DowntimeJailDuration",
+            "SlashFractionDoubleSign",
+            "SlashFractionDowntime"
+        ],
+        distribution: [
+            "communitytax",
+            "secretfoundationtax",
+            "secretfoundationaddress",
+            "baseproposerreward",
+            "bonusproposerreward",
+            "withdrawaddrenabled"
+        ],
+        crisis: ["ConstantFee"],
+        mint: [
+            "MintDenom",
+            "InflationRateChange",
+            "InflationMax",
+            "InflationMin",
+            "GoalBonded",
+            "BlocksPerYear"
+        ],
+        evidence: ["MaxEvidenceAge"]
+    }
 }

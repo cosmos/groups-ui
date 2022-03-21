@@ -19,6 +19,14 @@ export interface Chain {
 // fixme: some networks data not correct, osmosis for example
 const list: Chain[] = [
     {
+        rpc: "https://rpc-juno.itastakers.com",
+        rest: "https://lcd-juno.itastakers.com",
+        chainId: "juno-1",
+        chainName: "Juno",
+        coinDenom: "juno",
+        coinMinimalDenom: "ujuno"
+    },
+    {
         rpc: "https://rpc-cosmoshub.keplr.app",
         rest: "https://lcd-cosmoshub.keplr.app",
         chainId: "cosmoshub-4",

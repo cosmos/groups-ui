@@ -4,5 +4,8 @@
  * @param address
  */
 export function truncateAddress(address: string) {
-    return address.substring(0, 9) + "…" + address.substring(address.length - 4)
+    if (address !== undefined && address !== null && address !== '')
+        return address.substring(0, 9) + "…" + address.substring(address.length - 4)
+    else
+        return address
 }

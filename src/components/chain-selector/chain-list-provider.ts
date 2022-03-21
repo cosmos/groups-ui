@@ -2,17 +2,17 @@ export function chainListProvider(): readonly Chain[] {
     // todo: switch to registry repo https://github.com/cosmos/chain-registry
     //  usage example https://jsfiddle.net/nooomski/nygm6o9s/
     //  The best solution: onchain data provider when it will be available
-    return Object.freeze(list);
+    return Object.freeze(list)
 }
 
 // fixme: get additional properties like: coinDecimals, bip44, bech32Config, stakeCurrency, currencies, feeCurrencies, features
 export interface Chain {
-    readonly chainId: string;
-    readonly chainName: string;
-    readonly rpc: string;
-    readonly rest: string;
-    readonly coinDenom: string;
-    readonly coinMinimalDenom: string;
+    readonly chainId: string
+    readonly chainName: string
+    readonly rpc: string
+    readonly rest: string
+    readonly coinDenom: string
+    readonly coinMinimalDenom: string
 }
 
 // source https://github.com/cosmos/composer/blob/master/react/src/types/settings.ts
@@ -138,4 +138,4 @@ const list: Chain[] = [
         coinDenom: "ngm",
         coinMinimalDenom: "ungm"
     }
-];
+]

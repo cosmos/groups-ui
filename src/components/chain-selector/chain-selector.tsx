@@ -93,12 +93,12 @@ const useStyles = makeStyles((theme: Theme) =>
             marginLeft: '20px'
         }
     }),
-);
+)
 
 const ChainSelector: React.FC = observer(() => {
     const { chainInfo, setChainInfo } = useStores().chainInfoStore
 
-    const implementChain = async (chain: Chain) => {
+    const setChain = async (chain: Chain) => {
         const currency: Currency = {
             ...chainInfo.stakeCurrency,
             coinDenom: chain.coinDenom,
@@ -112,7 +112,7 @@ const ChainSelector: React.FC = observer(() => {
             feeCurrencies: [{ ...currency }]
         }
 
-        await setChainInfo(updatedChainInfo);
+        await setChainInfo(updatedChainInfo)
     }
 
     const handleChainChanged = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -120,21 +120,21 @@ const ChainSelector: React.FC = observer(() => {
         if (chainId === "+") return // skip "+ new chain" option
 
         const chain = chainListProvider().find((chain: Chain) => chain.chainId === chainId)
-        implementChain(chain)
+        setChain(chain)
     }
 
     const handleAddChain = () => {
         // todo: do we need to save in localstore all added chains?
         // todo check for the uniq name. We are using name as key for items, it should be uniq or we need to change a key
-        implementChain(newChain)
+        setChain(newChain)
         setAllChainList( [...chainListProvider(), newChain])
         setOpen(false)
     }
 
-    const [allChainList, setAllChainList] = React.useState([...chainListProvider(), chainInfo]);
-    const [open, setOpen] = React.useState(false);
-    const [newChain, setNewChain] = React.useState<Chain | undefined>(undefined);
-    const [presetChainId, setPresetChainId] = React.useState<string | undefined>(undefined);
+    const [allChainList, setAllChainList] = React.useState([...chainListProvider(), chainInfo])
+    const [open, setOpen] = React.useState(false)
+    const [newChain, setNewChain] = React.useState<Chain | undefined>(undefined)
+    const [presetChainId, setPresetChainId] = React.useState<string | undefined>(undefined)
 
     const handlePresetChanged = (event: React.ChangeEvent<{ value: unknown }>) => {
         const chainId = event.target.value as string
@@ -154,14 +154,14 @@ const ChainSelector: React.FC = observer(() => {
                 coinMinimalDenom: chainInfo.stakeCurrency.coinMinimalDenom
         })
         setPresetChainId(chainInfo.chainId)
-        setOpen(true);
-    };
+        setOpen(true)
+    }
 
     const handleClose = () => {
-        setOpen(false);
-    };
+        setOpen(false)
+    }
 
-    const classes = useStyles();
+    const classes = useStyles()
 
     return (
         <>
@@ -284,4 +284,4 @@ const ChainSelector: React.FC = observer(() => {
     )
 })
 
-export default ChainSelector;
+export default ChainSelector

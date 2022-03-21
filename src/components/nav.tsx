@@ -7,7 +7,7 @@ import './nav.css'
 import { CosmosNodeService } from '../protocol/cosmos-node-service'
 import {createStyles, makeStyles, Theme} from '@material-ui/core'
 import {truncateAddress} from "../utils";
-import ChainSelector from "./chain-selector";
+import ChainSelector from "./chain-selector/chain-selector";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({

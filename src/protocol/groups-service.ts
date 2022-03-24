@@ -1,4 +1,4 @@
-import { getService, service } from './services'
+import { getService, Service, service } from './services'
 import { ChainInfo } from '@keplr-wallet/types'
 import { CosmosClient } from './cosmos-client'
 import {
@@ -18,8 +18,8 @@ import {
 } from '../generated/cosmos/group/v1beta1/query'
 
 @service
-export class GroupsService {
-    static serviceName: string = GroupsService.name
+export class GroupsService implements Service {
+    static serviceName: string = "GroupsService"
 
     static get instance(): GroupsService {
         return getService<GroupsService>(GroupsService.serviceName)

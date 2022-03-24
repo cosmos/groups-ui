@@ -1,7 +1,7 @@
 import { CosmosClient } from './cosmos-client'
 import { ChainInfo } from '@keplr-wallet/types'
 
-interface Service {
+export interface Service {
     applyChainInfo: (chainInfo: ChainInfo) => Promise<void>
 }
 
@@ -18,7 +18,7 @@ export const getService = <T extends Service>(s: string): T => {
  * Helper decorator that sets static methods to class to make it singleton
  */
 export function service(ServiceClassRef) {
-    servicesMap.set(ServiceClassRef.name, new ServiceClassRef(CosmosClient.instance))
+    servicesMap.set(ServiceClassRef.serviceName, new ServiceClassRef(CosmosClient.instance))
 
     return ServiceClassRef
 }

@@ -255,3 +255,10 @@ input::-ms-clear {
     border-radius: 4px;
 }
 
+.easy-edit-wrapper {
+    display: inline;
+}
+
+.easy-edit-component-wrapper {
+    width: 100%;
+}

@@ -448,7 +448,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                             variant="outlined"
                             color="primary"
                             className="btn"
-                            onClick={() => history.push(Routes.PROPOSALS_NEW_TEXT)}
+                            onClick={() => history.push(Routes.PROPOSALS_NEW_TEXT.replace(':id', groupId))}
                         >
                             <Description style={{ fontSize: '20px', marginRight: '5px' }} />
                             text proposal

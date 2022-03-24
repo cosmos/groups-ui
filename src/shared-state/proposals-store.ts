@@ -5,7 +5,7 @@ import {
     MsgExec,
     MsgVote,
     protobufPackage,
-    MsgSubmitProposal as MsgCreateProposal,
+    MsgSubmitProposal as MsgCreateProposal, MsgCreateGroup,
 } from '../generated/cosmos/group/v1beta1/tx';
 import { TextProposal } from '../generated/gov/gov';
 import { ParameterChangeProposal } from '../generated/params/params';
@@ -112,9 +112,7 @@ export class ProposalsStore {
         }
     }
 
-    createProposal = (group: Group) => {}
-
-    createProposalMock = async (
+    createProposal = async (
         group: Group
     ): Promise<BroadcastTxResponse | null> => {
         // TODO remove mocks
@@ -139,7 +137,6 @@ export class ProposalsStore {
             me,
             mockCoins
         );
-        const mockMsgs = [mockMsgSubmitProposal];
 
         // TODO replace hardcode
         const exec = Exec.EXEC_TRY;
@@ -149,7 +146,7 @@ export class ProposalsStore {
             // this is group policy address hardcoded for testing
             address: 'regen1m73npu5jn89syq23568a44ymrj7za9qa7mxgh0',
             proposers: group.members.map((m) => m.member.address),
-            messages: mockMsgs,
+            messages: [mockMsgSubmitProposal],
             exec,
             metadata: toUint8Array(mockMetaData).toString(),
         });
@@ -164,13 +161,16 @@ export class ProposalsStore {
         const fee = {
             amount: coins(
                 0,
-                CosmosNodeService.instance.chainInfo.stakeCurrency
-                    .coinMinimalDenom
+                CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom
             ),
             gas: '2000000',
         };
 
         try {
+            CosmosNodeService.instance.cosmosClient.registry.register(
+                `/${protobufPackage}.MsgCreateProposal`,
+                MsgCreateProposal
+            )
             const res =
                 await CosmosNodeService.instance.cosmosClient.signAndBroadcast(
                     me,

@@ -10,6 +10,8 @@ import {CreateStakeAction} from "./stake/create-stake-action";
 import {CreateTextAction} from "./others/create-text-action";
 import {CreateSpendAction} from "./others/create-spend-action";
 import {CreateParameterChangeAction} from "./others/create-parameter-change-action";
+import EasyEdit, { Types } from "react-easy-edit";
+
 
 const expand = (place) => {
     const block = document.querySelector(place)
@@ -19,8 +21,10 @@ const expand = (place) => {
 
 export const ActionsComposer: React.FC<{initialProposerType: ActionType, newAction: Function}> = observer((props) => {
     const classes = useStyles()
-    const [name, setName] = useState('Regen #22 Stake 500 REGEN and spend 100 REGEN')
-    const [description, setDescription] = useState('We propose to delegate 500 Regen to LOACOM and to spend 100 REGEN.')
+    const [name, setName] = useState('New Proposal')
+    const [nameEditing, setNameEditing] = useState(false)
+    const [description, setDescription] = useState('Test')
+    const [descriptionEditing, setDescriptionEditing] = useState(false)
     const {newProposal, addAction} = useStores().proposalsStore
 
     useEffect( () => {
@@ -38,18 +42,36 @@ export const ActionsComposer: React.FC<{initialProposerType: ActionType, newActi
         <>
             <div className={classes.root}>
                 <div className={classes.heroBlock}>
-                    <h1>{name}
-                        <Button className={classes.heroLink} color="primary">
+                    <h1>
+                        <EasyEdit
+                            type={Types.TEXTAREA}
+                            value={name}
+                            editMode={nameEditing}
+                            onCancel={() => setNameEditing(false)}
+                            onSave={(name) => { setName(name); setNameEditing(false) }}
+                        />
+                        <Button className={classes.heroLink} color="primary"
+                                style={{display: nameEditing ? 'none' : 'inline'}}
+                                onClick={() => setNameEditing(true)}>
                             <CreateRounded style={{ fontSize: 16, marginRight: '4px' }}/>
                             rename
                         </Button>
                     </h1>
                 </div>
                 <div className={classes.description} style={{ margin: '30px 0', }}>
-                    <span>{description}
-                        <Button className={classes.heroLink} color="primary">
+                    <span>
+                        <EasyEdit
+                            type={Types.TEXTAREA}
+                            value={description}
+                            editMode={descriptionEditing}
+                            onCancel={() => setDescriptionEditing(false)}
+                            onSave={(val) => { setDescription(val); setDescriptionEditing(false) }}
+                        />
+                        <Button className={classes.heroLink} color="primary"
+                                onClick={() => setDescriptionEditing(true)}
+                                style={{display: descriptionEditing ? 'none' : 'inline'}}>
                             <CreateRounded style={{ fontSize: 16, marginRight: '4px' }}/>
-                            Add description
+                            {description ? 'Edit description' : 'Add description'}
                         </Button>
                     </span>
                 </div>

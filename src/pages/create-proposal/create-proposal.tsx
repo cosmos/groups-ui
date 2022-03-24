@@ -24,6 +24,7 @@ import {ActionsComposer} from "./actions-composer";
 import {ActionType} from "../../shared-state/proposals-store";
 import CreateProposalNavPanel from "./create-proposal-nav-panel";
 import {PrimaryButton} from "../../components/primary-button";
+import {useParams} from "react-router-dom";
 
 type Anchor = 'top' | 'left' | 'bottom' | 'right';
 
@@ -71,10 +72,12 @@ const drawerStyles = makeStyles((theme) => ({
 
 export const CreateProposal: React.FC<{initialProposerType: ActionType}> = observer(({initialProposerType}) => {
     const {addAction, createProposal} = useStores().proposalsStore
-    const {editedGroup} = useStores().groupsStore
+    const {fetchGroupById} = useStores().groupsStore
+    const params: any = useParams()
+    const groupId = params.id
 
     const saveProposal = async () => {
-        await createProposal(editedGroup)
+        await createProposal(await fetchGroupById(groupId))
         setActiveStep(activeStep + 1)
     }
 

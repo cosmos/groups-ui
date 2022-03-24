@@ -10,10 +10,19 @@ export const useStyles = makeStyles((theme) => ({
 
     heroBlock: {
 
-        '& h1': {
+        '& h1, & h1 input, & h1 textarea': {
             fontWeight: 900,
             fontSize: '38px',
             lineHeight: '49px'
+        },
+        '& h1 textarea': {
+            width: '100%',
+            // resize: 'none',
+            overflow: 'hidden',
+            minHeight: '125px',
+            padding: '10px',
+            border: '1px solid #D2D5D9',
+            borderRadius: '5px'
         }
     },
 

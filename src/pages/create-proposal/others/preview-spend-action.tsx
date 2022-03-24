@@ -12,7 +12,7 @@ export const PreviewSpendAction: React.FC<{id: symbol}> = observer(({id}) => {
     const data = newProposal.actions.find(a => a.id === id)?.data as SpendActionData
 
     return (
-        <Paper elevation={1} style={{ borderRadius: '10px', border: '1px solid #D2D5D9', marginBottom: '72px' }}>
+        <Paper elevation={1} style={{ borderRadius: '10px', border: '1px solid #D2D5D9', marginBottom: '30px' }}>
             <div className={classes.paperHead}>
                 <h2>Spend</h2>
             </div>

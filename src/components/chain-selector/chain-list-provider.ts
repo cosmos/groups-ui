@@ -34,7 +34,7 @@ const list: Chain[] = [
         coinDenom: "STAKE",
         coinMinimalDenom: "stake"
     },
-    }
+    {
         rpc: "https://rpc-juno.itastakers.com",
         rest: "https://lcd-juno.itastakers.com",
         chainId: "juno-1",

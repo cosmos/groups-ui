@@ -116,10 +116,10 @@ const ChainSelector: React.FC = observer(() => {
     }
 
     const handleChainChanged = (event: React.ChangeEvent<{ value: unknown }>) => {
-        const chainId = event.target.value as string
-        if (chainId === "+") return // skip "+ new chain" option
+        const chainName = event.target.value as string
+        if (chainName === "+") return // skip "+ new chain" option
 
-        const chain = chainListProvider().find((chain: Chain) => chain.chainId === chainId)
+        const chain = chainListProvider().find((chain: Chain) => chain.chainName === chainName)
         setChain(chain)
     }
 
@@ -131,7 +131,7 @@ const ChainSelector: React.FC = observer(() => {
         setOpen(false)
     }
 
-    const [allChainList, setAllChainList] = React.useState([...chainListProvider(), chainInfo])
+    const [allChainList, setAllChainList] = React.useState(chainListProvider())
     const [open, setOpen] = React.useState(false)
     const [newChain, setNewChain] = React.useState<Chain | undefined>(undefined)
     const [presetChainId, setPresetChainId] = React.useState<string | undefined>(undefined)
@@ -170,12 +170,12 @@ const ChainSelector: React.FC = observer(() => {
                 <Select
                     labelId="demo-simple-select-outlined-label"
                     id="demo-simple-select-outlined"
-                    value={chainInfo.chainId}
+                    value={chainInfo.chainName}
                     onChange={handleChainChanged}
                     label="REGEN CHAIN"
                 >
                     { allChainList.map( (chain: Chain) =>
-                        <MenuItem key={chain.chainName} value={chain.chainId} className={classes.menuItem}>{chain.chainName}</MenuItem>
+                        <MenuItem key={chain.chainName} value={chain.chainName} className={classes.menuItem}>{chain.chainName}</MenuItem>
                     )}
 
                     <MenuItem key="+" value="+" style={{ padding: '0' }}>

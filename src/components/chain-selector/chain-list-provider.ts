@@ -19,6 +19,22 @@ export interface Chain {
 // fixme: some networks data not correct, osmosis for example
 const list: Chain[] = [
     {
+        rpc: `http://44.200.220.236:26657`,
+        rest: `http://44.200.220.236:1317`,
+        chainId: "cosmoswithgroups",
+        chainName: "GROUPS-UI-TEST",
+        coinDenom: "STAKE",
+        coinMinimalDenom: "stake"
+    },
+    {
+        rpc: `http://${window.location.hostname}:26657`,
+        rest: `http://${window.location.hostname}:1317`,
+        chainId: "cosmoswithgroups",
+        chainName: "GROUPS-UI-TEST-LOCAL",
+        coinDenom: "STAKE",
+        coinMinimalDenom: "stake"
+    },
+    {
         rpc: "https://rpc-cosmoshub.keplr.app",
         rest: "https://lcd-cosmoshub.keplr.app",
         chainId: "cosmoshub-4",

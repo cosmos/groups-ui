@@ -35,9 +35,8 @@ function getDefaultChainInfo(): ChainInfo {
     return {
         rpc: `http://${window.location.hostname}:26657`,
         rest: `http://${window.location.hostname}:1317`,
-        // rpc: `http://cosmos-test-2.adoriasoft.link:26657`,
-        // rest: `http://cosmos-test-2.adoriasoft.link:1317`,
-        // chainId: "test",
+        // rpc: `http://44.200.220.236:26657`,
+        // rest: `http://44.200.220.236:1317`,
         chainId: "cosmoswithgroups",
         // chainName: "GROUPS-UI-REGEN-TEST",
         chainName: "GROUPS-UI-SDK-TEST",

@@ -430,7 +430,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                             variant="outlined"
                             color="primary"
                             className="btn"
-                            onClick={() => history.push(Routes.PROPOSALS_NEW_STAKE)}
+                            onClick={() => history.push(Routes.PROPOSALS_NEW_STAKE.replace(':id', groupId.toString()))}
                         >
                             <SvgIcon component={DeligateIcon} className="icon"/>
                             stake
@@ -439,7 +439,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                             variant="outlined"
                             color="primary"
                             className="btn"
-                            onClick={() => history.push(Routes.PROPOSALS_NEW_SPEND)}
+                            onClick={() => history.push(Routes.PROPOSALS_NEW_SPEND.replace(':id', groupId.toString()))}
                         >
                             <SvgIcon component={SpendIcon} className="icon"/>
                             spend funds
@@ -448,7 +448,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                             variant="outlined"
                             color="primary"
                             className="btn"
-                            onClick={() => history.push(Routes.PROPOSALS_NEW_TEXT.replace(':id', groupId))}
+                            onClick={() => history.push(Routes.PROPOSALS_NEW_TEXT.replace(':id', groupId.toString()))}
                         >
                             <Description style={{ fontSize: '20px', marginRight: '5px' }} />
                             text proposal
@@ -457,7 +457,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                             variant="outlined"
                             color="primary"
                             className="btn"
-                            onClick={() => history.push(Routes.PROPOSALS_NEW_CUSTOM)}
+                            onClick={() => history.push(Routes.PROPOSALS_NEW_CUSTOM.replace(':id', groupId.toString()))}
                         >
                             <SettingsRounded style={{ fontSize: '20px', marginRight: '5px' }} />
                             custom proposal

@@ -83,6 +83,27 @@ export class GroupsStore {
         return groups
     }
 
+    fetchGroupById = async (id: number): Promise<Group | null> => {
+        const groupInfo = await GroupsService.instance.groupById(id)
+        if (groupInfo === null) {
+            return null
+        }
+
+        const [members, policies] = await Promise.all([
+            GroupsService.instance.groupMembers(groupInfo.id),
+            GroupsService.instance.groupPolicies(groupInfo.id)
+        ])
+
+        const group = {
+            info: groupInfo,
+            members,
+            policy: toGroupPolicy(policies),
+            metadata: JSON.parse(atob(groupInfo.metadata as unknown as string))
+        }
+
+        return group
+    }
+
     fetchEditedGroupById = async (id: number): Promise<Group | null> => {
         const groupInfo = await GroupsService.instance.groupById(id)
         if (groupInfo === null) {

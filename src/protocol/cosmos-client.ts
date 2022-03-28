@@ -2,17 +2,7 @@ import { getKeplrFromWindow } from '@keplr-wallet/stores'
 import { ChainInfo, Keplr } from '@keplr-wallet/types'
 import { EncodeObject, Registry } from '@cosmjs/proto-signing'
 import { defaultRegistryTypes, SigningStargateClient } from '@cosmjs/stargate'
-import {
-    LcdClient,
-    setupAuthExtension,
-    // setupBankExtension,
-    // setupDistributionExtension,
-    // setupGovExtension,
-    // setupMintExtension,
-    // setupSlashingExtension,
-    // setupStakingExtension,
-    // setupSupplyExtension
-} from "@cosmjs/launchpad"
+import { LcdClient, setupAuthExtension, setupBankExtension } from '@cosmjs/launchpad'
 import { AuthExtension } from '@cosmjs/launchpad/build/lcdapi/auth'
 import { StdFee } from '@cosmjs/amino'
 import { BroadcastTxResponse } from '@cosmjs/stargate/build/stargateclient'
@@ -87,7 +77,7 @@ export class CosmosClient {
         this.lcdClient = LcdClient.withExtensions(
             { apiUrl: chainInfo.rest },
             setupAuthExtension,
-            // setupBankExtension,
+            setupBankExtension,
             // setupDistributionExtension,
             // setupGovExtension,
             // setupMintExtension,

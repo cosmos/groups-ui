@@ -1,12 +1,12 @@
-import { getService, service } from './services'
+import { getService, Service, service } from './services'
 import { ChainInfo } from '@keplr-wallet/types'
 import { CosmosClient } from './cosmos-client'
 import {Vote} from "../generated/cosmos/group/v1beta1/types";
 import {QueryVotesByProposalResponse} from "../generated/cosmos/group/v1beta1/query";
 
 @service
-export class CosmosNodeService {
-    static serviceName: string = 'CosmosNodeService'
+export class CosmosNodeService implements Service {
+    static serviceName: string = "CosmosNodeService"
 
     static get instance(): CosmosNodeService {
         return getService<CosmosNodeService>(CosmosNodeService.serviceName)

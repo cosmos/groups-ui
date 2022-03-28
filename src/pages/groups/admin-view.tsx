@@ -24,6 +24,7 @@ import { ReactComponent as SpendIcon } from '../../icons/spend.svg'
 import { Link, useHistory, useParams } from 'react-router-dom'
 import { Page } from '../page'
 import { statusStyles } from '../create-proposal/proposal'
+import {Routes} from "../../routes";
 
 interface Data {
     date: string;
@@ -429,16 +430,16 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                             variant="outlined"
                             color="primary"
                             className="btn"
-                            onClick={() => history.push('/proposals/new')}
+                            onClick={() => history.push(Routes.PROPOSALS_NEW_STAKE)}
                         >
                             <SvgIcon component={DeligateIcon} className="icon"/>
-                            delegate funds
+                            stake
                         </Button>
                         <Button
                             variant="outlined"
                             color="primary"
                             className="btn"
-                            onClick={() => history.push('/proposals/new')}
+                            onClick={() => history.push(Routes.PROPOSALS_NEW_SPEND)}
                         >
                             <SvgIcon component={SpendIcon} className="icon"/>
                             spend funds
@@ -447,7 +448,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                             variant="outlined"
                             color="primary"
                             className="btn"
-                            onClick={() => history.push('/proposals/new')}
+                            onClick={() => history.push(Routes.PROPOSALS_NEW_TEXT.replace(':id', groupId))}
                         >
                             <Description style={{ fontSize: '20px', marginRight: '5px' }} />
                             text proposal
@@ -456,7 +457,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                             variant="outlined"
                             color="primary"
                             className="btn"
-                            onClick={() => history.push('/proposals/new')}
+                            onClick={() => history.push(Routes.PROPOSALS_NEW_CUSTOM)}
                         >
                             <SettingsRounded style={{ fontSize: '20px', marginRight: '5px' }} />
                             custom proposal

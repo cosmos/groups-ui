@@ -168,8 +168,21 @@ export const useStyles = makeStyles(() => ({
             /* or 26px */
             color: '#202020'
         }
-    }
+    },
 
+    editGroupBtn: {
+        background: '#3D7ACF',
+        borderRadius: '2px',
+        fontFamily: 'Mulish',
+        fontStyle: 'normal',
+        fontWeight: 800,
+        fontSize: '18px',
+        lineHeight: '23px',
+        letterSpacing: '1px',
+        textTransform: 'uppercase',
+        color: '#FFFFFF',
+        padding: '10px 25px'
+    },
 }))
 
 function createData(

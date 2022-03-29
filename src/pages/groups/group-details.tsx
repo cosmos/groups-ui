@@ -86,7 +86,7 @@ interface Data {
     address: string;
     weight: string;
     date: string;
-};
+}
 
 function createData(
     address: string,
@@ -281,10 +281,6 @@ export const GroupDetails: React.FC<{}> = observer(() => {
                 })()
             }
         }
-
-        return () => {
-            resetEditedGroup()
-        }
     }, [resetEditedGroup])
 
     if (!editedGroup) {
@@ -349,7 +345,7 @@ export const GroupDetails: React.FC<{}> = observer(() => {
                     <div className={classes.heroBlock}>
                         <h1>Group Details</h1>
                         <Link to={`/groups/${groupId}`}>
-                            <Button variant="contained" color="primary" className="btn">
+                            <Button variant="contained" className={classes.editGroupBtn}>
                                 edit group
                             </Button>
                         </Link>

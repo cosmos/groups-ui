@@ -126,10 +126,6 @@ export const EditGroup: React.FC<{}> = observer(() => {
                 })()
             }
         }
-
-        return () => {
-            resetEditedGroup()
-        }
     }, [setDefaultNewGroup, resetEditedGroup])
 
     if (!editedGroup) {

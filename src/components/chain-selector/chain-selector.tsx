@@ -58,15 +58,12 @@ const useStyles = makeStyles((theme: Theme) =>
             marginTop: theme.spacing(2),
         },
         modal: {
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingTop: '130px'
+            display: 'block',
         },
         modalPaper: {
             padding: '43px 30px',
             width: '556px',
-            marginTop: '100px',
+            margin: '25px auto',
 
             "& h2": {
                 fontWeight: 900,

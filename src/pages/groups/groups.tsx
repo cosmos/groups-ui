@@ -148,7 +148,6 @@ export const Groups: React.FC<{}> = observer(() => {
                             {/* <TableCell className={tableStyle.col}>Description</TableCell> */}
                             <TableCell className={tableStyle.headCell}>Number of <br/> members</TableCell>
                             <TableCell className={tableStyle.headCell}>Your <br/> membership type</TableCell>
-                            <TableCell/>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -171,7 +170,6 @@ export const Groups: React.FC<{}> = observer(() => {
                                 })}</TableCell>
                                 {/* <TableCell align="right">{group.metadata.description}</TableCell> */}
                                 <TableCell className={tableStyle.col}>{(group.members || []).length}</TableCell>
-                                <TableCell className={tableStyle.col}>TODO</TableCell>
                                 <TableCell className={tableStyle.col}><span className={`${status.marker} blue`}>Member</span></TableCell>
                             </StyledTableRow>
                         ))}

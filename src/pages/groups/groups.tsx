@@ -155,7 +155,7 @@ export const Groups: React.FC<{}> = observer(() => {
                         {groups.map(group => (
                             <StyledTableRow key={group.info.id} className={tableStyle.tableItem}>
                                 <TableCell component="th" scope="row" className={tableStyle.nameCol}>
-                                    {group.metadata.name}
+                                    <Link to={`/groups/${group.info.group_id}/admin-view`}>{group.metadata.name}</Link>
                                 </TableCell>
                                 <TableCell
                                     className={tableStyle.col}>{new Date(group.metadata.created).toLocaleString('en-US', {

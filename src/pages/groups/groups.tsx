@@ -13,6 +13,7 @@ import {
     withStyles
 } from '@material-ui/core'
 import { Link } from 'react-router-dom'
+import { statusStyles } from '../create-proposal/proposal'
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -33,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
         letterSpacing: '1px',
         textTransform: 'uppercase',
         color: '#FFFFFF',
-        padding: '3px 25px'
+        padding: '10px 25px'
     },
     tableHead: {
 
@@ -102,6 +103,7 @@ const StyledTableRow = withStyles((theme) => ({
 }))(TableRow)
 
 export const Groups: React.FC<{}> = observer(() => {
+    const status = statusStyles()
     const { groups, fetchGroups } = useStores().groupsStore
     const [loading, setLoading] = useState(true)
     useEffect(() => {
@@ -170,8 +172,7 @@ export const Groups: React.FC<{}> = observer(() => {
                                 {/* <TableCell align="right">{group.metadata.description}</TableCell> */}
                                 <TableCell className={tableStyle.col}>{(group.members || []).length}</TableCell>
                                 <TableCell className={tableStyle.col}>TODO</TableCell>
-                                <TableCell className={tableStyle.col}><Link to={`/groups/${group.info.id}/admin-view`}>Admin
-                                    View</Link></TableCell>
+                                <TableCell className={tableStyle.col}><span className={`${status.marker} blue`}>Member</span></TableCell>
                             </StyledTableRow>
                         ))}
                     </TableBody>

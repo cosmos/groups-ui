@@ -54,12 +54,15 @@ export const Nav: React.FC<{}> = observer(() => {
                 maxWidth: '1140px',
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'space-between',
                 flex: 1,
             }}>
                 <div>
-                    <img src={`${window.location.origin}/groups_logo.svg`} alt="logo" width="53px" />
+                    <Link to={Routes.GROUPS}>
+                        <img src={`${window.location.origin}/groups_logo.svg`} alt="logo" width="53px" />
+                    </Link>
                 </div>
-                <ul className="nav">
+                {/* <ul className="nav">
                     <li className={classNames({
                         'active': pathname === Routes.ROOT
                     })}>
@@ -83,7 +86,7 @@ export const Nav: React.FC<{}> = observer(() => {
                     })}>
                         <Link to={Routes.SETTINGS}>SETTINGS</Link>
                     </li>
-                </ul>
+                </ul> */}
                 <div style={{ display: 'flex', alignItems: "center" }}>
                     <ChainSelector />
                     <div className={classes.userLabel}>{userString}</div>

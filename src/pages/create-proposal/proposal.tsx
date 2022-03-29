@@ -401,6 +401,11 @@ export const statusStyles = makeStyles(() => ({
             color: '#FF9110',
             borderColor: '#FFA53A',
             backgroundColor: 'rgba(255, 165, 58, 0.1)'
+        },
+        '&.blue': {
+            color: '#3D7ACF',
+            borderColor: '#B1CAEC',
+            backgroundColor: 'rgba(61, 122, 207, 0.05)'
         }
     },
     button: {

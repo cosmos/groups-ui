@@ -23,8 +23,8 @@ import { ReactComponent as DeligateIcon } from '../../icons/deligate.svg'
 import { ReactComponent as SpendIcon } from '../../icons/spend.svg'
 import { Link, useHistory, useParams } from 'react-router-dom'
 import { Page } from '../page'
-import { statusStyles } from '../create-proposal/proposal'
 import {Routes} from "../../routes";
+import {statusStyles} from "../proposals/proposal";
 
 interface Data {
     date: string;

@@ -24,7 +24,8 @@ import {ActionsComposer} from "./actions-composer";
 import {ActionType} from "../../shared-state/proposals-store";
 import CreateProposalNavPanel from "./create-proposal-nav-panel";
 import {PrimaryButton} from "../../components/primary-button";
-import {useParams} from "react-router-dom";
+import {useHistory, useParams} from "react-router-dom";
+import {Routes} from "../../routes";
 
 type Anchor = 'top' | 'left' | 'bottom' | 'right';
 
@@ -71,6 +72,7 @@ const drawerStyles = makeStyles((theme) => ({
 }))
 
 export const CreateProposal: React.FC<{initialProposerType: ActionType}> = observer(({initialProposerType}) => {
+    const history = useHistory()
     const {addAction, createProposal} = useStores().proposalsStore
     const {fetchGroupById} = useStores().groupsStore
     const params: any = useParams()
@@ -212,7 +214,7 @@ export const CreateProposal: React.FC<{initialProposerType: ActionType}> = obser
                                     <div className={classes.description} style={{ margin: '30px 0', }}>
                                         <span>You have successfully created a proposal!</span>
                                     </div>
-                                    <PrimaryButton >view your proposal</PrimaryButton>
+                                    <PrimaryButton onClick={() => history.push(Routes.PROPOSALS_VIEW.replace(':id', String(1)))}>view your proposal</PrimaryButton>
                                 </div>
                             </div>
                         </>

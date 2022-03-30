@@ -84,14 +84,19 @@ enum ProposalTypeUrls {
 
 export class ProposalsStore {
     @observable
-    newProposal: NewProposal = {
-        actions: [],
-        name: '',
-        description: ''
-    }
+    newProposal: NewProposal
 
     constructor() {
+        this.resetNewProposal()
         makeObservable(this);
+    }
+
+    resetNewProposal() {
+        this.newProposal = {
+            actions: [],
+            name: '',
+            description: ''
+        }
     }
 
     addAction = (type: ActionType) => {
@@ -112,7 +117,12 @@ export class ProposalsStore {
         }
     }
 
-    createProposal = async (
+    createProposal = async (group: Group): Promise<BroadcastTxResponse | null> => {
+        this.resetNewProposal()
+        return null
+    }
+
+    createProposal_NotWorking = async (
         group: Group
     ): Promise<BroadcastTxResponse | null> => {
         // TODO remove mocks
@@ -144,6 +154,7 @@ export class ProposalsStore {
         const msg: MsgCreateProposal = MsgCreateProposal.fromPartial({
             // TODO replace with fetching group policy address
             // this is group policy address hardcoded for testing
+            // address: group.policy[0].address,
             address: 'regen1m73npu5jn89syq23568a44ymrj7za9qa7mxgh0',
             proposers: group.members.map((m) => m.member.address),
             messages: [mockMsgSubmitProposal],

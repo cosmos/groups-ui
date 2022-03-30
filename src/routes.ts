@@ -4,6 +4,7 @@ export enum Routes {
     GROUPS_EDIT = '/groups/:id',
     GROUPS_ADMIN_VIEW = '/groups/:id/admin-view',
     GROUPS_DETAILS = '/groups/:id/details',
+    PROPOSALS_VIEW = '/proposals/:id',
     PROPOSALS_NEW_TEXT = '/groups/:id/proposals/new/text',
     PROPOSALS_NEW_STAKE = '/groups/:id/proposals/new/stake',
     PROPOSALS_NEW_SPEND = '/groups/:id/proposals/new/spend',

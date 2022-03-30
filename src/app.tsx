@@ -8,12 +8,12 @@ import {Routes} from './routes'
 import {Settings} from './pages/settings/settings'
 import {GroupAdminView} from './pages/groups/admin-view'
 import {GroupDetails} from './pages/groups/group-details'
-import {ProposalPage} from './pages/create-proposal/proposal'
 import {CreateProposal} from './pages/create-proposal/create-proposal'
 
 import './app.css'
 import {EditGroup} from './pages/edit-group/edit-group'
 import {ActionType} from "./shared-state/proposals-store";
+import {ProposalPage} from "./pages/proposals/proposal";
 
 
 export const App: React.FC = () => {
@@ -39,6 +39,9 @@ export const App: React.FC = () => {
                 <Route exact path={Routes.GROUPS_EDIT}>
                     <EditGroup />
                 </Route>
+                <Route exact path={Routes.PROPOSALS_VIEW}>
+                    <ProposalPage />
+                </Route>
                 <Route exact path={Routes.PROPOSALS_NEW_STAKE}>
                     <CreateProposal initialProposerType={ActionType.STAKE} />
                 </Route>
@@ -58,9 +61,6 @@ export const App: React.FC = () => {
                     <Page>
                         <Settings />
                     </Page>
-                </Route>
-                <Route exact path='/my/component'>
-                    <ProposalPage />
                 </Route>
             </Switch>
         </Router>

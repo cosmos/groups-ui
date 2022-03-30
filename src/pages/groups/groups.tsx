@@ -13,7 +13,7 @@ import {
     withStyles
 } from '@material-ui/core'
 import { Link } from 'react-router-dom'
-import { statusStyles } from '../create-proposal/proposal'
+import {statusStyles} from "../proposals/proposal";
 
 const useStyles = makeStyles((theme) => ({
     paper: {

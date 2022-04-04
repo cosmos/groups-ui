@@ -255,7 +255,10 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                             }}
                                         />
                                     </label>
-                                    <p className={classes.inputTitle}>Add member accounts</p>
+                                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                        <p className={classes.inputTitle}>Add member accounts</p>
+                                        <p className={classes.inputTitle} style={{ marginRight: "115px" }}>Weight</p>
+                                    </div>
                                     {editedGroup.members.map((m, i) => {
                                         return (
                                             <div className={classes.label} key={i}>
@@ -275,6 +278,7 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                                             })
                                                         }}
                                                     />
+                                                    <TextField placeholder='1' variant="outlined" style={{ width: "84px", marginLeft: "20px" }} />
                                                     <IconButton
                                                         aria-label="delete"
                                                         disabled={editedGroup.members.length === 1}

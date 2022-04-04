@@ -393,7 +393,8 @@ export const GroupDetails: React.FC<{}> = observer(() => {
                         {membersEditMode ? (
                             <div style={{
                                 display: 'flex',
-                                paddingRight: '24px'
+                                paddingRight: '24px',
+                                width: "100%"
                             }}>
                                 <TextField
                                     fullWidth
@@ -409,6 +410,7 @@ export const GroupDetails: React.FC<{}> = observer(() => {
                                     <Button
                                         variant="outlined"
                                         color="primary"
+                                        style={{ width: "200px", padding: "12px 5px", fontSize: "18px", fontWeight: 800 }}
                                         onClick={() => {
                                             updateEditedGroup({
                                                 ...editedGroup,
@@ -429,21 +431,23 @@ export const GroupDetails: React.FC<{}> = observer(() => {
                                             })
                                         }}
                                     >
-                                        Add
+                                        + Add member
                                     </Button>
                                     <Button
                                         variant="text"
                                         color="primary"
+                                        style={{ margin: "0 20px", fontWeight: 800, fontSize: "12px", color: "#545555"  }}
                                         onClick={console.log}
                                     >
                                         Cancel
                                     </Button>
                                     <Button
-                                        variant="outlined"
+                                        variant="contained"
                                         color="primary"
+                                        style={{ width: "200px", padding: "12px 5px", fontSize: "18px", fontWeight: 800 }}
                                         onClick={console.log}
                                     >
-                                        Save
+                                        Save changes
                                     </Button>
                                 </div>
                             </div>

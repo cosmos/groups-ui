@@ -1,14 +1,14 @@
 import { getService, Service, service } from './services'
 import { ChainInfo } from '@keplr-wallet/types'
 import { CosmosClient } from './cosmos-client'
-import { Proposal, Vote } from '../generated/cosmos/group/v1beta1/types'
+import { Proposal, Vote } from '../generated/cosmos/group/v1/types'
 import {
     QueryProposalResponse,
     QueryProposalsByGroupPolicyResponse,
     QueryVoteByProposalVoterResponse,
     QueryVotesByProposalResponse
-} from '../generated/cosmos/group/v1beta1/query'
-import { MsgExec, MsgSubmitProposal, MsgVote, protobufPackage } from '../generated/cosmos/group/v1beta1/tx'
+} from '../generated/cosmos/group/v1/query'
+import { MsgExec, MsgSubmitProposal, MsgVote, protobufPackage } from '../generated/cosmos/group/v1/tx'
 
 @service
 export class ProposalsService implements Service {
@@ -41,14 +41,14 @@ export class ProposalsService implements Service {
 
     proposalById = async (proposalId: number): Promise<Proposal> => {
         const res = await this.cosmosClient.lcdClientGet(
-            `/cosmos/group/v1beta1/proposal/${proposalId}`
+            `/cosmos/group/v1/proposal/${proposalId}`
         ) as QueryProposalResponse
         return res.proposal
     }
 
     proposalsByGroupAccount = async (accountAddress: string): Promise<Proposal[]> => {
         const res = await this.cosmosClient.lcdClientGet(
-            `/cosmos/group/v1beta1/proposals_by_group_policy/${accountAddress}`
+            `/cosmos/group/v1/proposals_by_group_policy/${accountAddress}`
         ) as QueryProposalsByGroupPolicyResponse
 
         // TODO check pagination field later
@@ -59,21 +59,21 @@ export class ProposalsService implements Service {
 
     voteByProposalVoter = async (proposalId: number, voterAddress: string): Promise<Vote> => {
         const res = await this.cosmosClient.lcdClientGet(
-            `/cosmos/group/v1beta1/vote_by_proposal_voter/${proposalId}/${voterAddress}`
+            `/cosmos/group/v1/vote_by_proposal_voter/${proposalId}/${voterAddress}`
         ) as QueryVoteByProposalVoterResponse
         return res.vote
     }
 
     votesByProposal = async (proposalId: number): Promise<Vote[]> => {
         const res = await this.cosmosClient.lcdClientGet(
-            `/cosmos/group/v1beta1/votes_by_proposal/${proposalId}`
+            `/cosmos/group/v1/votes_by_proposal/${proposalId}`
         ) as QueryVotesByProposalResponse
         return res.votes
     }
 
     votesByVoter = async (voterAddress: string): Promise<Vote[]> => {
         const res = await this.cosmosClient.lcdClientGet(
-            `/cosmos/group/v1beta1/votes_by_voter/${voterAddress}`
+            `/cosmos/group/v1/votes_by_voter/${voterAddress}`
         ) as QueryVotesByProposalResponse
         return res.votes
     }

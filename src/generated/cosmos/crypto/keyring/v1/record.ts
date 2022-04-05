@@ -158,36 +158,25 @@ export const Record = {
 
   fromPartial<I extends Exact<DeepPartial<Record>, I>>(object: I): Record {
     const message = { ...baseRecord } as Record;
-    //@ts-ignore
     message.name = object.name ?? "";
     message.pub_key =
-        //@ts-ignore
       object.pub_key !== undefined && object.pub_key !== null
-          //@ts-ignore
         ? Any.fromPartial(object.pub_key)
         : undefined;
     message.local =
-        //@ts-ignore
       object.local !== undefined && object.local !== null
-          //@ts-ignore
         ? Record_Local.fromPartial(object.local)
         : undefined;
     message.ledger =
-        //@ts-ignore
       object.ledger !== undefined && object.ledger !== null
-          //@ts-ignore
         ? Record_Ledger.fromPartial(object.ledger)
         : undefined;
     message.multi =
-        //@ts-ignore
       object.multi !== undefined && object.multi !== null
-          //@ts-ignore
         ? Record_Multi.fromPartial(object.multi)
         : undefined;
     message.offline =
-        //@ts-ignore
       object.offline !== undefined && object.offline !== null
-          //@ts-ignore
         ? Record_Offline.fromPartial(object.offline)
         : undefined;
     return message;
@@ -260,12 +249,9 @@ export const Record_Local = {
   ): Record_Local {
     const message = { ...baseRecord_Local } as Record_Local;
     message.priv_key =
-        //@ts-ignore
       object.priv_key !== undefined && object.priv_key !== null
-          //@ts-ignore
         ? Any.fromPartial(object.priv_key)
         : undefined;
-    //@ts-ignore
     message.priv_key_type = object.priv_key_type ?? "";
     return message;
   },
@@ -323,9 +309,7 @@ export const Record_Ledger = {
   ): Record_Ledger {
     const message = { ...baseRecord_Ledger } as Record_Ledger;
     message.path =
-        //@ts-ignore
       object.path !== undefined && object.path !== null
-          //@ts-ignore
         ? BIP44Params.fromPartial(object.path)
         : undefined;
     return message;
@@ -440,7 +424,6 @@ export type DeepPartial<T> = T extends Builtin
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin
   ? P
-    //@ts-ignore
   : P & { [K in keyof P]: Exact<P[K], I[K]> } & Record<
         Exclude<keyof I, KeysOfUnion<P>>,
         never

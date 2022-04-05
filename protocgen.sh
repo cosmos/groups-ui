@@ -15,9 +15,9 @@ set -eo pipefail
 #    string scalar = 93003;
 #}
 
-#proto_files=$(find $HOME/projects/temp/cosmos-sdk/proto/cosmos -path -prune -o -name '*.proto')
+proto_files=$(find $HOME/projects/temp/cosmos-sdk/proto/cosmos -path -prune -o -name '*.proto')
 #go get github.com/cosmos/cosmos-sdk@d10034fbb1f2dd72c49f89c7933baf92cc69313b
-proto_files=$(find $GOPATH/pkg/mod/github.com/cosmos/cosmos-sdk@v0.46.0-alpha2.0.20220215170643-d10034fbb1f2/proto/cosmos -path -prune -o -name '*.proto')
+#proto_files=$(find $GOPATH/pkg/mod/github.com/cosmos/cosmos-sdk@v0.46.0-alpha2.0.20220215170643-d10034fbb1f2/proto/cosmos -path -prune -o -name '*.proto')
 
 for file_path in $proto_files; do
   echo $file_path
@@ -27,8 +27,8 @@ for file_path in $proto_files; do
     --ts_proto_out=./src/generated \
     --ts_proto_opt=snakeToCamel=false \
     $file_path \
-#     -I $HOME/projects/temp/cosmos-sdk/proto \
-#     -I $HOME/projects/temp/cosmos-sdk/third_party/proto
-     -I $GOPATH/pkg/mod/github.com/cosmos/cosmos-sdk@v0.46.0-alpha2.0.20220215170643-d10034fbb1f2/proto \
-     -I $GOPATH/pkg/mod/github.com/cosmos/cosmos-sdk@v0.46.0-alpha2.0.20220215170643-d10034fbb1f2/third_party/proto
+     -I $HOME/projects/temp/cosmos-sdk/proto \
+     -I $HOME/projects/temp/cosmos-sdk/third_party/proto
+#     -I $GOPATH/pkg/mod/github.com/cosmos/cosmos-sdk@v0.46.0-alpha2.0.20220215170643-d10034fbb1f2/proto \
+#     -I $GOPATH/pkg/mod/github.com/cosmos/cosmos-sdk@v0.46.0-alpha2.0.20220215170643-d10034fbb1f2/third_party/proto
 done

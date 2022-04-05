@@ -1,9 +1,8 @@
-import {getService, service} from "./services";
-import {ChainInfo} from "@keplr-wallet/types";
-import {CosmosClient} from "./cosmos-client";
-import {QueryVotesByProposalResponse} from "../generated/cosmos/group/v1beta1/query";
-import {QueryValidatorsResponse} from "../generated/cosmos/staking/v1beta1/query";
-import {Validator} from "../generated/cosmos/staking/v1beta1/staking";
+import { getService, service } from './services'
+import { ChainInfo } from '@keplr-wallet/types'
+import { CosmosClient } from './cosmos-client'
+import { QueryValidatorsResponse } from '../generated/cosmos/staking/v1beta1/query'
+import { Validator } from '../generated/cosmos/staking/v1beta1/staking'
 
 @service
 export class ValidatorsService {

@@ -8,14 +8,14 @@ import {
     MsgUpdateGroupMetadata,
     MsgUpdateGroupPolicyDecisionPolicy,
     protobufPackage
-} from '../generated/cosmos/group/v1beta1/tx'
-import { GroupInfo, GroupMember, GroupPolicyInfo } from '../generated/cosmos/group/v1beta1/types'
+} from '../generated/cosmos/group/v1/tx'
+import { GroupInfo, GroupMember, GroupPolicyInfo } from '../generated/cosmos/group/v1/types'
 import {
     QueryGroupInfoResponse,
     QueryGroupMembersResponse,
     QueryGroupPoliciesByGroupResponse,
     QueryGroupsByAdminResponse
-} from '../generated/cosmos/group/v1beta1/query'
+} from '../generated/cosmos/group/v1/query'
 
 @service
 export class GroupsService implements Service {
@@ -56,14 +56,14 @@ export class GroupsService implements Service {
 
     groupsByAdmin = async (admin: string): Promise<GroupInfo[]> => {
         const res = await this.cosmosClient.lcdClientGet(
-            `/cosmos/group/v1beta1/groups_by_admin/${admin}`
+            `/cosmos/group/v1/groups_by_admin/${admin}`
         ) as QueryGroupsByAdminResponse
         return res.groups.map(normalizeBackendGroup)
     }
 
     groupById = async (groupId: number): Promise<GroupInfo> => {
         const res = await this.cosmosClient.lcdClientGet(
-            `/cosmos/group/v1beta1/group_info/${groupId}`
+            `/cosmos/group/v1/group_info/${groupId}`
         ) as QueryGroupInfoResponse
 
         if (!res.info) {
@@ -75,14 +75,14 @@ export class GroupsService implements Service {
 
     groupPolicies = async (groupId: number): Promise<GroupPolicyInfo[]> => {
         const res = await this.cosmosClient.lcdClientGet(
-            `/cosmos/group/v1beta1/group_policies_by_group/${groupId}`
+            `/cosmos/group/v1/group_policies_by_group/${groupId}`
         ) as QueryGroupPoliciesByGroupResponse
         return res.group_policies
     }
 
     groupMembers = async (groupId: number): Promise<GroupMember[]> => {
         const res = await this.cosmosClient.lcdClientGet(
-            `/cosmos/group/v1beta1/group_members/${groupId}`
+            `/cosmos/group/v1/group_members/${groupId}`
         ) as QueryGroupMembersResponse
         return res.members
     }

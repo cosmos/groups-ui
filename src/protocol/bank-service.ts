@@ -1,13 +1,9 @@
-import {getService, service} from "./services";
-import {ChainInfo} from "@keplr-wallet/types";
-import {CosmosClient} from "./cosmos-client";
-import {QueryVotesByProposalResponse} from "../generated/cosmos/group/v1beta1/query";
-import {QueryValidatorsResponse} from "../generated/cosmos/staking/v1beta1/query";
-import {Validator} from "../generated/cosmos/staking/v1beta1/staking";
-import {CosmosNodeService} from "./cosmos-node-service";
-import {BankBalancesResponse} from "@cosmjs/launchpad";
-import {Coin} from "@cosmjs/amino";
-import {QueryAllBalancesResponse} from "../generated/cosmos/bank/v1beta1/query";
+import { getService, service } from './services'
+import { ChainInfo } from '@keplr-wallet/types'
+import { CosmosClient } from './cosmos-client'
+import { CosmosNodeService } from './cosmos-node-service'
+import { Coin } from '@cosmjs/amino'
+import { QueryAllBalancesResponse } from '../generated/cosmos/bank/v1beta1/query'
 
 @service
 export class BankService {

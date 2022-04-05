@@ -54,7 +54,7 @@ export interface PeriodicAllowance {
 
 /** AllowedMsgAllowance creates allowance only for specified message types. */
 export interface AllowedMsgAllowance {
-  /** allowance can be any of basic and filtered fee allowance. */
+  /** allowance can be any of basic and periodic fee allowance. */
   allowance: Any | undefined;
   /** allowed_messages are the messages for which the grantee has the access. */
   allowed_messages: string[];
@@ -66,7 +66,7 @@ export interface Grant {
   granter: string;
   /** grantee is the address of the user being granted an allowance of another user's funds. */
   grantee: string;
-  /** allowance can be any of basic and filtered fee allowance. */
+  /** allowance can be any of basic, periodic, allowed fee allowance. */
   allowance: Any | undefined;
 }
 

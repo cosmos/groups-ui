@@ -5,7 +5,7 @@ import {useStores} from "../../../shared-state/repo";
 
 export const CreateTextAction: React.FC<{id: symbol}> = ({id}) => {
     const classes = useStyles()
-    const {newProposal} = useStores().proposalsStore
+    const {newProposal} = useStores().createProposalStore
     const [text, setText] = useState(newProposal.actions.find(a => a.id === id).data['text'])
 
     const textRef = useRef<any>();

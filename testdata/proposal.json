@@ -1,0 +1,14 @@
+{
+  "address": "cosmos17pmq7hp4upvmmveqexzuhzu64v36re3w3447n7dt46uwp594wtpsqv4fn5",
+  "messages": [
+    {
+      "@type": "/cosmos.bank.v1beta1.MsgSend",
+      "from_address": "cosmos1kdzkazludrnmnzchcxgs6znsjph5ugx4rhljrh",
+      "to_address": "cosmos106ljn6kds9vegaux0w4jnend97fdm50yec59vq",
+      "amount":[{"denom": "stake","amount": "10"}]
+    }
+  ],
+  "metadata": "4pIMOgIGx1vZGU=",
+  "exec": 0,
+  "proposers": ["cosmos1kdzkazludrnmnzchcxgs6znsjph5ugx4rhljrh", "cosmos106ljn6kds9vegaux0w4jnend97fdm50yec59vq"]
+}

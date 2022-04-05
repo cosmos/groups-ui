@@ -2,11 +2,11 @@ import React, {useEffect} from "react";
 import {FormControl, FormGroup, MenuItem, Paper, Select, TextField} from "@material-ui/core";
 import {useStores} from "../../../shared-state/repo";
 import {useStyles} from "../create-proposal-styles";
-import {ParameterChangeActionData} from "../../../shared-state/proposals-store";
+import {ParameterChangeActionData} from "../../../shared-state/create-proposal-store";
 
 export const CreateParameterChangeAction: React.FC<{id: symbol}> = ({id}) => {
     const classes = useStyles()
-    const {updateAction, newProposal, parameters} = useStores().proposalsStore
+    const {updateAction, newProposal, parameters} = useStores().createProposalStore
 
     const initialData = newProposal.actions.find( a => a.id === id).data as ParameterChangeActionData
     const [module, setModule] = React.useState(initialData.module)

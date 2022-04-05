@@ -3,12 +3,12 @@ import {Button, FormControl, FormGroup, MenuItem, Paper, Select, TextField} from
 import {useStores} from "../../../shared-state/repo";
 import {BankService} from "../../../protocol/bank-service";
 import {useStyles} from "../create-proposal-styles";
-import {ActionStateType, SpendActionData, StakeActionData} from "../../../shared-state/proposals-store";
+import {ActionStateType, SpendActionData, StakeActionData} from "../../../shared-state/create-proposal-store";
 
 export const CreateSpendAction: React.FC<{id: symbol}> = ({id}) => {
     // todo: fee
     const classes = useStyles()
-    const {updateAction, newProposal} = useStores().proposalsStore
+    const {updateAction, newProposal} = useStores().createProposalStore
     const {allValidators, fetchAllValidators} = useStores().validatorsStore
     const {chainInfo} = useStores().chainInfoStore
 
@@ -39,7 +39,7 @@ export const CreateSpendAction: React.FC<{id: symbol}> = ({id}) => {
     }, [fetchAllValidators])
 
     useEffect(() => {
-        BankService.instance.getAllBalances().then( balances => {
+        BankService.instance.getAllUserBalances().then(balances => {
             let balance = balances.find(coin => coin.denom.toUpperCase() === currencyDenom.toUpperCase());
             if (balance) {
                 const currency = chainInfo.currencies.find( currency => currency.coinDenom === currencyDenom)

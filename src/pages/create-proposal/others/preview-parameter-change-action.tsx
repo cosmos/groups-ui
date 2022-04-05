@@ -3,11 +3,11 @@ import {Paper} from "@material-ui/core";
 import {useStores} from "../../../shared-state/repo";
 import {observer} from "mobx-react-lite";
 import {useStyles} from "../create-proposal-styles";
-import {ParameterChangeActionData} from "../../../shared-state/proposals-store";
+import {ParameterChangeActionData} from "../../../shared-state/create-proposal-store";
 
 export const PreviewParameterChangeAction: React.FC<{id: symbol}> = observer(({id}) => {
     const classes = useStyles()
-    const {newProposal} = useStores().proposalsStore
+    const {newProposal} = useStores().createProposalStore
     const data = newProposal.actions.find(a => a.id === id)?.data as ParameterChangeActionData
 
     return (

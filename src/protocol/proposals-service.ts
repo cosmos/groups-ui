@@ -46,9 +46,9 @@ export class ProposalsService implements Service {
         return res.proposal
     }
 
-    proposalsByGroupAccount = async (accountAddress: string): Promise<Proposal[]> => {
+    proposalsByGroupPolicy = async (policyAddress: string): Promise<Proposal[]> => {
         const res = await this.cosmosClient.lcdClientGet(
-            `/cosmos/group/v1/proposals_by_group_policy/${accountAddress}`
+            `/cosmos/group/v1/proposals_by_group_policy/${policyAddress}`
         ) as QueryProposalsByGroupPolicyResponse
 
         // TODO check pagination field later

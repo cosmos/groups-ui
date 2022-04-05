@@ -26,6 +26,7 @@ import { useStores } from '../../shared-state/repo'
 import { Routes } from '../../routes'
 import { GroupMember } from '../../generated/cosmos/group/v1beta1/types'
 import Pagination from '@material-ui/lab/Pagination'
+import {PrimaryButton} from "../../components/primary-button";
 
 const useStyles1 = makeStyles((theme) => ({
     root: {
@@ -345,9 +346,7 @@ export const GroupDetails: React.FC<{}> = observer(() => {
                     <div className={classes.heroBlock}>
                         <h1>Group Details</h1>
                         <Link to={`/groups/${groupId}`}>
-                            <Button variant="contained" className={classes.editGroupBtn}>
-                                edit group
-                            </Button>
+                            <PrimaryButton>edit group</PrimaryButton>
                         </Link>
                     </div>
                     <div className={classes.heroBlock}>
@@ -375,15 +374,15 @@ export const GroupDetails: React.FC<{}> = observer(() => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {(editedGroup.policy || []).map((p, i) => (
-                                <StyledTableRow key={i}>
+                            {editedGroup.policy && (
+                                <StyledTableRow>
                                     <StyledTableCell align="left">{'TODO Date'}</StyledTableCell>
-                                    <StyledTableCell align="left">{`${p.timeoutInDays} days`}</StyledTableCell>
-                                    <StyledTableCell align="left">{p.threshold}</StyledTableCell>
+                                    <StyledTableCell align="left">{`${editedGroup.policy.timeoutInDays} days`}</StyledTableCell>
+                                    <StyledTableCell align="left">{editedGroup.policy.threshold}</StyledTableCell>
                                     <StyledTableCell align="left">{'TODO no data for quorum'}</StyledTableCell>
                                     <StyledTableCell align="left">{editedGroup.info.admin}</StyledTableCell>
                                 </StyledTableRow>
-                            ))}
+                            )}
                         </TableBody>
                     </Table>
                 </Paper>

@@ -1,7 +1,7 @@
 import React from "react";
 import {Button, Paper} from "@material-ui/core";
 import {stores, useStores} from "../../shared-state/repo";
-import {ActionStateType, ActionType, StakeActionData} from "../../shared-state/proposals-store";
+import {ActionStateType, ActionType, StakeActionData} from "../../shared-state/create-proposal-store";
 import {observer} from "mobx-react-lite";
 import {useStyles} from "./create-proposal-styles";
 import {PreviewDelegateAction} from "./stake/preview-delegate-action";
@@ -14,7 +14,7 @@ import {PreviewParameterChangeAction} from "./others/preview-parameter-change-ac
 
 export const PreviewProposal: React.FC<{}> = observer(({}) => {
     const classes = useStyles()
-    const {newProposal} = useStores().proposalsStore
+    const {newProposal} = useStores().createProposalStore
 
     return (
         <>

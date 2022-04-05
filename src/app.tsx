@@ -13,7 +13,7 @@ import {CreateProposal} from './pages/create-proposal/create-proposal'
 
 import './app.css'
 import {EditGroup} from './pages/edit-group/edit-group'
-import {ActionType} from "./shared-state/proposals-store";
+import {ActionType} from "./shared-state/create-proposal-store";
 
 
 export const App: React.FC = () => {

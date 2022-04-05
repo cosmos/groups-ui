@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import {FormControlLabel, Paper, Radio, RadioGroup} from "@material-ui/core";
 import {CreateDelegateAction} from "./create-delegate-action";
 import {useStyles} from "../create-proposal-styles";
-import {ActionStateType} from "../../../shared-state/proposals-store";
+import {ActionStateType} from "../../../shared-state/create-proposal-store";
 import {CreateRedelegateAction} from "./create-redelegate-action";
 import {CreateClaimRewardAction} from "./create-claim-reward-action";
 

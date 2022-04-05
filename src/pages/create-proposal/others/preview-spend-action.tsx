@@ -4,11 +4,11 @@ import {useStores} from "../../../shared-state/repo";
 import {truncateAddress} from "../../../utils";
 import {observer} from "mobx-react-lite";
 import {useStyles} from "../create-proposal-styles";
-import {SpendActionData, StakeActionData} from "../../../shared-state/proposals-store";
+import {SpendActionData, StakeActionData} from "../../../shared-state/create-proposal-store";
 
 export const PreviewSpendAction: React.FC<{id: symbol}> = observer(({id}) => {
     const classes = useStyles()
-    const {newProposal} = useStores().proposalsStore
+    const {newProposal} = useStores().createProposalStore
     const data = newProposal.actions.find(a => a.id === id)?.data as SpendActionData
 
     return (

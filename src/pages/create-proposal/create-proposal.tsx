@@ -21,7 +21,7 @@ import {PreviewProposal} from "./preview-proposal";
 import {useStores} from "../../shared-state/repo";
 import {useStyles} from "./create-proposal-styles";
 import {ActionsComposer} from "./actions-composer";
-import {ActionType} from "../../shared-state/proposals-store";
+import {ActionType} from "../../shared-state/create-proposal-store";
 import CreateProposalNavPanel from "./create-proposal-nav-panel";
 import {PrimaryButton} from "../../components/primary-button";
 import {useParams} from "react-router-dom";
@@ -71,7 +71,7 @@ const drawerStyles = makeStyles((theme) => ({
 }))
 
 export const CreateProposal: React.FC<{initialProposerType: ActionType}> = observer(({initialProposerType}) => {
-    const {addAction, createProposal} = useStores().proposalsStore
+    const {addAction, createProposal} = useStores().createProposalStore
     const {fetchGroupById} = useStores().groupsStore
     const params: any = useParams()
     const groupId = params.id

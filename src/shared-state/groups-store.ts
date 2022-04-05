@@ -9,14 +9,14 @@ import {
     GroupMember,
     GroupPolicyInfo,
     ThresholdDecisionPolicy
-} from '../generated/cosmos/group/v1beta1/types'
+} from '../generated/cosmos/group/v1/types'
 import {
     MsgCreateGroup,
     MsgCreateGroupPolicy,
     MsgUpdateGroupMembers,
     MsgUpdateGroupMetadata,
     protobufPackage
-} from '../generated/cosmos/group/v1beta1/tx'
+} from '../generated/cosmos/group/v1/tx'
 
 // {"name": "bla", "description": "blabbl", "created": 1640599686655, "lastEdited": 1640599686655, "linkToForum": "", "other": "blabla"}
 interface GroupMetadata {
@@ -210,7 +210,7 @@ export class GroupsStore {
         const result1 = await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny1], fee1)
         results.push(result1)
 
-        const createdGroupId = Number(JSON.parse(result1.rawLog)[0].events.find(e => e.type === 'cosmos.group.v1beta1.EventCreateGroup').attributes[0].value.replaceAll('"', ''))
+        const createdGroupId = Number(JSON.parse(result1.rawLog)[0].events.find(e => e.type === 'cosmos.group.v1.EventCreateGroup').attributes[0].value.replaceAll('"', ''))
 
         // const createdGroupId = 13 // TODO hardcode
         console.log('createdGroupId', createdGroupId)
@@ -225,7 +225,7 @@ export class GroupsStore {
                 foo: 'bar'
             }),
             decision_policy: {
-                type_url: '/cosmos.group.v1beta1.ThresholdDecisionPolicy',
+                type_url: '/cosmos.group.v1.ThresholdDecisionPolicy',
                 value: toUint8Array(
                     JSON.stringify({
                         // "@type": "/regen.group.v1alpha1.ThresholdDecisionPolicy",
@@ -248,7 +248,7 @@ export class GroupsStore {
                     foo: 'bar'
                 }),
                 decision_policy: {
-                    type_url: '/cosmos.group.v1beta1.ThresholdDecisionPolicy',
+                    type_url: '/cosmos.group.v1.ThresholdDecisionPolicy',
                     value: ThresholdDecisionPolicy.encode(
                         {
                             threshold: '1',

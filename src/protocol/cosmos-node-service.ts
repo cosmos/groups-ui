@@ -1,8 +1,6 @@
 import { getService, Service, service } from './services'
 import { ChainInfo } from '@keplr-wallet/types'
 import { CosmosClient } from './cosmos-client'
-import {Vote} from "../generated/cosmos/group/v1beta1/types";
-import {QueryVotesByProposalResponse} from "../generated/cosmos/group/v1beta1/query";
 
 @service
 export class CosmosNodeService implements Service {

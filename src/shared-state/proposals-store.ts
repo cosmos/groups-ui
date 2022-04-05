@@ -1,20 +1,21 @@
-import { makeObservable, observable } from 'mobx';
-import { Any } from '../generated/google/protobuf/any';
+import { makeObservable, observable } from 'mobx'
+import { Any } from '../generated/google/protobuf/any'
 import {
     Exec,
     MsgExec,
+    MsgSubmitProposal as MsgCreateProposal,
     MsgVote,
-    protobufPackage,
-    MsgSubmitProposal as MsgCreateProposal, MsgCreateGroup,
-} from '../generated/cosmos/group/v1beta1/tx';
-import { TextProposal } from '../generated/gov/gov';
-import { ParameterChangeProposal } from '../generated/params/params';
-import { Group, toUint8Array } from './groups-store';
-import { CosmosNodeService } from '../protocol/cosmos-node-service';
-import { VoteOption } from '../generated/cosmos/group/v1beta1/types';
-import { Coin, coins } from '@cosmjs/proto-signing';
-import { BroadcastTxResponse } from '@cosmjs/stargate';
-import { MsgSubmitProposal } from '../generated/gov/tx';
+    protobufPackage
+} from '../generated/cosmos/group/v1/tx'
+import { TextProposal } from '../generated/gov/gov'
+import { ParameterChangeProposal } from '../generated/params/params'
+import { Group, toUint8Array } from './groups-store'
+import { CosmosNodeService } from '../protocol/cosmos-node-service'
+import { VoteOption } from '../generated/cosmos/group/v1/types'
+import { BroadcastTxResponse } from '@cosmjs/stargate'
+import { MsgSubmitProposal } from '../generated/cosmos/gov/v1/tx'
+import { Coin } from '../generated/cosmos/base/v1beta1/coin'
+import { coins } from '@cosmjs/launchpad'
 
 interface NewProposal {
     actions: Action[]
@@ -78,7 +79,7 @@ interface Action {
 }
 
 enum ProposalTypeUrls {
-    TextProposal = '/cosmos.gov.v1beta1.TextProposal',
+    TextProposal = '/cosmos.gov.v1.TextProposal',
     ParameterChangeProposal = '/cosmos.params.v1beta1.ParameterChangeProposal',
 }
 
@@ -282,11 +283,12 @@ export class ProposalsStore {
         deposit: Coin[]
     ): Any => {
         const msg = {
-            type_url: '/cosmos.gov.v1beta1.MsgSubmitProposal',
+            type_url: '/cosmos.gov.v1.MsgSubmitProposal',
             value: MsgSubmitProposal.encode({
-                content: anyProposal,
+                messages: [anyProposal],
                 proposer,
-                initialDeposit: deposit,
+                metadata: "",
+                initial_deposit: deposit,
             }).finish(),
         };
         return msg;

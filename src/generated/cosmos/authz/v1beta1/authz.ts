@@ -23,6 +23,11 @@ export interface GenericAuthorization {
  */
 export interface Grant {
   authorization: Any | undefined;
+  /**
+   * time when the grant will expire and will be pruned. If null, then the grant
+   * doesn't have a time expiration (other conditions  in `authorization`
+   * may apply to invalidate the grant)
+   */
   expiration: Date | undefined;
 }
 

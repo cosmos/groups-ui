@@ -70,6 +70,10 @@ bank-send:
 create-group:
 	simd tx group create-group $(USER2) $$(echo '{"name": "bla1", "description": "blabbl", "created": $(NOW), "lastEdited": $(NOW), "linkToForum": "", "other": "blabla"}' | base64 -w 0) ./testdata/members.json --chain-id $(CHAIN_ID) --keyring-backend test --keyring-dir $(CHAIN_HOME)
 
+.PHONY: update-group-metadata
+update-group-metadata:
+	simd tx group update-group-metadata $(USER2) 2 $$(echo '{"name": "bla1", "description": "blabbl", "created": $(NOW), "lastEdited": $(NOW), "linkToForum": "", "other": "blabla"}' | base64 -w 0) --home $(CHAIN_HOME) --chain-id $(CHAIN_ID) --keyring-backend test --keyring-dir $(CHAIN_HOME)
+
 .PHONY: query-groups
 query-groups:
 	simd q group groups-by-admin $(USER2)

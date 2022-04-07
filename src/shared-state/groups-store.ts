@@ -189,11 +189,11 @@ export class GroupsStore {
         const msg1: MsgCreateGroup = {
             admin: this.editedGroup.info.admin,
             members: this.editedGroup.members.map(m => m.member),
-            metadata: JSON.stringify({
+            metadata: btoa(JSON.stringify({
                 ...this.editedGroup.metadata,
                 created: Date.now(),
                 lastEdited: Date.now()
-            })
+            }))
         }
         const msgAny1 = {
             typeUrl: `/${protobufPackage}.MsgCreateGroup`,
@@ -215,69 +215,69 @@ export class GroupsStore {
         // const createdGroupId = 13 // TODO hardcode
         console.log('createdGroupId', createdGroupId)
 
-        const msg2: MsgCreateGroupPolicy = {
-            admin: this.editedGroup.info.admin,
-            group_id: createdGroupId,
-            // metadata: toUint8Array(JSON.stringify({
-            //     foo: 'bar'
-            // })),
-            metadata: JSON.stringify({
-                foo: 'bar'
-            }),
-            decision_policy: {
-                type_url: '/cosmos.group.v1.ThresholdDecisionPolicy',
-                value: toUint8Array(
-                    JSON.stringify({
-                        // "@type": "/regen.group.v1alpha1.ThresholdDecisionPolicy",
-                        'threshold': '1',
-                        'timeout': '1s'
-                    })
-                )
-            }
-        }
-
-        const msgAny2 = {
-            typeUrl: `/${protobufPackage}.MsgCreateGroupPolicy`,
-            value: MsgCreateGroupPolicy.encode({
-                admin: this.editedGroup.info.admin,
-                group_id: createdGroupId,
-                // metadata: toUint8Array(JSON.stringify({
-                //     foo: 'bar'
-                // })),
-                metadata: JSON.stringify({
-                    foo: 'bar'
-                }),
-                decision_policy: {
-                    type_url: '/cosmos.group.v1.ThresholdDecisionPolicy',
-                    value: ThresholdDecisionPolicy.encode(
-                        {
-                            threshold: '1',
-                            windows: {
-                                voting_period: {
-                                    seconds: 1,
-                                    nanos: 0
-                                },
-                                min_execution_period: {
-                                    seconds: 1,
-                                    nanos: 0
-                                }
-                            }
-                        }
-                    ).finish()
-                }
-            }).finish()
-        }
-
-        console.log('msgAny2', msgAny2)
-
-        const fee2 = {
-            amount: coins(0, CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom),
-            gas: '2000000'
-        }
-
-        results.push(await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny2], fee2))
-
-        console.log('results', results)
+        // const msg2: MsgCreateGroupPolicy = {
+        //     admin: this.editedGroup.info.admin,
+        //     group_id: createdGroupId,
+        //     // metadata: toUint8Array(JSON.stringify({
+        //     //     foo: 'bar'
+        //     // })),
+        //     metadata: JSON.stringify({
+        //         foo: 'bar'
+        //     }),
+        //     decision_policy: {
+        //         type_url: '/cosmos.group.v1.ThresholdDecisionPolicy',
+        //         value: toUint8Array(
+        //             JSON.stringify({
+        //                 // "@type": "/regen.group.v1alpha1.ThresholdDecisionPolicy",
+        //                 'threshold': '1',
+        //                 'timeout': '1s'
+        //             })
+        //         )
+        //     }
+        // }
+        //
+        // const msgAny2 = {
+        //     typeUrl: `/${protobufPackage}.MsgCreateGroupPolicy`,
+        //     value: MsgCreateGroupPolicy.encode({
+        //         admin: this.editedGroup.info.admin,
+        //         group_id: createdGroupId,
+        //         // metadata: toUint8Array(JSON.stringify({
+        //         //     foo: 'bar'
+        //         // })),
+        //         metadata: JSON.stringify({
+        //             foo: 'bar'
+        //         }),
+        //         decision_policy: {
+        //             type_url: '/cosmos.group.v1.ThresholdDecisionPolicy',
+        //             value: ThresholdDecisionPolicy.encode(
+        //                 {
+        //                     threshold: '1',
+        //                     windows: {
+        //                         voting_period: {
+        //                             seconds: 1,
+        //                             nanos: 0
+        //                         },
+        //                         min_execution_period: {
+        //                             seconds: 1,
+        //                             nanos: 0
+        //                         }
+        //                     }
+        //                 }
+        //             ).finish()
+        //         }
+        //     }).finish()
+        // }
+        //
+        // console.log('msgAny2', msgAny2)
+        //
+        // const fee2 = {
+        //     amount: coins(0, CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom),
+        //     gas: '2000000'
+        // }
+        //
+        // results.push(await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny2], fee2))
+        //
+        // console.log('results', results)
         return [createdGroupId, results]
     }
 
@@ -290,10 +290,10 @@ export class GroupsStore {
             const msg: MsgUpdateGroupMetadata = {
                 admin: this.editedGroup.info.admin,
                 group_id: this.editedGroup.info.id,
-                metadata: JSON.stringify({
+                metadata: btoa(JSON.stringify({
                     ...this.editedGroup.metadata,
                     lastEdited: Date.now()
-                })
+                }))
             }
             const msgAny = {
                 typeUrl: `/${protobufPackage}.MsgUpdateGroupMetadata`,

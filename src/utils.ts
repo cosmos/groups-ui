@@ -20,7 +20,10 @@ export function truncateAddress(address: string) {
  * }
  * @param coins regen,atom for example
  */
-export function fetchCoinPrices(coins: string[]): Promise<{ [key: string]: { usd: number } }> {
+export function fetchCoinPrices(coins: string[]): Promise<{ [key: string]: { usd: number } }|undefined> {
     return fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coins.join(',')}&vs_currencies=usd`)
-        .then( result => result.json() )
+        .then(result => result.json())
+        .catch(e => {
+            console.log(e)
+        })
 }

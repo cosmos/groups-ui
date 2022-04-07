@@ -36,7 +36,9 @@ interface GroupPolicy {
     address: string
     admin: string
     threshold: number // percentage [0..100]
-    timeoutInDays: number
+    timeoutInDays: string
+    quorum: string
+    createdAt?: Date
 }
 
 export interface Group {
@@ -45,18 +47,18 @@ export interface Group {
     // groupAccounts: GroupAccountInfo[]
     policy?: GroupPolicy
     metadata: GroupMetadata
-    balances?: GroupBalances
 }
 
-export interface GroupBalance extends Coin {
+export interface GroupPolicyBalance extends Coin {
     formattedAmount: string
     price?: number
     decimals: number
 }
 
-export interface GroupBalances {
-    summary: string
-    balances: readonly GroupBalance[]
+export interface GroupPolicyBalances {
+    primary?: GroupPolicyBalance
+    secondariesSummary?: string
+    secondaries: readonly GroupPolicyBalance[]
 }
 
 export class GroupsStore {
@@ -111,58 +113,58 @@ export class GroupsStore {
             GroupsService.instance.groupMembers(groupInfo.id),
             GroupsService.instance.groupPolicies(groupInfo.id)
         ])
-        const policy = toGroupPolicy(policies)
-        const balances = await BankService.instance.getAllBalances(policy.address)
+        const metadata = JSON.parse(atob(groupInfo.metadata as unknown as string))
+
+        return Object.freeze({
+            info: groupInfo,
+            members,
+            policy: toGroupPolicy(policies),
+            metadata //: {...metadata, created: metadata.created * 100} // strange bug
+        })
+    }
+
+    /*fetchMembers = async (groupId: number): Promise<readonly GroupMember[]> => {
+        return GroupsService.instance.groupMembers(groupId)
+    }*/
+
+    fetchGroupPolicyBalances = async (policyAddress: string) => {
+        const chainInfor = CosmosNodeService.instance.chainInfo
+        const balances = await BankService.instance.getAllBalances(policyAddress)
         const prices = await fetchCoinPrices(balances.map(b => b.denom))
         const balancesWithPrice = balances.map((coin) => {
             const decimals = 6 // fixme: where to get decimals for each coins?
             return {
                 ...coin,
-                formattedAmount: (Number(coin.amount) / 10**decimals).toString(),
-                price: prices[coin.denom]?.usd,
+                formattedAmount: (Number(coin.amount) / 10 ** decimals).toString(),
+                price: prices && prices[coin.denom]?.usd,
                 decimals
             }
         })
+        const primaryCoinDenom = chainInfor.feeCurrencies[0].coinDenom;
+        const primaryBalance = balancesWithPrice.find(balance => balance.denom.toUpperCase() === primaryCoinDenom.toUpperCase())
+        const secondaryBalances = balancesWithPrice.filter(balance => balance.denom.toUpperCase() !== primaryCoinDenom.toUpperCase())
 
-        const totalPrice = balancesWithPrice.reduce((sum, balance) => sum + balance.price, 0)
-        const summary = `${balances.length + 1} other tokens ($${totalPrice} USD)`
+        const totalPrice = secondaryBalances.reduce((sum, balance) => sum + balance.price, 0)
+        const secondariesSummary = `${balances.length + 1} other tokens ($${totalPrice} USD)`
 
-        return Object.freeze({
-            info: groupInfo,
-            members,
-            policy,
-            balances: {
-                summary,
-                balances: balancesWithPrice
-            },
-            metadata: JSON.parse(atob(groupInfo.metadata as unknown as string))
-        })
+        const emptyBalance = { amount: '0', denom: primaryCoinDenom, price: 0, formattedAmount: '0', decimals: 0 };
+        const groupBalances: GroupPolicyBalances = {
+            primary: primaryBalance || emptyBalance,
+            secondariesSummary,
+            secondaries: secondaryBalances
+        }
+        return groupBalances;
     }
 
     fetchEditedGroupById = async (id: number): Promise<Group | null> => {
-        const groupInfo = await GroupsService.instance.groupById(id)
-        if (groupInfo === null) {
-            return null
-        }
-
-        const [members, policies] = await Promise.all([
-            GroupsService.instance.groupMembers(groupInfo.id),
-            GroupsService.instance.groupPolicies(groupInfo.id)
-        ])
-
-        const editedGroup = {
-            info: groupInfo,
-            members: members,
-            policy: toGroupPolicy(policies),
-            metadata: JSON.parse(atob(groupInfo.metadata as unknown as string))
-        }
+        const group = await this.fetchGroupById(id)
 
         runInAction(() => {
-            this.editedGroup = editedGroup
-            this.originalEditedGroup = cloneDeep(editedGroup)
+            this.editedGroup = group
+            this.originalEditedGroup = cloneDeep(group)
         })
 
-        return editedGroup
+        return group
     }
 
     @action
@@ -197,7 +199,8 @@ export class GroupsStore {
                 policy: {
                     address: '',
                     admin: '',
-                    timeoutInDays: 0,
+                    timeoutInDays: '0',
+                    quorum: "?",
                     threshold: 0
                 },
                 metadata: {
@@ -388,7 +391,7 @@ function toGroupPolicy(policyInfos: GroupPolicyInfo[]): GroupPolicy | undefined 
         const info = policyInfos[0]
         // fixme: remove as unknown as
         const decisionPolicy = info.decision_policy as unknown as {
-            percentage: string
+            percentage: number
             windows: {
                 voting_period: string,
                 min_execution_period: string
@@ -397,8 +400,10 @@ function toGroupPolicy(policyInfos: GroupPolicyInfo[]): GroupPolicy | undefined 
         return {
             address: info.address,
             admin: info.admin,
+            createdAt: info.created_at && new Date(info.created_at),
             threshold: Number(decisionPolicy.percentage) * 100,
-            timeoutInDays: 1 // todo
+            quorum: "?", // fixme
+            timeoutInDays: decisionPolicy.windows.voting_period
         }
     }
 }

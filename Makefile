@@ -71,7 +71,7 @@ query-balance:
 keys-list:
 	simd keys list --home $(CHAIN_HOME) --keyring-backend test --keyring-dir $(CHAIN_HOME)
 
-.PHONY: bank-send
+.PHONY: bank-send-from-alice-to-user2
 bank-send:
 	simd tx bank send $(ALICE) $(USER2) 1000000000000000stake --chain-id $(CHAIN_ID) --home $(CHAIN_HOME) --keyring-backend test --keyring-dir $(CHAIN_HOME)
 
@@ -82,6 +82,7 @@ create-group:
 
 .PHONY: create-group-with-policy
 create-group-with-policy:
+	# USER2 should have some coins to pay fee
 	simd tx group create-group-with-policy $(USER2) \
  		$$(echo '{"name": "bla1", "description": "blabbl", "created": $(NOW), "lastEdited": $(NOW), "linkToForum": "", "other": "blabla"}' | $(base64)) \
 		'' ./testdata/members.json \
@@ -94,14 +95,14 @@ create-group-policy:
 	simd tx group create-group-policy $(USER2) $$groupId '' --chain-id $(CHAIN_ID) \
     	'{"@type":"/cosmos.group.v1.ThresholdDecisionPolicy", "threshold":"1", "windows": {"voting_period": "120h"}}'
 
-.PHONY:  submit-proposal
- submit-proposal:
-	simd tx group submit-proposal ./testdata/proposal.json --chain-id $(CHAIN_ID)
-
-.PHONY: create-group-policy
+.PHONY: query-group-policies
 query-group-policies:
 	@read -p "Group ID:" groupId; \
 	simd q group group-policies-by-group $$groupId
+
+.PHONY: submit-proposal
+ submit-proposal:
+	simd tx group submit-proposal ./testdata/proposal.json --chain-id $(CHAIN_ID)
 
 
 .PHONY: update-group-metadata

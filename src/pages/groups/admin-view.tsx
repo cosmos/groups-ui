@@ -26,7 +26,7 @@ import { Page } from '../page'
 import { statusStyles } from '../create-proposal/proposal'
 import {Routes} from "../../routes";
 import {useStores} from "../../shared-state/repo";
-import {Group} from "../../shared-state/groups-store";
+import {Group, GroupPolicyBalances} from "../../shared-state/groups-store";
 import {Proposal} from "../../shared-state/proposals-store";
 import {ProposalsService} from "../../protocol/proposals-service";
 
@@ -363,9 +363,11 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
     const [dense, setDense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
     const [group, setGroup] = React.useState<Group>(undefined)
-    const [proposals, setProposals] = React.useState<Proposal[]>([])
+    const [balances, setBalances] = React.useState<GroupPolicyBalances>(undefined)
+    const [proposals, setProposals] = React.useState<readonly Proposal[]>([])
 
-    const {fetchGroupById} = useStores().groupsStore
+    const {fetchGroupById, fetchGroupPolicyBalances} = useStores().groupsStore
+    const {fetchProposals} = useStores().proposalsStore
 
     useEffect(() => {
         // ProposalsService.instance.proposalsByGroupPolicy(group.policy.address)
@@ -375,9 +377,9 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
         event: React.MouseEvent<unknown>,
         property: keyof Data,
     ) => {
-        const isAsc = orderBy === property && order === 'asc';
-        setOrder(isAsc ? 'desc' : 'asc');
-        setOrderBy(property);
+        const isAsc = orderBy === property && order === 'asc'
+        setOrder(isAsc ? 'desc' : 'asc')
+        setOrderBy(property)
     };
 
     const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -393,7 +395,13 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
     const groupId = Number(pathParams.id)
 
     useEffect(() => {
-        fetchGroupById(groupId).then(group => setGroup(group))
+        fetchGroupById(groupId).then(async (group) => {
+            setGroup(group)
+            if (group && group.policy) {
+                setBalances(await fetchGroupPolicyBalances(group.policy.address))
+                setProposals(await fetchProposals(group.policy.address))
+            }
+        })
     }, [])
 
     const handleChange = (event) => {
@@ -432,19 +440,22 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                     )}
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <div className={classes.regen}>
-                            <h2>{group?.balances?.balances[0]?.formattedAmount}</h2>
-                            <p>{group?.balances?.balances[0]?.denom}</p>
-                            <span>({group?.balances?.balances[0]?.price} USD)</span>
+                            <h2>{balances?.primary?.formattedAmount}</h2>
+                            <p>{balances?.primary?.denom}</p>
+                            {balances?.primary?.price &&
+                                <span>({balances?.primary?.price} USD)</span>
+                            }
                         </div>
-                        <FormControl variant="outlined" style={{ width: '30%' }}>
-                            <InputLabel id="demo-simple-select-outlined-label" />
-                            <Select placeholder={group?.balances?.summary}
-                                    id="demo-simple-select-outlined">
-                                { group?.balances?.balances.map( balance => (
-                                    <MenuItem>{balance.formattedAmount} {balance.denom}</MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                        {balances?.secondaries.length > 0 &&
+                            <FormControl variant="outlined" style={{width: '30%'}}>
+                                <InputLabel id="demo-simple-select-outlined-label">{balances?.secondariesSummary}</InputLabel>
+                                <Select id="demo-simple-select-outlined">
+                                    {balances?.secondaries.map(balance => (
+                                        <MenuItem>{balance.formattedAmount} {balance.denom}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        }
                     </div>
                 </div>
                 <Paper elevation={2} className={classes.actions}>

@@ -1,14 +1,13 @@
 {
-  "address": "cosmos17pmq7hp4upvmmveqexzuhzu64v36re3w3447n7dt46uwp594wtpsqv4fn5",
+  "group_policy_address": "cosmos1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsfwkgpd",
   "messages": [
     {
       "@type": "/cosmos.bank.v1beta1.MsgSend",
-      "from_address": "cosmos1kdzkazludrnmnzchcxgs6znsjph5ugx4rhljrh",
-      "to_address": "cosmos106ljn6kds9vegaux0w4jnend97fdm50yec59vq",
+      "from_address": "cosmos1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsfwkgpd",
+      "to_address": "cosmos1kdzkazludrnmnzchcxgs6znsjph5ugx4rhljrh",
       "amount":[{"denom": "stake","amount": "10"}]
     }
   ],
   "metadata": "4pIMOgIGx1vZGU=",
-  "exec": 0,
-  "proposers": ["cosmos1kdzkazludrnmnzchcxgs6znsjph5ugx4rhljrh", "cosmos106ljn6kds9vegaux0w4jnend97fdm50yec59vq"]
+  "proposers": ["cosmos106ljn6kds9vegaux0w4jnend97fdm50yec59vq"]
 }

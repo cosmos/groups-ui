@@ -39,6 +39,9 @@ export const App: React.FC = () => {
                 <Route exact path={Routes.GROUPS_EDIT}>
                     <EditGroup />
                 </Route>
+                <Route exact path={Routes.GROUPS_NEW}>
+                    <EditGroup />
+                </Route>
                 <Route exact path={Routes.PROPOSALS_NEW_STAKE}>
                     <CreateProposal initialProposerType={ActionType.STAKE} />
                 </Route>

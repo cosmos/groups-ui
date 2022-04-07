@@ -27,6 +27,7 @@ import { Routes } from '../../routes'
 import { GroupMember } from '../../generated/cosmos/group/v1beta1/types'
 import Pagination from '@material-ui/lab/Pagination'
 import {PrimaryButton} from "../../components/primary-button";
+import {truncateAddress} from "../../utils";
 
 const useStyles1 = makeStyles((theme) => ({
     root: {
@@ -272,7 +273,7 @@ export const GroupDetails: React.FC<{}> = observer(() => {
     useEffect(() => {
         if (!editedGroup) {
             if (groupId === -1) {
-                history.push('/groups/new')
+                history.push(Routes.GROUPS_NEW)
             } else {
                 (async () => {
                     const group = await fetchEditedGroupById(groupId)
@@ -298,6 +299,7 @@ export const GroupDetails: React.FC<{}> = observer(() => {
     type memberStatus = 'unChanged' | 'changed' | 'newDeleted' | 'newAdded'
     const members: Array<{
         address: string
+        addedAt: Date
         weight: number
         status: memberStatus
     }> = []
@@ -318,6 +320,7 @@ export const GroupDetails: React.FC<{}> = observer(() => {
         })()
         members.push({
             address: m.member.address,
+            addedAt: m.member.added_at && new Date(m.member.added_at),
             weight: Number(m.member.weight),
             status
         })
@@ -328,6 +331,7 @@ export const GroupDetails: React.FC<{}> = observer(() => {
         if (!member) {
             members.push({
                 address: m.member.address,
+                addedAt: m.member.added_at,
                 weight: Number(m.member.weight),
                 status: 'newDeleted'
             })
@@ -338,20 +342,20 @@ export const GroupDetails: React.FC<{}> = observer(() => {
         <Page>
             <div className={classes.root}>
                 <div>
-                    <Link to="#" style={{ fontSize: '12px', textTransform: 'uppercase', fontWeight: 800 }}
-                        className={classes.link} onClick={() => console.log('click')}>
+                    <Link to={Routes.GROUPS_ADMIN_VIEW.replace(':id', groupId.toString())}
+                          style={{ fontSize: '12px', textTransform: 'uppercase', fontWeight: 800 }}
+                          className={classes.link} onClick={() => console.log('click')}>
                         <ArrowBack style={{ fontSize: '18px', marginRight: '8px' }} />
-                        Foo dev team
+                        {editedGroup.metadata.name}
                     </Link>
                     <div className={classes.heroBlock}>
                         <h1>Group Details</h1>
-                        <Link to={`/groups/${groupId}`}>
+                        <Link to={Routes.GROUPS_EDIT.replace(':id', groupId.toString())}>
                             <PrimaryButton>edit group</PrimaryButton>
                         </Link>
                     </div>
                     <div className={classes.heroBlock}>
-                        <p className="subtitle">This group is to manage the funds for the Foo developer team’s
-                            efforts.</p>
+                        <p className="subtitle">{editedGroup.metadata.description}</p>
                     </div>
                     <div className={classes.regen}>
                         <p style={{ marginLeft: '0' }}>group admin</p>
@@ -376,11 +380,11 @@ export const GroupDetails: React.FC<{}> = observer(() => {
                         <TableBody>
                             {editedGroup.policy && (
                                 <StyledTableRow>
-                                    <StyledTableCell align="left">{'TODO Date'}</StyledTableCell>
-                                    <StyledTableCell align="left">{`${editedGroup.policy.timeoutInDays} days`}</StyledTableCell>
-                                    <StyledTableCell align="left">{editedGroup.policy.threshold}</StyledTableCell>
-                                    <StyledTableCell align="left">{'TODO no data for quorum'}</StyledTableCell>
-                                    <StyledTableCell align="left">{editedGroup.info.admin}</StyledTableCell>
+                                    <StyledTableCell align="left">{editedGroup.policy.createdAt.toLocaleString()}</StyledTableCell>
+                                    <StyledTableCell align="left">{editedGroup.policy.timeoutInDays}</StyledTableCell>
+                                    <StyledTableCell align="left">{`${editedGroup.policy.threshold}%`}</StyledTableCell>
+                                    <StyledTableCell align="left">{editedGroup.policy.quorum}</StyledTableCell>
+                                    <StyledTableCell align="left">{truncateAddress(editedGroup.info.admin)}</StyledTableCell>
                                 </StyledTableRow>
                             )}
                         </TableBody>
@@ -492,7 +496,7 @@ export const GroupDetails: React.FC<{}> = observer(() => {
                                         <StyledTableCell align="left" style={{
                                             width: '30%',
                                             padding: '28px 40px'
-                                        }}>{'TODO Date added'}</StyledTableCell>
+                                        }}>{m.addedAt.toLocaleString()}</StyledTableCell>
                                         <StyledTableCell align="left" style={{
                                             width: '30%',
                                             padding: '28px 40px'

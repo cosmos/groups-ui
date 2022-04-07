@@ -103,7 +103,7 @@ export const EditGroup: React.FC<{}> = observer(() => {
     const [activeStep, setActiveStep] = useState(0)
     const history = useHistory()
     const pathParams: any = useParams()
-    const groupId = pathParams.id === 'new' ? -1 : Number(pathParams.id)
+    const groupId = pathParams.id ? Number(pathParams.id) : -1
     const [group, setGroup] = React.useState(10)
     const [loading, setLoading] = React.useState(false)
 
@@ -387,7 +387,7 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                                         ...editedGroup,
                                                         policy: {
                                                             ...editedGroup.policy,
-                                                            timeoutInDays: Number(e.target.value)
+                                                            timeoutInDays: e.target.value
                                                         }
                                                     })
                                                 }}
@@ -479,7 +479,7 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                                             const [createdId, broadcastResults] = await createGroup()
                                                             alert(`BroadcastRes: 
 ${JSON.stringify(broadcastResults, null, 2)}`)
-                                                            history.push(`/groups/${createdId}`)
+                                                            history.push(Routes.GROUPS_EDIT.replace(':id', createdId.toString()))
                                                         } finally {
                                                             setLoading(false)
                                                         }

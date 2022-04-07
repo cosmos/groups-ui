@@ -14,6 +14,7 @@ import {
 } from '@material-ui/core'
 import { Link } from 'react-router-dom'
 import { statusStyles } from '../create-proposal/proposal'
+import {Routes} from "../../routes";
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -106,6 +107,7 @@ export const Groups: React.FC<{}> = observer(() => {
     const status = statusStyles()
     const { groups, fetchGroups } = useStores().groupsStore
     const [loading, setLoading] = useState(true)
+
     useEffect(() => {
         fetchGroups()
             .then(() => setLoading(false))
@@ -127,7 +129,7 @@ export const Groups: React.FC<{}> = observer(() => {
                 }}>
                     Groups
                 </div>
-                <Link to="/groups/new">
+                <Link to={Routes.GROUPS_NEW}>
                     <Button
                         className={tableStyle.createGroupBtn}
                         variant="contained"

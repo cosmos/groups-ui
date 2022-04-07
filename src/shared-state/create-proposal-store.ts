@@ -5,7 +5,7 @@ import {
     MsgExec,
     MsgVote,
     protobufPackage,
-    MsgSubmitProposal as MsgCreateProposal, MsgCreateGroup,
+    MsgSubmitProposal as MsgCreateProposal
 } from '../generated/cosmos/group/v1/tx';
 import { TextProposal } from '../generated/gov/gov';
 import { ParameterChangeProposal } from '../generated/params/params';

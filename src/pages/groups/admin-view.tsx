@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import {
     Box,
     Button,
@@ -25,6 +25,10 @@ import { Link, useHistory, useParams } from 'react-router-dom'
 import { Page } from '../page'
 import { statusStyles } from '../create-proposal/proposal'
 import {Routes} from "../../routes";
+import {useStores} from "../../shared-state/repo";
+import {Group, GroupPolicyBalances} from "../../shared-state/groups-store";
+import {Proposal} from "../../shared-state/proposals-store";
+import {ProposalsService} from "../../protocol/proposals-service";
 
 interface Data {
     date: string;
@@ -333,7 +337,7 @@ const StyledTableRow = withStyles((theme) => ({
     }
 }))(TableRow)
 
-const rows = [
+const propositionRows = [
     createData('62.12.2021', 'unfinalized', `#1`, 'sometext in description'),
     createData('22.11.2021', 'unfinalized', `#2`, 'sometext in description'),
     createData('52.15.2021', 'unfinalized', `#3`, 'sometext in description'),
@@ -358,19 +362,29 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
     const [page, setPage] = React.useState(0);
     const [dense, setDense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
+    const [group, setGroup] = React.useState<Group>(undefined)
+    const [balances, setBalances] = React.useState<GroupPolicyBalances>(undefined)
+    const [proposals, setProposals] = React.useState<readonly Proposal[]>([])
+
+    const {fetchGroupById, fetchGroupPolicyBalances} = useStores().groupsStore
+    const {fetchProposals} = useStores().proposalsStore
+
+    useEffect(() => {
+        // ProposalsService.instance.proposalsByGroupPolicy(group.policy.address)
+    }, [group])
 
     const handleRequestSort = (
         event: React.MouseEvent<unknown>,
         property: keyof Data,
     ) => {
-        const isAsc = orderBy === property && order === 'asc';
-        setOrder(isAsc ? 'desc' : 'asc');
-        setOrderBy(property);
+        const isAsc = orderBy === property && order === 'asc'
+        setOrder(isAsc ? 'desc' : 'asc')
+        setOrderBy(property)
     };
 
     const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked) {
-            const newSelecteds = rows.map((n) => n.desc);
+            const newSelecteds = propositionRows.map((n) => n.desc);
             setSelected(newSelecteds);
             return;
         }
@@ -378,7 +392,17 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
     };
 
     const pathParams: any = useParams()
-    const groupId = pathParams.id === 'new' ? -1 : Number(pathParams.id)
+    const groupId = Number(pathParams.id)
+
+    useEffect(() => {
+        fetchGroupById(groupId).then(async (group) => {
+            setGroup(group)
+            if (group && group.policy) {
+                setBalances(await fetchGroupPolicyBalances(group.policy.address))
+                setProposals(await fetchProposals(group.policy.address))
+            }
+        })
+    }, [])
 
     const handleChange = (event) => {
         setAge(event.target.value)
@@ -389,14 +413,14 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
     const status = statusStyles()
 
     const emptyRows =
-        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - propositionRows.length) : 0;
 
     return (
         <Page>
             <div className={classes.root}>
                 <div>
                     <div className={classes.heroBlock}>
-                        <h1>Foo Dev Team</h1>
+                        <h1>{group?.metadata.name}</h1>
                         <Link to={`/groups/${groupId}/details`}>
                             <Button variant="outlined" color="primary" className="btn">
                                 group details
@@ -405,35 +429,33 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
 
                     </div>
                     <div className={classes.heroBlock}>
-                        <p className="subtitle">This group is to manage the funds for the Foo developer team’s
-                            efforts.</p>
-                        <p className={classes.date}>Created Nov 29th 2021, 12:00:35 AM</p>
+                        <p className="subtitle">{group?.metadata.description}</p>
+                        <p className={classes.date}>{new Date(group?.metadata.created).toLocaleString()}</p>
                     </div>
-                    <Link to="#" className={classes.link} onClick={() => console.log('click')}>
-                        <ChatBubbleOutline style={{ fontSize: '18px', marginRight: '8px' }} />
-                        View discussion on group forum»
-                    </Link>
+                    { group && group.metadata.linkToForum && (
+                        <a href={group?.metadata.linkToForum} target="_blank" className={classes.link}>
+                            <ChatBubbleOutline style={{ fontSize: '18px', marginRight: '8px' }} />
+                            View discussion on group forum»
+                        </a>
+                    )}
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <div className={classes.regen}>
-                            <h2>1,200</h2>
-                            <p>regen</p>
-                            <span>($2,117 USD)</span>
+                            <h2>{balances?.primary?.formattedAmount}</h2>
+                            <p>{balances?.primary?.denom}</p>
+                            {balances?.primary?.price &&
+                                <span>({balances?.primary?.price} USD)</span>
+                            }
                         </div>
-                        <FormControl variant="outlined" style={{ width: '30%' }}>
-                            <InputLabel id="demo-simple-select-outlined-label" />
-                            <Select
-                                id="demo-simple-select-outlined"
-                                value={age}
-                                onChange={handleChange}
-                            >
-                                <MenuItem value="">
-                                    <em>None</em>
-                                </MenuItem>
-                                <MenuItem value={10}>Ten</MenuItem>
-                                <MenuItem value={20}>Twenty</MenuItem>
-                                <MenuItem value={30}>Thirty</MenuItem>
-                            </Select>
-                        </FormControl>
+                        {balances?.secondaries.length > 0 &&
+                            <FormControl variant="outlined" style={{width: '30%'}}>
+                                <InputLabel id="demo-simple-select-outlined-label">{balances?.secondariesSummary}</InputLabel>
+                                <Select id="demo-simple-select-outlined">
+                                    {balances?.secondaries.map(balance => (
+                                        <MenuItem>{balance.formattedAmount} {balance.denom}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        }
                     </div>
                 </div>
                 <Paper elevation={2} className={classes.actions}>
@@ -486,10 +508,10 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                             orderBy={orderBy}
                             onSelectAllClick={handleSelectAllClick}
                             onRequestSort={handleRequestSort}
-                            rowCount={rows.length}
+                            rowCount={propositionRows.length}
                         />
                         <TableBody>
-                            {stableSort(rows, getComparator(order, orderBy))
+                            {stableSort(propositionRows, getComparator(order, orderBy))
                                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                 .map((row, index) => {
                                     // const isItemSelected = isSelected(row.date);
@@ -529,7 +551,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                             )}
                         </TableBody>
                         {/* <TableBody>
-                            {rows.map((row) => (
+                            {propositionRows.map((row) => (
                                 <StyledTableRow key={row.number}>
                                     <StyledTableCell align="left" style={{ width: '30%' }}>{row.date}</StyledTableCell>
                                     <StyledTableCell align="left"><span className={`${status.marker} orange`}>{row.status}</span></StyledTableCell>

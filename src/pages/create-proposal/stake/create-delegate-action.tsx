@@ -3,13 +3,13 @@ import {Button, FormControl, FormGroup, MenuItem, Select, TextField} from "@mate
 import {useStores} from "../../../shared-state/repo";
 import {BankService} from "../../../protocol/bank-service";
 import {useStyles} from "../create-proposal-styles";
-import {ActionStateType, StakeActionData} from "../../../shared-state/proposals-store";
+import {ActionStateType, StakeActionData} from "../../../shared-state/create-proposal-store";
 
 export const CreateDelegateAction: React.FC<{id: symbol, type: ActionStateType}> = ({id, type}) => {
     // todo: fee
     const classes = useStyles()
     // const [id] = useState(Symbol(ProposalType.STAKE_DELEGATE))
-    const {updateAction, newProposal} = useStores().proposalsStore
+    const {updateAction, newProposal} = useStores().createProposalStore
     // in case of editing
     const initialData = newProposal.actions.find( a => a.id === id).data as StakeActionData
     const {allValidators, fetchAllValidators} = useStores().validatorsStore
@@ -39,7 +39,7 @@ export const CreateDelegateAction: React.FC<{id: symbol, type: ActionStateType}>
     }, [fetchAllValidators])
 
     useEffect(() => {
-        BankService.instance.getAllBalances().then( balances => {
+        BankService.instance.getAllUserBalances().then(balances => {
             let balance = balances.find(coin => coin.denom.toUpperCase() === currencyDenom.toUpperCase());
             if (balance) {
                 const currency = chainInfo.currencies.find( currency => currency.coinDenom === currencyDenom)

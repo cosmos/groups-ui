@@ -13,7 +13,7 @@ import {CreateProposal} from './pages/create-proposal/create-proposal'
 
 import './app.css'
 import {EditGroup} from './pages/edit-group/edit-group'
-import {ActionType} from "./shared-state/proposals-store";
+import {ActionType} from "./shared-state/create-proposal-store";
 
 
 export const App: React.FC = () => {
@@ -37,6 +37,9 @@ export const App: React.FC = () => {
                     <GroupDetails />
                 </Route>
                 <Route exact path={Routes.GROUPS_EDIT}>
+                    <EditGroup />
+                </Route>
+                <Route exact path={Routes.GROUPS_NEW}>
                     <EditGroup />
                 </Route>
                 <Route exact path={Routes.PROPOSALS_NEW_STAKE}>

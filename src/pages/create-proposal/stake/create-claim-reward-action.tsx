@@ -3,12 +3,12 @@ import {Button, FormGroup, TextField} from "@material-ui/core";
 import {useStores} from "../../../shared-state/repo";
 import {BankService} from "../../../protocol/bank-service";
 import {useStyles} from "../create-proposal-styles";
-import {ActionStateType, StakeActionData} from "../../../shared-state/proposals-store";
+import {ActionStateType, StakeActionData} from "../../../shared-state/create-proposal-store";
 
 export const CreateClaimRewardAction: React.FC<{id: symbol}> = ({id}) => {
     // todo: fee
     const classes = useStyles()
-    const {updateAction, newProposal} = useStores().proposalsStore
+    const {updateAction, newProposal} = useStores().createProposalStore
     const {chainInfo} = useStores().chainInfoStore
 
     const initialData = newProposal.actions.find( a => a.id === id).data as StakeActionData
@@ -23,7 +23,7 @@ export const CreateClaimRewardAction: React.FC<{id: symbol}> = ({id}) => {
     }, [amount])
 
     useEffect(() => {
-        BankService.instance.getAllBalances().then( balances => {
+        BankService.instance.getAllUserBalances().then(balances => {
             let balance = balances.find(coin => coin.denom.toUpperCase() === "REGEN");
             if (balance) {
                 const currency = chainInfo.currencies.find( currency => currency.coinDenom.toUpperCase() === "REGEN")

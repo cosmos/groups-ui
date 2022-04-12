@@ -8,6 +8,7 @@ import {
     GroupInfo,
     GroupMember,
     GroupPolicyInfo,
+    PercentageDecisionPolicy,
     ThresholdDecisionPolicy
 } from '../generated/cosmos/group/v1/types'
 import {
@@ -17,6 +18,9 @@ import {
     MsgUpdateGroupMetadata,
     protobufPackage
 } from '../generated/cosmos/group/v1/tx'
+import {Coin} from "../generated/cosmos/base/v1beta1/coin";
+import {BankService} from "../protocol/bank-service";
+import {fetchCoinPrices} from "../utils";
 
 // {"name": "bla", "description": "blabbl", "created": 1640599686655, "lastEdited": 1640599686655, "linkToForum": "", "other": "blabla"}
 interface GroupMetadata {
@@ -29,16 +33,32 @@ interface GroupMetadata {
 }
 
 interface GroupPolicy {
-    threshold: number
-    timeoutInDays: number
+    address: string
+    admin: string
+    threshold: number // percentage [0..100]
+    timeoutInDays: string
+    quorum: string
+    createdAt?: Date
 }
 
 export interface Group {
     info: Omit<GroupInfo, 'metadata'>
-    members: GroupMember[]
+    members: readonly GroupMember[]
     // groupAccounts: GroupAccountInfo[]
-    policy: GroupPolicy[]
+    policy?: GroupPolicy
     metadata: GroupMetadata
+}
+
+export interface GroupPolicyBalance extends Coin {
+    formattedAmount: string
+    price?: number
+    decimals: number
+}
+
+export interface GroupPolicyBalances {
+    primary?: GroupPolicyBalance
+    secondariesSummary?: string
+    secondaries: readonly GroupPolicyBalance[]
 }
 
 export class GroupsStore {
@@ -62,15 +82,15 @@ export class GroupsStore {
 
         await Promise.all(groupInfoItems.map(g => {
             return (async () => {
-                const results = await Promise.all([
+                const [members, policies] = await Promise.all([
                     GroupsService.instance.groupMembers(g.id),
                     GroupsService.instance.groupPolicies(g.id)
                 ])
 
                 groups.push({
                     info: g,
-                    members: results[0],
-                    policy: toGroupPolicy(results[1]),
+                    members,
+                    policy: toGroupPolicy(policies),
                     metadata: JSON.parse(atob(g.metadata as unknown as string))
                 })
             })()
@@ -93,41 +113,58 @@ export class GroupsStore {
             GroupsService.instance.groupMembers(groupInfo.id),
             GroupsService.instance.groupPolicies(groupInfo.id)
         ])
+        const metadata = JSON.parse(atob(groupInfo.metadata as unknown as string))
 
-        const group = {
+        return Object.freeze({
             info: groupInfo,
             members,
             policy: toGroupPolicy(policies),
-            metadata: JSON.parse(atob(groupInfo.metadata as unknown as string))
-        }
+            metadata //: {...metadata, created: metadata.created * 100} // strange bug
+        })
+    }
 
-        return group
+    /*fetchMembers = async (groupId: number): Promise<readonly GroupMember[]> => {
+        return GroupsService.instance.groupMembers(groupId)
+    }*/
+
+    fetchGroupPolicyBalances = async (policyAddress: string) => {
+        const chainInfor = CosmosNodeService.instance.chainInfo
+        const balances = await BankService.instance.getAllBalances(policyAddress)
+        const prices = await fetchCoinPrices(balances.map(b => b.denom))
+        const balancesWithPrice = balances.map((coin) => {
+            const decimals = 6 // fixme: where to get decimals for each coins?
+            return {
+                ...coin,
+                formattedAmount: (Number(coin.amount) / 10 ** decimals).toString(),
+                price: prices && prices[coin.denom]?.usd,
+                decimals
+            }
+        })
+        const primaryCoinDenom = chainInfor.feeCurrencies[0].coinDenom;
+        const primaryBalance = balancesWithPrice.find(balance => balance.denom.toUpperCase() === primaryCoinDenom.toUpperCase())
+        const secondaryBalances = balancesWithPrice.filter(balance => balance.denom.toUpperCase() !== primaryCoinDenom.toUpperCase())
+
+        const totalPrice = secondaryBalances.reduce((sum, balance) => sum + balance.price, 0)
+        const secondariesSummary = `${balances.length + 1} other tokens ($${totalPrice} USD)`
+
+        const emptyBalance = { amount: '0', denom: primaryCoinDenom, price: 0, formattedAmount: '0', decimals: 0 };
+        const groupBalances: GroupPolicyBalances = {
+            primary: primaryBalance || emptyBalance,
+            secondariesSummary,
+            secondaries: secondaryBalances
+        }
+        return groupBalances;
     }
 
     fetchEditedGroupById = async (id: number): Promise<Group | null> => {
-        const groupInfo = await GroupsService.instance.groupById(id)
-        if (groupInfo === null) {
-            return null
-        }
-
-        const results = await Promise.all([
-            GroupsService.instance.groupMembers(groupInfo.id),
-            GroupsService.instance.groupPolicies(groupInfo.id)
-        ])
-
-        const editedGroup = {
-            info: groupInfo,
-            members: results[0],
-            policy: toGroupPolicy(results[1]),
-            metadata: JSON.parse(atob(groupInfo.metadata as unknown as string))
-        }
+        const group = await this.fetchGroupById(id)
 
         runInAction(() => {
-            this.editedGroup = editedGroup
-            this.originalEditedGroup = cloneDeep(editedGroup)
+            this.editedGroup = group
+            this.originalEditedGroup = cloneDeep(group)
         })
 
-        return editedGroup
+        return group
     }
 
     @action
@@ -159,12 +196,13 @@ export class GroupsStore {
                         added_at: new Date()
                     }
                 }],
-                policy: [
-                    {
-                        timeoutInDays: 0,
-                        threshold: 0
-                    }
-                ],
+                policy: {
+                    address: '',
+                    admin: '',
+                    timeoutInDays: '0',
+                    quorum: "?",
+                    threshold: 0
+                },
                 metadata: {
                     name: '',
                     description: '',
@@ -215,69 +253,69 @@ export class GroupsStore {
         // const createdGroupId = 13 // TODO hardcode
         console.log('createdGroupId', createdGroupId)
 
-        // const msg2: MsgCreateGroupPolicy = {
-        //     admin: this.editedGroup.info.admin,
-        //     group_id: createdGroupId,
-        //     // metadata: toUint8Array(JSON.stringify({
-        //     //     foo: 'bar'
-        //     // })),
-        //     metadata: JSON.stringify({
-        //         foo: 'bar'
-        //     }),
-        //     decision_policy: {
-        //         type_url: '/cosmos.group.v1.ThresholdDecisionPolicy',
-        //         value: toUint8Array(
-        //             JSON.stringify({
-        //                 // "@type": "/regen.group.v1alpha1.ThresholdDecisionPolicy",
-        //                 'threshold': '1',
-        //                 'timeout': '1s'
-        //             })
-        //         )
-        //     }
-        // }
-        //
-        // const msgAny2 = {
-        //     typeUrl: `/${protobufPackage}.MsgCreateGroupPolicy`,
-        //     value: MsgCreateGroupPolicy.encode({
-        //         admin: this.editedGroup.info.admin,
-        //         group_id: createdGroupId,
-        //         // metadata: toUint8Array(JSON.stringify({
-        //         //     foo: 'bar'
-        //         // })),
-        //         metadata: JSON.stringify({
-        //             foo: 'bar'
-        //         }),
-        //         decision_policy: {
-        //             type_url: '/cosmos.group.v1.ThresholdDecisionPolicy',
-        //             value: ThresholdDecisionPolicy.encode(
-        //                 {
-        //                     threshold: '1',
-        //                     windows: {
-        //                         voting_period: {
-        //                             seconds: 1,
-        //                             nanos: 0
-        //                         },
-        //                         min_execution_period: {
-        //                             seconds: 1,
-        //                             nanos: 0
-        //                         }
-        //                     }
-        //                 }
-        //             ).finish()
-        //         }
-        //     }).finish()
-        // }
-        //
-        // console.log('msgAny2', msgAny2)
-        //
-        // const fee2 = {
-        //     amount: coins(0, CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom),
-        //     gas: '2000000'
-        // }
-        //
-        // results.push(await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny2], fee2))
-        //
-        // console.log('results', results)
+        const msg2: MsgCreateGroupPolicy = {
+            admin: this.editedGroup.info.admin,
+            group_id: createdGroupId,
+            // metadata: toUint8Array(JSON.stringify({
+            //     foo: 'bar'
+            // })),
+            metadata: JSON.stringify({
+                foo: 'bar'
+            }),
+            decision_policy: {
+                type_url: '/cosmos.group.v1.ThresholdDecisionPolicy',
+                value: toUint8Array(
+                    JSON.stringify({
+                        // "@type": "/regen.group.v1alpha1.ThresholdDecisionPolicy",
+                        'threshold': '1',
+                        'timeout': '1s'
+                    })
+                )
+            }
+        }
+
+        const msgAny2 = {
+            typeUrl: `/${protobufPackage}.MsgCreateGroupPolicy`,
+            value: MsgCreateGroupPolicy.encode({
+                admin: this.editedGroup.info.admin,
+                group_id: createdGroupId,
+                // metadata: toUint8Array(JSON.stringify({
+                //     foo: 'bar'
+                // })),
+                metadata: JSON.stringify({
+                    foo: 'bar'
+                }),
+                decision_policy: {
+                    type_url: '/cosmos.group.v1.ThresholdDecisionPolicy',
+                    value: PercentageDecisionPolicy.encode(
+                        {
+                            percentage: '51',
+                            windows: {
+                                voting_period: {
+                                    seconds: 1,
+                                    nanos: 0
+                                },
+                                min_execution_period: {
+                                    seconds: 1,
+                                    nanos: 0
+                                }
+                            }
+                        }
+                    ).finish()
+                }
+            }).finish()
+        }
+
+        console.log('msgAny2', msgAny2)
+
+        const fee2 = {
+            amount: coins(0, CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom),
+            gas: '2000000'
+        }
+
+        results.push(await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny2], fee2))
+
+        console.log('results', results)
         return [createdGroupId, results]
     }
 
@@ -348,15 +386,24 @@ toUint8Array(str: string): Uint8Array {
     return new TextEncoder().encode(str)
 }
 
-function
-
-toGroupPolicy(groupAccounts: GroupPolicyInfo[]): GroupPolicy[] {
-    // console.log(groupAccounts[0].decision_policy) // TODO
-
-    return [
-        {
-            threshold: 1,
-            timeoutInDays: 1
+function toGroupPolicy(policyInfos: GroupPolicyInfo[]): GroupPolicy | undefined {
+    if (policyInfos && policyInfos.length > 0) {
+        const info = policyInfos[0]
+        // fixme: remove as unknown as
+        const decisionPolicy = info.decision_policy as unknown as {
+            percentage: number
+            windows: {
+                voting_period: string,
+                min_execution_period: string
+            }
         }
-    ]
+        return {
+            address: info.address,
+            admin: info.admin,
+            createdAt: info.created_at && new Date(info.created_at),
+            threshold: Number(decisionPolicy.percentage) * 100,
+            quorum: "?", // fixme
+            timeoutInDays: decisionPolicy.windows.voting_period
+        }
+    }
 }

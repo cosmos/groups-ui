@@ -5,7 +5,7 @@ import {CreateRounded} from "@material-ui/icons";
 import {ReactComponent as VectorIcon} from '../../icons/vector.svg'
 import {stores, useStores} from "../../shared-state/repo";
 import {useStyles} from "./create-proposal-styles";
-import {ActionType} from "../../shared-state/proposals-store";
+import {ActionType} from "../../shared-state/create-proposal-store";
 import {CreateStakeAction} from "./stake/create-stake-action";
 import {CreateTextAction} from "./others/create-text-action";
 import {CreateSpendAction} from "./others/create-spend-action";
@@ -25,7 +25,7 @@ export const ActionsComposer: React.FC<{initialProposerType: ActionType, newActi
     const [nameEditing, setNameEditing] = useState(false)
     const [description, setDescription] = useState('Test')
     const [descriptionEditing, setDescriptionEditing] = useState(false)
-    const {newProposal, addAction} = useStores().proposalsStore
+    const {newProposal, addAction} = useStores().createProposalStore
 
     useEffect( () => {
         if (newProposal.actions.length === 0) {

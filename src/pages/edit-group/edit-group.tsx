@@ -98,12 +98,12 @@ export const EditGroup: React.FC<{}> = observer(() => {
         editedGroup, updateEditedGroup, setDefaultNewGroup, resetEditedGroup, saveGroup, createGroup,
         fetchEditedGroupById
     } = useStores().groupsStore
-    const propStore = useStores().proposalsStore
+    const propStore = useStores().createProposalStore
     // const [activeStep, setActiveStep] = useState(1) // TODO hardcoded 1 for development
     const [activeStep, setActiveStep] = useState(0)
     const history = useHistory()
     const pathParams: any = useParams()
-    const groupId = pathParams.id === 'new' ? -1 : Number(pathParams.id)
+    const groupId = pathParams.id ? Number(pathParams.id) : -1
     const [group, setGroup] = React.useState(10)
     const [loading, setLoading] = React.useState(false)
 
@@ -381,16 +381,14 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                                 fullWidth
                                                 id="outlined"
                                                 variant="outlined"
-                                                value={editedGroup.policy[0].timeoutInDays}
+                                                value={editedGroup.policy.timeoutInDays}
                                                 onChange={e => {
                                                     updateEditedGroup({
                                                         ...editedGroup,
-                                                        policy: [
-                                                            {
-                                                                ...editedGroup.policy[0],
-                                                                timeoutInDays: Number(e.target.value)
-                                                            }
-                                                        ]
+                                                        policy: {
+                                                            ...editedGroup.policy,
+                                                            timeoutInDays: e.target.value
+                                                        }
                                                     })
                                                 }}
                                             >
@@ -410,16 +408,14 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                                 fullWidth
                                                 id="outlined"
                                                 variant="outlined"
-                                                value={editedGroup.policy[0].threshold}
+                                                value={editedGroup.policy.threshold}
                                                 onChange={e => {
                                                     updateEditedGroup({
                                                         ...editedGroup,
-                                                        policy: [
-                                                            {
-                                                                ...editedGroup.policy[0],
-                                                                threshold: Number(e.target.value)
-                                                            }
-                                                        ]
+                                                        policy: {
+                                                            ...editedGroup.policy,
+                                                            threshold: Number(e.target.value)
+                                                        }
                                                     })
                                                 }}
                                             >
@@ -483,7 +479,7 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                                             const [createdId, broadcastResults] = await createGroup()
                                                             alert(`BroadcastRes: 
 ${JSON.stringify(broadcastResults, null, 2)}`)
-                                                            history.push(`/groups/${createdId}`)
+                                                            history.push(Routes.GROUPS_EDIT.replace(':id', createdId.toString()))
                                                         } finally {
                                                             setLoading(false)
                                                         }

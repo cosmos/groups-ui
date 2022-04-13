@@ -13,9 +13,9 @@ import {
 } from '../generated/cosmos/group/v1/types'
 import {
     MsgCreateGroup,
-    MsgCreateGroupPolicy,
+    MsgCreateGroupPolicy, MsgCreateGroupWithPolicy,
     MsgUpdateGroupMembers,
-    MsgUpdateGroupMetadata,
+    MsgUpdateGroupMetadata, MsgUpdateGroupPolicyDecisionPolicy,
     protobufPackage
 } from '../generated/cosmos/group/v1/tx'
 import {Coin} from "../generated/cosmos/base/v1beta1/coin";
@@ -36,7 +36,7 @@ interface GroupPolicy {
     address: string
     admin: string
     threshold: number // percentage [0..100]
-    timeoutInDays: string
+    timeoutInDays: number
     quorum: string
     createdAt?: Date
 }
@@ -199,7 +199,7 @@ export class GroupsStore {
                 policy: {
                     address: '',
                     admin: '',
-                    timeoutInDays: '0',
+                    timeoutInDays: 0,
                     quorum: "?",
                     threshold: 0
                 },
@@ -224,18 +224,38 @@ export class GroupsStore {
         const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
         const me = key.bech32Address
 
-        const msg1: MsgCreateGroup = {
+        const msg1: MsgCreateGroupWithPolicy = {
             admin: this.editedGroup.info.admin,
             members: this.editedGroup.members.map(m => m.member),
-            metadata: btoa(JSON.stringify({
+            group_metadata: btoa(JSON.stringify({
                 ...this.editedGroup.metadata,
                 created: Date.now(),
                 lastEdited: Date.now()
-            }))
+            })),
+            group_policy_metadata: '',/*JSON.stringify({
+                foo: 'bar'
+            }),*/
+            group_policy_as_admin: false,
+            decision_policy: {
+                type_url: '/cosmos.group.v1.PercentageDecisionPolicy',
+                value: PercentageDecisionPolicy.encode({
+                    percentage: (this.editedGroup.policy.threshold / 100).toString(),
+                    windows: {
+                        voting_period: {
+                            seconds: this.editedGroup.policy.timeoutInDays * 24 * 360,
+                            nanos: 0
+                        },
+                        min_execution_period: {
+                            seconds: 1,
+                            nanos: 0
+                        }
+                    }
+                }).finish()
+            }
         }
         const msgAny1 = {
-            typeUrl: `/${protobufPackage}.MsgCreateGroup`,
-            value: msg1
+            typeUrl: `/${protobufPackage}.MsgCreateGroupWithPolicy`,
+            value: MsgCreateGroupWithPolicy.fromPartial(msg1)
         }
 
         const fee1 = {
@@ -253,7 +273,7 @@ export class GroupsStore {
         // const createdGroupId = 13 // TODO hardcode
         console.log('createdGroupId', createdGroupId)
 
-        const msg2: MsgCreateGroupPolicy = {
+        /*const msg2: MsgCreateGroupPolicy = {
             admin: this.editedGroup.info.admin,
             group_id: createdGroupId,
             // metadata: toUint8Array(JSON.stringify({
@@ -272,9 +292,9 @@ export class GroupsStore {
                     })
                 )
             }
-        }
+        }*/
 
-        const msgAny2 = {
+        /*const msgAny2 = {
             typeUrl: `/${protobufPackage}.MsgCreateGroupPolicy`,
             value: MsgCreateGroupPolicy.encode({
                 admin: this.editedGroup.info.admin,
@@ -286,7 +306,7 @@ export class GroupsStore {
                     foo: 'bar'
                 }),
                 decision_policy: {
-                    type_url: '/cosmos.group.v1.ThresholdDecisionPolicy',
+                    type_url: '/cosmos.group.v1.PercentageDecisionPolicy',
                     value: PercentageDecisionPolicy.encode(
                         {
                             percentage: '51',
@@ -315,7 +335,7 @@ export class GroupsStore {
 
         results.push(await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny2], fee2))
 
-        console.log('results', results)
+        console.log('results', results)*/
         return [createdGroupId, results]
     }
 
@@ -335,6 +355,41 @@ export class GroupsStore {
             }
             const msgAny = {
                 typeUrl: `/${protobufPackage}.MsgUpdateGroupMetadata`,
+                value: msg
+            }
+
+            const fee = {
+                amount: coins(0, CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom),
+                gas: '2000000'
+            }
+
+            results.push(await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny], fee))
+        }
+
+        if (!isEqual(toJS(this.editedGroup.policy), this.originalEditedGroup.policy)) {
+            // if (this.editedGroup.policy.threshold !== this.originalEditedGroup.policy.threshold)
+            const msg: MsgUpdateGroupPolicyDecisionPolicy = {
+                admin: this.editedGroup.policy.admin,
+                address: this.editedGroup.policy.address,
+                decision_policy: {
+                    type_url: '/cosmos.group.v1.PercentageDecisionPolicy',
+                    value: PercentageDecisionPolicy.encode({
+                        percentage: (this.editedGroup.policy.threshold / 100).toString(),
+                        windows: {
+                            voting_period: {
+                                seconds: this.editedGroup.policy.timeoutInDays * 24 * 360,
+                                nanos: 0
+                            },
+                            min_execution_period: {
+                                seconds: 1,
+                                nanos: 0
+                            }
+                        }
+                    }).finish()
+                }
+            }
+            const msgAny = {
+                typeUrl: `/${protobufPackage}.MsgUpdateGroupPolicyDecisionPolicy`,
                 value: msg
             }
 
@@ -386,6 +441,17 @@ toUint8Array(str: string): Uint8Array {
     return new TextEncoder().encode(str)
 }
 
+function parsePeriod(period: string) {
+    if (period.endsWith("s")) {
+        return Number(period.replace("s", ""))
+    } else if (period.endsWith("h")) {
+        return Number(period.replace("h", "")) * 60 * 60
+    } else if (period.endsWith("d")) {
+        return Number(period.replace("d", "")) * 24 * 60 * 60
+    }
+    return 0
+}
+
 function toGroupPolicy(policyInfos: GroupPolicyInfo[]): GroupPolicy | undefined {
     if (policyInfos && policyInfos.length > 0) {
         const info = policyInfos[0]
@@ -403,7 +469,7 @@ function toGroupPolicy(policyInfos: GroupPolicyInfo[]): GroupPolicy | undefined 
             createdAt: info.created_at && new Date(info.created_at),
             threshold: Number(decisionPolicy.percentage) * 100,
             quorum: "?", // fixme
-            timeoutInDays: decisionPolicy.windows.voting_period
+            timeoutInDays: parsePeriod(decisionPolicy.windows.voting_period) / (24 * 360)
         }
     }
 }

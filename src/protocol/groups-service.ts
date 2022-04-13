@@ -3,7 +3,7 @@ import { ChainInfo } from '@keplr-wallet/types'
 import { CosmosClient } from './cosmos-client'
 import {
     MsgCreateGroup,
-    MsgCreateGroupPolicy,
+    MsgCreateGroupPolicy, MsgCreateGroupWithPolicy,
     MsgUpdateGroupMembers,
     MsgUpdateGroupMetadata,
     MsgUpdateGroupPolicyDecisionPolicy,
@@ -35,6 +35,10 @@ export class GroupsService implements Service {
         this.cosmosClient.registry.register(
             `/${protobufPackage}.MsgCreateGroup`,
             MsgCreateGroup
+        )
+        this.cosmosClient.registry.register(
+            `/${protobufPackage}.MsgCreateGroupWithPolicy`,
+            MsgCreateGroupWithPolicy
         )
         this.cosmosClient.registry.register(
             `/${protobufPackage}.MsgUpdateGroupMetadata`,

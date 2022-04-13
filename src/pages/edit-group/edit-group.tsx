@@ -387,7 +387,7 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                                         ...editedGroup,
                                                         policy: {
                                                             ...editedGroup.policy,
-                                                            timeoutInDays: e.target.value
+                                                            timeoutInDays: Number(e.target.value)
                                                         }
                                                     })
                                                 }}

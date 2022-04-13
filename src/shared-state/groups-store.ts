@@ -13,7 +13,7 @@ import {
 } from '../generated/cosmos/group/v1/types'
 import {
     MsgCreateGroup,
-    MsgCreateGroupPolicy,
+    MsgCreateGroupPolicy, MsgCreateGroupWithPolicy,
     MsgUpdateGroupMembers,
     MsgUpdateGroupMetadata,
     protobufPackage
@@ -224,18 +224,38 @@ export class GroupsStore {
         const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
         const me = key.bech32Address
 
-        const msg1: MsgCreateGroup = {
+        const msg1: MsgCreateGroupWithPolicy = {
             admin: this.editedGroup.info.admin,
             members: this.editedGroup.members.map(m => m.member),
-            metadata: btoa(JSON.stringify({
+            group_metadata: btoa(JSON.stringify({
                 ...this.editedGroup.metadata,
                 created: Date.now(),
                 lastEdited: Date.now()
-            }))
+            })),
+            group_policy_metadata: JSON.stringify({
+                foo: 'bar'
+            }),
+            group_policy_as_admin: false,
+            decision_policy: {
+                type_url: '/cosmos.group.v1.PercentageDecisionPolicy',
+                value: PercentageDecisionPolicy.encode({
+                    percentage: '0.51',
+                    windows: {
+                        voting_period: {
+                            seconds: 1,
+                            nanos: 0
+                        },
+                        min_execution_period: {
+                            seconds: 1,
+                            nanos: 0
+                        }
+                    }
+                }).finish()
+            }
         }
         const msgAny1 = {
-            typeUrl: `/${protobufPackage}.MsgCreateGroup`,
-            value: msg1
+            typeUrl: `/${protobufPackage}.MsgCreateGroupWithPolicy`,
+            value: MsgCreateGroupWithPolicy.encode(msg1).finish()
         }
 
         const fee1 = {
@@ -253,7 +273,7 @@ export class GroupsStore {
         // const createdGroupId = 13 // TODO hardcode
         console.log('createdGroupId', createdGroupId)
 
-        const msg2: MsgCreateGroupPolicy = {
+        /*const msg2: MsgCreateGroupPolicy = {
             admin: this.editedGroup.info.admin,
             group_id: createdGroupId,
             // metadata: toUint8Array(JSON.stringify({
@@ -272,9 +292,9 @@ export class GroupsStore {
                     })
                 )
             }
-        }
+        }*/
 
-        const msgAny2 = {
+        /*const msgAny2 = {
             typeUrl: `/${protobufPackage}.MsgCreateGroupPolicy`,
             value: MsgCreateGroupPolicy.encode({
                 admin: this.editedGroup.info.admin,
@@ -286,7 +306,7 @@ export class GroupsStore {
                     foo: 'bar'
                 }),
                 decision_policy: {
-                    type_url: '/cosmos.group.v1.ThresholdDecisionPolicy',
+                    type_url: '/cosmos.group.v1.PercentageDecisionPolicy',
                     value: PercentageDecisionPolicy.encode(
                         {
                             percentage: '51',
@@ -315,7 +335,7 @@ export class GroupsStore {
 
         results.push(await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny2], fee2))
 
-        console.log('results', results)
+        console.log('results', results)*/
         return [createdGroupId, results]
     }
 

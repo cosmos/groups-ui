@@ -381,7 +381,7 @@ export const GroupDetails: React.FC<{}> = observer(() => {
                             {editedGroup.policy && (
                                 <StyledTableRow>
                                     <StyledTableCell align="left">{editedGroup.policy.createdAt.toLocaleString()}</StyledTableCell>
-                                    <StyledTableCell align="left">{editedGroup.policy.timeoutInDays}</StyledTableCell>
+                                    <StyledTableCell align="left">{editedGroup.policy.timeoutInDays} days</StyledTableCell>
                                     <StyledTableCell align="left">{`${editedGroup.policy.threshold}%`}</StyledTableCell>
                                     <StyledTableCell align="left">{editedGroup.policy.quorum}</StyledTableCell>
                                     <StyledTableCell align="left">{truncateAddress(editedGroup.info.admin)}</StyledTableCell>

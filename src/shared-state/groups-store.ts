@@ -15,7 +15,7 @@ import {
     MsgCreateGroup,
     MsgCreateGroupPolicy, MsgCreateGroupWithPolicy,
     MsgUpdateGroupMembers,
-    MsgUpdateGroupMetadata,
+    MsgUpdateGroupMetadata, MsgUpdateGroupPolicyDecisionPolicy,
     protobufPackage
 } from '../generated/cosmos/group/v1/tx'
 import {Coin} from "../generated/cosmos/base/v1beta1/coin";
@@ -36,7 +36,7 @@ interface GroupPolicy {
     address: string
     admin: string
     threshold: number // percentage [0..100]
-    timeoutInDays: string
+    timeoutInDays: number
     quorum: string
     createdAt?: Date
 }
@@ -199,7 +199,7 @@ export class GroupsStore {
                 policy: {
                     address: '',
                     admin: '',
-                    timeoutInDays: '0',
+                    timeoutInDays: 0,
                     quorum: "?",
                     threshold: 0
                 },
@@ -232,17 +232,17 @@ export class GroupsStore {
                 created: Date.now(),
                 lastEdited: Date.now()
             })),
-            group_policy_metadata: JSON.stringify({
+            group_policy_metadata: '',/*JSON.stringify({
                 foo: 'bar'
-            }),
+            }),*/
             group_policy_as_admin: false,
             decision_policy: {
                 type_url: '/cosmos.group.v1.PercentageDecisionPolicy',
                 value: PercentageDecisionPolicy.encode({
-                    percentage: '0.51',
+                    percentage: (this.editedGroup.policy.threshold / 100).toString(),
                     windows: {
                         voting_period: {
-                            seconds: 1,
+                            seconds: this.editedGroup.policy.timeoutInDays * 24 * 360,
                             nanos: 0
                         },
                         min_execution_period: {
@@ -255,7 +255,7 @@ export class GroupsStore {
         }
         const msgAny1 = {
             typeUrl: `/${protobufPackage}.MsgCreateGroupWithPolicy`,
-            value: MsgCreateGroupWithPolicy.encode(msg1).finish()
+            value: MsgCreateGroupWithPolicy.fromPartial(msg1)
         }
 
         const fee1 = {
@@ -366,6 +366,41 @@ export class GroupsStore {
             results.push(await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny], fee))
         }
 
+        if (!isEqual(toJS(this.editedGroup.policy), this.originalEditedGroup.policy)) {
+            // if (this.editedGroup.policy.threshold !== this.originalEditedGroup.policy.threshold)
+            const msg: MsgUpdateGroupPolicyDecisionPolicy = {
+                admin: this.editedGroup.policy.admin,
+                address: this.editedGroup.policy.address,
+                decision_policy: {
+                    type_url: '/cosmos.group.v1.PercentageDecisionPolicy',
+                    value: PercentageDecisionPolicy.encode({
+                        percentage: (this.editedGroup.policy.threshold / 100).toString(),
+                        windows: {
+                            voting_period: {
+                                seconds: this.editedGroup.policy.timeoutInDays * 24 * 360,
+                                nanos: 0
+                            },
+                            min_execution_period: {
+                                seconds: 1,
+                                nanos: 0
+                            }
+                        }
+                    }).finish()
+                }
+            }
+            const msgAny = {
+                typeUrl: `/${protobufPackage}.MsgUpdateGroupPolicyDecisionPolicy`,
+                value: msg
+            }
+
+            const fee = {
+                amount: coins(0, CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom),
+                gas: '2000000'
+            }
+
+            results.push(await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny], fee))
+        }
+
         if (!isEqual(toJS(this.editedGroup.members), this.originalEditedGroup.members)) {
             const msg: MsgUpdateGroupMembers = {
                 admin: this.editedGroup.info.admin,
@@ -406,6 +441,17 @@ toUint8Array(str: string): Uint8Array {
     return new TextEncoder().encode(str)
 }
 
+function parsePeriod(period: string) {
+    if (period.endsWith("s")) {
+        return Number(period.replace("s", ""))
+    } else if (period.endsWith("h")) {
+        return Number(period.replace("h", "")) * 60 * 60
+    } else if (period.endsWith("d")) {
+        return Number(period.replace("d", "")) * 24 * 60 * 60
+    }
+    return 0
+}
+
 function toGroupPolicy(policyInfos: GroupPolicyInfo[]): GroupPolicy | undefined {
     if (policyInfos && policyInfos.length > 0) {
         const info = policyInfos[0]
@@ -423,7 +469,7 @@ function toGroupPolicy(policyInfos: GroupPolicyInfo[]): GroupPolicy | undefined 
             createdAt: info.created_at && new Date(info.created_at),
             threshold: Number(decisionPolicy.percentage) * 100,
             quorum: "?", // fixme
-            timeoutInDays: decisionPolicy.windows.voting_period
+            timeoutInDays: parsePeriod(decisionPolicy.windows.voting_period) / (24 * 360)
         }
     }
 }

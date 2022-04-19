@@ -7,10 +7,10 @@ import {
   TableContainer,
   TableRow,
 } from '@material-ui/core'
-
 import { observer } from 'mobx-react-lite'
 import React from 'react'
 import { Chart, registerables } from 'chart.js'
+
 import { Page } from '../page'
 import { useStyles } from './proposal-style'
 import { Data, Order } from './proposal-types'

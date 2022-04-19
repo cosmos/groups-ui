@@ -88,7 +88,15 @@ export class GroupsService implements Service {
         const res = await this.cosmosClient.lcdClientGet(
             `/cosmos/group/v1/group_members/${groupId}`
         ) as QueryGroupMembersResponse
-        return res.members
+        return [...res.members.map(groupMember => {
+            return {
+                ...groupMember,
+                member: {
+                    ...groupMember.member,
+                    added_at: new Date(groupMember.member.added_at)
+                }
+            }
+        })]
     }
 }
 

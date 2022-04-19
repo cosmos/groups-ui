@@ -320,7 +320,7 @@ export const GroupDetails: React.FC<{}> = observer(() => {
         })()
         members.push({
             address: m.member.address,
-            addedAt: m.member.added_at && new Date(m.member.added_at),
+            addedAt: m.member.added_at,
             weight: Number(m.member.weight),
             status
         })

@@ -477,9 +477,8 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                                         setLoading(true)
                                                         try {
                                                             const [createdId, broadcastResults] = await createGroup()
-                                                            alert(`BroadcastRes: 
-${JSON.stringify(broadcastResults, null, 2)}`)
-                                                            history.push(Routes.GROUPS_EDIT.replace(':id', createdId.toString()))
+                                                            // alert(`BroadcastRes: ${JSON.stringify(broadcastResults, null, 2)}`)
+                                                            history.push(Routes.GROUPS_ADMIN_VIEW.replace(':id', createdId.toString()))
                                                         } finally {
                                                             setLoading(false)
                                                         }

@@ -264,78 +264,23 @@ export class GroupsStore {
         }
 
         const results = []
+        let createdGroupId
 
-        const result1 = await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny1], fee1)
-        results.push(result1)
-
-        const createdGroupId = Number(JSON.parse(result1.rawLog)[0].events.find(e => e.type === 'cosmos.group.v1.EventCreateGroup').attributes[0].value.replaceAll('"', ''))
+        try {
+            const result1 = await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny1], fee1)
+            results.push(result1)
+            createdGroupId = Number(JSON.parse(result1.rawLog)[0].events.find(e => e.type === 'cosmos.group.v1.EventCreateGroup').attributes[0].value.replaceAll('"', ''))
+        } catch (e) {
+            console.warn(e)
+            const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
+            const groups = await GroupsService.instance.groupsByAdmin(key.bech32Address)
+            const maxId = Math.max(...groups.map(g => Number(g.id)), 0)
+            createdGroupId = maxId
+        }
 
         // const createdGroupId = 13 // TODO hardcode
         console.log('createdGroupId', createdGroupId)
 
-        /*const msg2: MsgCreateGroupPolicy = {
-            admin: this.editedGroup.info.admin,
-            group_id: createdGroupId,
-            // metadata: toUint8Array(JSON.stringify({
-            //     foo: 'bar'
-            // })),
-            metadata: JSON.stringify({
-                foo: 'bar'
-            }),
-            decision_policy: {
-                type_url: '/cosmos.group.v1.ThresholdDecisionPolicy',
-                value: toUint8Array(
-                    JSON.stringify({
-                        // "@type": "/regen.group.v1alpha1.ThresholdDecisionPolicy",
-                        'threshold': '1',
-                        'timeout': '1s'
-                    })
-                )
-            }
-        }*/
-
-        /*const msgAny2 = {
-            typeUrl: `/${protobufPackage}.MsgCreateGroupPolicy`,
-            value: MsgCreateGroupPolicy.encode({
-                admin: this.editedGroup.info.admin,
-                group_id: createdGroupId,
-                // metadata: toUint8Array(JSON.stringify({
-                //     foo: 'bar'
-                // })),
-                metadata: JSON.stringify({
-                    foo: 'bar'
-                }),
-                decision_policy: {
-                    type_url: '/cosmos.group.v1.PercentageDecisionPolicy',
-                    value: PercentageDecisionPolicy.encode(
-                        {
-                            percentage: '51',
-                            windows: {
-                                voting_period: {
-                                    seconds: 1,
-                                    nanos: 0
-                                },
-                                min_execution_period: {
-                                    seconds: 1,
-                                    nanos: 0
-                                }
-                            }
-                        }
-                    ).finish()
-                }
-            }).finish()
-        }
-
-        console.log('msgAny2', msgAny2)
-
-        const fee2 = {
-            amount: coins(0, CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom),
-            gas: '2000000'
-        }
-
-        results.push(await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny2], fee2))
-
-        console.log('results', results)*/
         return [createdGroupId, results]
     }
 
@@ -363,7 +308,11 @@ export class GroupsStore {
                 gas: '2000000'
             }
 
-            results.push(await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny], fee))
+            try {
+                results.push(await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny], fee))
+            } catch (e) {
+                console.warn(e)
+            }
         }
 
         if (!isEqual(toJS(this.editedGroup.policy), this.originalEditedGroup.policy)) {
@@ -398,7 +347,11 @@ export class GroupsStore {
                 gas: '2000000'
             }
 
-            results.push(await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny], fee))
+            try {
+                results.push(await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny], fee))
+            } catch (e) {
+                console.warn(e)
+            }
         }
 
         if (!isEqual(toJS(this.editedGroup.members), this.originalEditedGroup.members)) {
@@ -423,8 +376,11 @@ export class GroupsStore {
                 amount: coins(0, CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom),
                 gas: '2000000'
             }
-
-            results.push(await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny], fee))
+            try {
+                results.push(await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny], fee))
+            } catch (e) {
+                console.warn(e)
+            }
         }
 
         console.log(results)

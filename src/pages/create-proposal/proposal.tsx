@@ -5,22 +5,21 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableFooter,
   TableRow,
 } from '@material-ui/core'
 
 import { observer } from 'mobx-react-lite'
 import React from 'react'
-import Pagination from '@material-ui/lab/Pagination'
 import { Chart, registerables } from 'chart.js'
 import { Page } from '../page'
-import { statusStyles, useStyles } from './proposal-style'
+import { useStyles } from './proposal-style'
 import { Data, Order } from './proposal-types'
 import { rows } from './constants'
 import { getComparator, stableSort } from './utils'
 import { EnhancedTableHead } from './enhanced-table-head'
 import { EnhancedTableToolbar } from './enhanced-table-toolbar'
 import ProposalContent from './proposal-content'
+import ProposalFooter from './proposal-footer'
 
 Chart.register(...registerables)
 // Chart.register(ArcElement);
@@ -132,20 +131,7 @@ export const ProposalPage: React.FC<{}> = observer(() => {
                     </TableRow>
                   )}
                 </TableBody>
-                <TableFooter style={{ height: '90px' }}>
-                  <TableRow>
-                    <Pagination
-                      count={10}
-                      color="primary"
-                      style={{
-                        width: '230%',
-                        marginTop: '25px',
-                        display: 'flex',
-                        justifyContent: 'flex-end',
-                      }}
-                    />
-                  </TableRow>
-                </TableFooter>
+                <ProposalFooter />
               </Table>
             </TableContainer>
           </Paper>

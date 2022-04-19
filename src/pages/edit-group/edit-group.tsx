@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react'
+import clsx from 'clsx';
 import { observer } from 'mobx-react-lite'
 import { useStores } from '../../shared-state/repo'
-import { Button, IconButton, Paper, Step, StepLabel, Stepper, TextField } from '@material-ui/core'
+import { Button, FormControl, FormControlLabel, FormLabel, IconButton, Paper, Radio, RadioGroup, RadioProps, Step, StepLabel, Stepper, TextField } from '@material-ui/core'
 import { useHistory, useParams } from 'react-router-dom'
 import { Routes } from '../../routes'
 import { makeStyles } from '@material-ui/core/styles'
 import { Page } from '../page'
-import { Delete } from '@material-ui/icons'
+import { Delete, InfoOutlined } from '@material-ui/icons'
 import { cloneDeep } from 'lodash'
 import { toJS } from 'mobx'
 
@@ -90,8 +91,101 @@ const useStyles = makeStyles((theme) => ({
         fontSize: '18px',
         fontWeight: 'bold',
         lineHeight: '23px'
+    },
+    radio: {
+        width: "100%",
+        padding: "20px",
+        display: "flex",
+        cursor: "pointer",
+        alignItems: "center",
+
+        "& p": {
+            fontFamily: '\'Lato\', sans-serif',
+            fontStyle: 'normal',
+            fontWeight: 'bold',
+            fontSize: '18px',
+            lineHeight: '145%',
+
+            '& span': {
+                color: '#545555'
+            },
+        },
+
+        "& input": {
+            appearance: "none",
+            borderRadius: "50%",
+            width: "20px",
+            height: "20px",
+            border: "2px solid #999",
+            transition: "0.2s all linear",
+            marginRight: "12px",
+        },
+        "& input:checked": {
+            border: "5px solid #3D7ACF"
+        }
+    },
+    radioBox: {
+        border: "1px solid #D2D5D9",
+        borderRadius: "5px",
+        marginBottom: "10px",
     }
 }))
+
+const radioStyles = makeStyles((theme)=>({
+    root: {
+        '&:hover': {
+          backgroundColor: 'transparent',
+        },
+      },
+      icon: {
+        borderRadius: '50%',
+        width: 16,
+        height: 16,
+        boxShadow: 'inset 0 0 0 1px rgba(16,22,26,.2), inset 0 -1px 0 rgba(16,22,26,.1)',
+        backgroundColor: '#f5f8fa',
+        backgroundImage: 'linear-gradient(180deg,hsla(0,0%,100%,.8),hsla(0,0%,100%,0))',
+        '$root.Mui-focusVisible &': {
+          outline: '2px auto rgba(19,124,189,.6)',
+          outlineOffset: 2,
+        },
+        'input:hover ~ &': {
+          backgroundColor: '#ebf1f5',
+        },
+        'input:disabled ~ &': {
+          boxShadow: 'none',
+          background: 'rgba(206,217,224,.5)',
+        },
+      },
+      checkedIcon: {
+        backgroundColor: '#137cbd',
+        backgroundImage: 'linear-gradient(180deg,hsla(0,0%,100%,.1),hsla(0,0%,100%,0))',
+        '&:before': {
+          display: 'block',
+          width: 16,
+          height: 16,
+          backgroundImage: 'radial-gradient(#fff,#fff 28%,transparent 32%)',
+          content: '""',
+        },
+        'input:hover ~ &': {
+          backgroundColor: '#106ba3',
+        },
+      },
+}))
+
+function StyledRadio(props: RadioProps) {
+    const classes = radioStyles();
+  
+    return (
+      <Radio
+        className={classes.root}
+        disableRipple
+        color="default"
+        checkedIcon={<span className={clsx(classes.icon, classes.checkedIcon)} />}
+        icon={<span className={classes.icon} />}
+        {...props}
+      />
+    );
+  }
 
 export const EditGroup: React.FC<{}> = observer(() => {
     const {
@@ -169,18 +263,48 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                     {groupId === -1 ? 'Create Group' : 'Edit Group'}
                                 </div>
                                 <Paper elevation={2}>
-                                    <label className={classes.label}>
-                                        <p className={classes.inputTitle}>Admin address</p>
-                                        <TextField
-                                            style={{ backgroundColor: '#EFEFEF' }}
-                                            fullWidth
-                                            value={editedGroup.info.admin}
-                                            disabled
-                                            id="outlined-disabled"
-                                            variant="outlined"
-                                        />
-                                    </label>
-                                    <label className={classes.label}>
+                                    <p className={classes.inputTitle}>Grouop admin</p>
+                                    <form action="">
+                                        <div className={classes.radioBox}>
+                                            <label htmlFor="adminChoise1" className={classes.radio}>
+                                                <input type="radio" name="admin" id="adminChoise1"/>
+                                                <p>Group policy</p>
+                                                <IconButton style={{ padding: '0px', marginLeft: "auto" }}><InfoOutlined style={{ width: '25px', height: '25px', color: '#3D7ACF' }}></InfoOutlined></IconButton>
+                                            </label>
+                                        </div>
+                                        <div className={classes.radioBox}>
+                                            <label htmlFor="adminChoise2" className={classes.radio}>
+                                                <input type="radio" name="admin" id="adminChoise2"/>
+                                                <p>You <span>(regenadjk..1kkk)</span></p>
+                                                <IconButton style={{ padding: '0px', marginLeft: "auto" }}><InfoOutlined style={{ width: '25px', height: '25px', color: '#3D7ACF' }}></InfoOutlined></IconButton>
+                                            </label>
+                                        </div>
+                                        <div className={classes.radioBox}>
+                                            <label htmlFor="adminChoise3" className={classes.radio}>
+                                                <input type="radio" name="admin" id="adminChoise3"/>
+                                                <p>Another account</p>
+                                                <IconButton style={{ padding: '0px', marginLeft: "auto" }}><InfoOutlined style={{ width: '25px', height: '25px', color: '#3D7ACF' }}></InfoOutlined></IconButton>
+                                            </label>
+                                            <label className={classes.label} style={{ padding: "0 20px", marginBottom: "20px"}}>
+                                                <p className={classes.inputTitle}>Admin address</p>
+                                                <TextField
+                                                    fullWidth
+                                                    value={editedGroup.info.admin}
+                                                    id="outlined-disabled"
+                                                    variant="outlined"
+                                                />
+                                            </label>
+                                        </div>
+                                    </form>
+                                    {/* <FormControl component="fieldset" className={classes.radioBox}>
+                                        <FormLabel component="legend" className={classes.inputTitle} style={{color: "#000000"}}>Group admin</FormLabel>
+                                        <RadioGroup defaultValue="female" aria-label="gender" name="customized-radios">
+                                            <FormControlLabel value="female" control={<StyledRadio />} label="Female <p>TEXT</p>" />
+                                            <FormControlLabel value="male" control={<StyledRadio />} label="Male" />
+                                            <FormControlLabel value="other" control={<StyledRadio />} label="Other" />
+                                        </RadioGroup>
+                                    </FormControl> */}
+                                    <label className={classes.label} style={{marginTop:"40px"}}>
                                         <p className={classes.inputTitle}>Group name</p>
                                         <TextField
                                             fullWidth
@@ -369,7 +493,31 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                     {/*    </FormControl>*/}
 
                                     {/*</div>*/}
-                                    <div className={classes.label}>
+                                    <p className={classes.inputTitle}>Grouop policy admin</p>
+                                    <form action="">
+                                        <div className={classes.radioBox}>
+                                            <label htmlFor="adminChoise1" className={classes.radio}>
+                                                <input type="radio" name="admin" id="adminChoise1"/>
+                                                <p>Group policy</p>
+                                                <IconButton style={{ padding: '0px', marginLeft: "auto" }}><InfoOutlined style={{ width: '25px', height: '25px', color: '#3D7ACF' }}></InfoOutlined></IconButton>
+                                            </label>
+                                        </div>
+                                        <div className={classes.radioBox}>
+                                            <label htmlFor="adminChoise2" className={classes.radio}>
+                                                <input type="radio" name="admin" id="adminChoise2"/>
+                                                <p>You <span>(regenadjk..1kkk)</span></p>
+                                                <IconButton style={{ padding: '0px', marginLeft: "auto" }}><InfoOutlined style={{ width: '25px', height: '25px', color: '#3D7ACF' }}></InfoOutlined></IconButton>
+                                            </label>
+                                        </div>
+                                        <div className={classes.radioBox}>
+                                            <label htmlFor="adminChoise3" className={classes.radio}>
+                                                <input type="radio" name="admin" id="adminChoise3"/>
+                                                <p>Another account</p>
+                                                <IconButton style={{ padding: '0px', marginLeft: "auto" }}><InfoOutlined style={{ width: '25px', height: '25px', color: '#3D7ACF' }}></InfoOutlined></IconButton>
+                                            </label>
+                                        </div>
+                                    </form>
+                                    <div className={classes.label} style={{marginTop: "40px"}}>
                                         <div className={classes.inputTitle}>
                                             Voting window
                                             <p className="subTitle">Define the maximum amount of time that must pass in

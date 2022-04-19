@@ -24,6 +24,12 @@ export interface HeadCell {
   numeric: boolean
 }
 
+export interface ITableInner {
+  isItemSelected: boolean
+  row: any
+  labelId: string
+}
+
 export interface EnhancedTableToolbarProps {
   numSelected: number
 }

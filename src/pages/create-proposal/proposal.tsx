@@ -20,6 +20,7 @@ import { EnhancedTableHead } from './enhanced-table-head'
 import { EnhancedTableToolbar } from './enhanced-table-toolbar'
 import ProposalContent from './proposal-content'
 import ProposalFooter from './proposal-footer'
+import TableInner from './table-inner'
 
 Chart.register(...registerables)
 // Chart.register(ArcElement);
@@ -96,29 +97,13 @@ export const ProposalPage: React.FC<{}> = observer(() => {
                     .map((row, index) => {
                       const isItemSelected = isSelected(row.name)
                       const labelId = `enhanced-table-checkbox-${index}`
-
                       return (
-                        <TableRow
-                          hover
-                          role="checkbox"
-                          aria-checked={isItemSelected}
-                          tabIndex={-1}
-                          key={row.name}
-                          selected={isItemSelected}
-                        >
-                          <TableCell
-                            style={{ padding: '20px 0 20px 40px' }}
-                            component="th"
-                            id={labelId}
-                            scope="row"
-                            padding="none"
-                          >
-                            {row.name}
-                          </TableCell>
-                          <TableCell align="right">{row.calories}</TableCell>
-                          <TableCell align="right">{row.fat}</TableCell>
-                          <TableCell align="right">{row.carbs}</TableCell>
-                        </TableRow>
+                        <TableInner
+                          isItemSelected={isItemSelected}
+                          labelId={labelId}
+                          key={labelId}
+                          row={row}
+                        />
                       )
                     })}
                   {emptyRows > 0 && (

@@ -272,10 +272,15 @@ export class GroupsStore {
             createdGroupId = Number(JSON.parse(result1.rawLog)[0].events.find(e => e.type === 'cosmos.group.v1.EventCreateGroup').attributes[0].value.replaceAll('"', ''))
         } catch (e) {
             console.warn(e)
-            const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
-            const groups = await GroupsService.instance.groupsByAdmin(key.bech32Address)
-            const maxId = Math.max(...groups.map(g => Number(g.id)), 0)
-            createdGroupId = maxId
+            if (e.message === 'Invalid string. Length must be a multiple of 4') {
+                const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
+                const groups = await GroupsService.instance.groupsByAdmin(key.bech32Address)
+                const maxId = Math.max(...groups.map(g => Number(g.id)), 0)
+                createdGroupId = maxId
+            } else {
+                // todo: show error
+                throw e
+            }
         }
 
         // const createdGroupId = 13 // TODO hardcode

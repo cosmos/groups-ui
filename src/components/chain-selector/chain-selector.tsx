@@ -163,13 +163,12 @@ const ChainSelector: React.FC = observer(() => {
     return (
         <>
             <FormControl variant="outlined" className={classes.formControl}>
-                <InputLabel id="demo-simple-select-outlined-label" className={classes.regenChainInput}>regen chain</InputLabel>
+                <InputLabel id="demo-simple-select-outlined-label" className={classes.regenChainInput}> </InputLabel>
                 <Select
                     labelId="demo-simple-select-outlined-label"
                     id="demo-simple-select-outlined"
                     value={chainInfo.chainName}
                     onChange={handleChainChanged}
-                    label="REGEN CHAIN"
                 >
                     { allChainList.map( (chain: Chain) =>
                         <MenuItem key={chain.chainName} value={chain.chainName} className={classes.menuItem}>{chain.chainName}</MenuItem>

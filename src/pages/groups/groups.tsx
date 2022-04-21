@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
         letterSpacing: '1px',
         textTransform: 'uppercase',
         color: '#FFFFFF',
-        padding: '10px 25px'
+        padding: '14px 49px'
     },
     tableHead: {
 

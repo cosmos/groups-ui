@@ -37,13 +37,18 @@ const useStyles = makeStyles((theme) => ({
         display: 'block',
         margin: '50px auto',
         backgroundColor: '#3D7ACF',
-        borderRadius: '2px',
-        padding: '5px 9px',
+        borderRadius: '4px',
+        padding: '14px 49px',
         color: '#FFFFFF',
         textAlign: 'center',
         fontWeight: 800,
         fontSize: '18px',
-        lineHeight: '23px'
+        lineHeight: '23px',
+        transition: ".3s",
+
+        "&:hover": {
+            backgroundColor: '#3061a6',
+        }
     },
     label: {
         width: '100%',
@@ -648,6 +653,7 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                         </div>
                                         <div>
                                             <Button
+                                                className={classes.finishedBtn}
                                                 color="primary"
                                                 disabled={loading}
                                                 onClick={async () => {

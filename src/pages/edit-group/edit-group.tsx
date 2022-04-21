@@ -387,7 +387,7 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                                         ...editedGroup,
                                                         policy: {
                                                             ...editedGroup.policy,
-                                                            timeoutInDays: Number(e.target.value)
+                                                            timeoutInDays: isNaN(Number(e.target.value)) ? 0 : Number(e.target.value)
                                                         }
                                                     })
                                                 }}
@@ -414,7 +414,7 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                                         ...editedGroup,
                                                         policy: {
                                                             ...editedGroup.policy,
-                                                            threshold: Number(e.target.value)
+                                                            threshold: isNaN(Number(e.target.value)) ? 0 : Number(e.target.value)
                                                         }
                                                     })
                                                 }}
@@ -423,19 +423,6 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                             <p>yes votes of 100</p>
                                         </div>
                                     </div>
-                                    {/*<div className={classes.label}>*/} {/* TODO doesn't exist in ThresholdDecisionPolicy */}
-                                    {/*    <div className={classes.inputTitle}>*/}
-                                    {/*        Define a quorum <span>(optional)</span>*/}
-                                    {/*        <p className="subTitle">Quorums define the percentage of total voting power*/}
-                                    {/*            that needs to vote for a proposal to pass.</p>*/}
-                                    {/*    </div>*/}
-                                    {/*    <div className={classes.input}>*/}
-                                    {/*        <TextField*/}
-                                    {/*            variant="outlined">*/}
-                                    {/*        </TextField>*/}
-                                    {/*        <p>% of total voting power</p>*/}
-                                    {/*    </div>*/}
-                                    {/*</div>*/}
                                     <div style={{
                                         width: '100%',
                                         display: 'flex',

@@ -19,3 +19,11 @@
 
 ## Use frontend with different backends
 - change `rpc` and `rest` fields in localhost:/3001/settings, or in chain-info-store.ts (default is window.location.hostname)
+
+## nginx (local test)
+- `docker run --rm -p 5001:80 -v $PWD/nginx.conf:/etc/nginx/conf.d/default.conf nginx`
+
+## nginx (on a node)
+- `sudo vim /etc/nginx/sites-available/default`
+- paste directive from groups-ui/nginx.conf
+- `sudo nginx -s reload`

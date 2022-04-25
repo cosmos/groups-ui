@@ -33,10 +33,8 @@ function getDefaultChainInfo(): ChainInfo {
     }
 
     return {
-        rpc: `http://${window.location.hostname}:26657`,
-        rest: `http://${window.location.hostname}:1317`,
-        // rpc: `http://44.200.220.236:26657`,
-        // rest: `http://44.200.220.236:1317`,
+        rpc: window.location.origin,
+        rest: window.location.origin,
         chainId: "cosmoswithgroups",
         // chainName: "GROUPS-UI-REGEN-TEST",
         chainName: "GROUPS-UI-SDK-TEST",

@@ -3,9 +3,9 @@ import { ChainInfo } from '@keplr-wallet/types'
 import { CosmosClient } from './cosmos-client'
 import {
     MsgCreateGroup,
-    MsgCreateGroupPolicy, MsgCreateGroupWithPolicy,
+    MsgCreateGroupPolicy, MsgCreateGroupWithPolicy, MsgUpdateGroupAdmin,
     MsgUpdateGroupMembers,
-    MsgUpdateGroupMetadata,
+    MsgUpdateGroupMetadata, MsgUpdateGroupPolicyAdmin,
     MsgUpdateGroupPolicyDecisionPolicy,
     protobufPackage
 } from '../generated/cosmos/group/v1/tx'
@@ -32,30 +32,14 @@ export class GroupsService implements Service {
     }
 
     applyChainInfo = async (chainInfo: ChainInfo): Promise<void> => {
-        this.cosmosClient.registry.register(
-            `/${protobufPackage}.MsgCreateGroup`,
-            MsgCreateGroup
-        )
-        this.cosmosClient.registry.register(
-            `/${protobufPackage}.MsgCreateGroupWithPolicy`,
-            MsgCreateGroupWithPolicy
-        )
-        this.cosmosClient.registry.register(
-            `/${protobufPackage}.MsgUpdateGroupMetadata`,
-            MsgUpdateGroupMetadata
-        )
-        this.cosmosClient.registry.register(
-            `/${protobufPackage}.MsgUpdateGroupMembers`,
-            MsgUpdateGroupMembers
-        )
-        this.cosmosClient.registry.register(
-            `/${protobufPackage}.MsgCreateGroupPolicy`,
-            MsgCreateGroupPolicy
-        )
-        this.cosmosClient.registry.register(
-            `/${protobufPackage}.MsgUpdateGroupPolicyDecisionPolicy`,
-            MsgUpdateGroupPolicyDecisionPolicy
-        )
+        this.cosmosClient.registry.register(`/${protobufPackage}.MsgCreateGroup`, MsgCreateGroup)
+        this.cosmosClient.registry.register(`/${protobufPackage}.MsgCreateGroupWithPolicy`, MsgCreateGroupWithPolicy)
+        this.cosmosClient.registry.register(`/${protobufPackage}.MsgUpdateGroupMetadata`, MsgUpdateGroupMetadata)
+        this.cosmosClient.registry.register(`/${protobufPackage}.MsgUpdateGroupMembers`, MsgUpdateGroupMembers)
+        this.cosmosClient.registry.register(`/${protobufPackage}.MsgUpdateGroupAdmin`, MsgUpdateGroupAdmin)
+        this.cosmosClient.registry.register(`/${protobufPackage}.MsgUpdateGroupPolicyAdmin`, MsgUpdateGroupPolicyAdmin)
+        this.cosmosClient.registry.register(`/${protobufPackage}.MsgCreateGroupPolicy`, MsgCreateGroupPolicy)
+        this.cosmosClient.registry.register(`/${protobufPackage}.MsgUpdateGroupPolicyDecisionPolicy`, MsgUpdateGroupPolicyDecisionPolicy)
     }
 
     groupsByAdmin = async (admin: string): Promise<GroupInfo[]> => {

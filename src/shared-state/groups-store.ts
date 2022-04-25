@@ -13,9 +13,9 @@ import {
 } from '../generated/cosmos/group/v1/types'
 import {
     MsgCreateGroup,
-    MsgCreateGroupPolicy, MsgCreateGroupWithPolicy,
+    MsgCreateGroupPolicy, MsgCreateGroupWithPolicy, MsgUpdateGroupAdmin,
     MsgUpdateGroupMembers,
-    MsgUpdateGroupMetadata, MsgUpdateGroupPolicyDecisionPolicy,
+    MsgUpdateGroupMetadata, MsgUpdateGroupPolicyAdmin, MsgUpdateGroupPolicyDecisionPolicy,
     protobufPackage
 } from '../generated/cosmos/group/v1/tx'
 import {Coin} from "../generated/cosmos/base/v1beta1/coin";
@@ -47,6 +47,8 @@ export interface Group {
     // groupAccounts: GroupAccountInfo[]
     policy?: GroupPolicy
     metadata: GroupMetadata
+    admin: string
+    // adminIsPolicy: boolean
 }
 
 export interface GroupPolicyBalance extends Coin {
@@ -87,11 +89,14 @@ export class GroupsStore {
                     GroupsService.instance.groupPolicies(g.id)
                 ])
 
+                const policy = toGroupPolicy(policies);
                 groups.push({
                     info: g,
                     members,
-                    policy: toGroupPolicy(policies),
-                    metadata: JSON.parse(atob(g.metadata as unknown as string))
+                    policy,
+                    metadata: JSON.parse(atob(g.metadata as unknown as string)),
+                    admin: policy && policy.admin === g.admin ? '' : g.admin,
+                    // adminIsPolicy: policy && policy.admin === g.admin
                 })
             })()
         }))
@@ -115,11 +120,13 @@ export class GroupsStore {
         ])
         const metadata = JSON.parse(atob(groupInfo.metadata as unknown as string))
 
+        const policy = toGroupPolicy(policies)
         return Object.freeze({
             info: groupInfo,
             members,
-            policy: toGroupPolicy(policies),
-            metadata //: {...metadata, created: metadata.created * 100} // strange bug
+            policy,
+            metadata, //: {...metadata, created: metadata.created * 100} // strange bug
+            admin: policy && policy.address === groupInfo.admin ? '' : groupInfo.admin,
         })
     }
 
@@ -210,7 +217,8 @@ export class GroupsStore {
                     lastEdited: -1,
                     linkToForum: '',
                     other: ''
-                }
+                },
+                admin: ''
             }
         })
     }
@@ -224,18 +232,61 @@ export class GroupsStore {
         const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
         const me = key.bech32Address
 
+        /*const msg1: MsgCreateGroupPolicy = {
+            admin: me,
+            group_id: 1,
+            metadata: btoa(JSON.stringify({
+                ...this.editedGroup.metadata,
+                created: Date.now(),
+                lastEdited: Date.now()
+            })),
+            decision_policy: {
+                type_url: '/cosmos.group.v1.PercentageDecisionPolicy',
+                value: PercentageDecisionPolicy.encode({
+                    percentage: (this.editedGroup.policy.threshold / 100).toString(),
+                    windows: {
+                        voting_period: {
+                            seconds: this.editedGroup.policy.timeoutInDays * 24 * 360,
+                            nanos: 0
+                        },
+                        min_execution_period: {
+                            seconds: 1,
+                            nanos: 0
+                        }
+                    }
+                }).finish()
+            }
+        }
+        const msgAny1 = {
+            typeUrl: `/${protobufPackage}.MsgCreateGroupPolicy`,
+            value: MsgCreateGroupPolicy.fromPartial(msg1)
+        }
+        const msg1: MsgCreateGroup = {
+            admin: this.editedGroup.admin,
+            members: this.editedGroup.members.map(m => m.member),
+            metadata: btoa(JSON.stringify({
+                ...this.editedGroup.metadata,
+                created: Date.now(),
+                lastEdited: Date.now()
+            }))
+        }
+        const msgAny1 = {
+            typeUrl: `/${protobufPackage}.MsgCreateGroup`,
+            value: MsgCreateGroup.fromPartial(msg1)
+        }*/
+
         const msg1: MsgCreateGroupWithPolicy = {
-            admin: this.editedGroup.info.admin,
+            admin: this.editedGroup.admin || me,
             members: this.editedGroup.members.map(m => m.member),
             group_metadata: btoa(JSON.stringify({
                 ...this.editedGroup.metadata,
                 created: Date.now(),
                 lastEdited: Date.now()
             })),
-            group_policy_metadata: '',/*JSON.stringify({
+            group_policy_metadata: JSON.stringify({
                 foo: 'bar'
-            }),*/
-            group_policy_as_admin: false,
+            }),
+            group_policy_as_admin: this.editedGroup.admin === '',
             decision_policy: {
                 type_url: '/cosmos.group.v1.PercentageDecisionPolicy',
                 value: PercentageDecisionPolicy.encode({
@@ -272,11 +323,12 @@ export class GroupsStore {
             createdGroupId = Number(JSON.parse(result1.rawLog)[0].events.find(e => e.type === 'cosmos.group.v1.EventCreateGroup').attributes[0].value.replaceAll('"', ''))
         } catch (e) {
             console.warn(e)
+            // fixme: How to react on errors like this?
+            //  Error: Broadcasting transaction failed with code 9 (codespace: sdk). Log: fee payer address: cosmos1vekmuyzcufswtfkywkkgc9wkgypedn8wpvawn6 does not exist: unknown address
             if (e.message === 'Invalid string. Length must be a multiple of 4') {
-                const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
-                const groups = await GroupsService.instance.groupsByAdmin(key.bech32Address)
-                const maxId = Math.max(...groups.map(g => Number(g.id)), 0)
-                createdGroupId = maxId
+                // fixme: with groupsByAdmin we are getting just first page of groups
+                const groups = await GroupsService.instance.groupsByAdmin(me)
+                createdGroupId = Math.max(...groups.map(g => Number(g.id)), 0)
             } else {
                 // todo: show error
                 throw e
@@ -285,6 +337,8 @@ export class GroupsStore {
 
         // const createdGroupId = 13 // TODO hardcode
         console.log('createdGroupId', createdGroupId)
+
+        this.resetEditedGroup()
 
         return [createdGroupId, results]
     }
@@ -315,6 +369,44 @@ export class GroupsStore {
 
             try {
                 results.push(await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny], fee))
+            } catch (e) {
+                console.warn(e)
+            }
+        }
+
+        let newAdmin = this.editedGroup.admin
+
+        if (!isEqual(newAdmin, this.originalEditedGroup.admin)) {
+            // if (this.editedGroup.policy.threshold !== this.originalEditedGroup.policy.threshold)
+            if (newAdmin === '') {
+                // admin is policy
+                newAdmin = this.originalEditedGroup.policy.address
+            }
+            const updateGroupAdminMsg: MsgUpdateGroupAdmin = {
+                admin: this.originalEditedGroup.admin,
+                new_admin: newAdmin,
+                group_id: this.originalEditedGroup.info.id
+            }
+            const updateGroupAdminMsgWrapped = {
+                typeUrl: `/${protobufPackage}.MsgUpdateGroupAdmin`,
+                value: updateGroupAdminMsg
+            }
+            const updateGroupPolicyAdminMsg: MsgUpdateGroupPolicyAdmin = {
+                admin: this.originalEditedGroup.policy.admin,
+                new_admin: newAdmin,
+                address: this.originalEditedGroup.policy.address
+            }
+            const updateGroupPolicyAdminMsgWrapped = {
+                typeUrl: `/${protobufPackage}.MsgUpdateGroupPolicyAdmin`,
+                value: updateGroupPolicyAdminMsg
+            }
+
+            try {
+                results.push(await CosmosNodeService.instance.cosmosClient.signAndBroadcast(
+                    me,
+                    [updateGroupAdminMsgWrapped, updateGroupPolicyAdminMsgWrapped],
+                    getFee()
+                ))
             } catch (e) {
                 console.warn(e)
             }
@@ -391,6 +483,13 @@ export class GroupsStore {
         console.log(results)
         return results
     }
+}
+
+function getFee() {
+    return {
+        amount: coins(0, CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom),
+        gas: '2000000'
+    };
 }
 
 export function

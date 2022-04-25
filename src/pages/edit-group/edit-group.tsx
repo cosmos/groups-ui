@@ -10,6 +10,8 @@ import { Page } from '../page'
 import { Delete, InfoOutlined } from '@material-ui/icons'
 import { cloneDeep } from 'lodash'
 import { toJS } from 'mobx'
+import {truncateAddress} from "../../utils";
+import {CosmosNodeService} from "../../protocol/cosmos-node-service";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -205,6 +207,8 @@ export const EditGroup: React.FC<{}> = observer(() => {
     const groupId = pathParams.id ? Number(pathParams.id) : -1
     const [group, setGroup] = React.useState(10)
     const [loading, setLoading] = React.useState(false)
+    const [admin, setAdmin] = React.useState('')
+    const [me, setMe] = React.useState('')
 
     const handleChange = (event) => {
         setGroup(event.target.value)
@@ -227,6 +231,16 @@ export const EditGroup: React.FC<{}> = observer(() => {
         }
     }, [setDefaultNewGroup, resetEditedGroup])
 
+    useEffect(() => {
+        editedGroup && setAdmin(editedGroup.admin)
+    }, [editedGroup])
+
+    useEffect(() => {
+        CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
+            .then( key => setMe(key.bech32Address) )
+    }, [])
+
+
     if (!editedGroup) {
         return null
     }
@@ -234,6 +248,11 @@ export const EditGroup: React.FC<{}> = observer(() => {
     console.log("group", toJS(editedGroup));
 
     // const res = propStore.createProposal(toJS(editedGroup))
+
+    function updateAdmin(value: string) {
+        setAdmin(value)
+        editedGroup.admin = value
+    }
 
     return (
         <div>
@@ -268,37 +287,41 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                     {groupId === -1 ? 'Create Group' : 'Edit Group'}
                                 </div>
                                 <Paper elevation={2}>
-                                    <p className={classes.inputTitle}>Grouop admin</p>
+                                    <p className={classes.inputTitle}>Group admin</p>
                                     <form action="">
-                                        <div className={classes.radioBox}>
+                                        <div className={classes.radioBox} onClick={() => updateAdmin('')}>
                                             <label htmlFor="adminChoise1" className={classes.radio}>
-                                                <input type="radio" name="admin" id="adminChoise1"/>
+                                                <input type="radio" checked={admin === ''} name="admin" id="adminChoise1"/>
                                                 <p>Group policy</p>
                                                 <IconButton style={{ padding: '0px', marginLeft: "auto" }}><InfoOutlined style={{ width: '25px', height: '25px', color: '#3D7ACF' }}></InfoOutlined></IconButton>
                                             </label>
                                         </div>
-                                        <div className={classes.radioBox}>
+                                        <div className={classes.radioBox} onClick={() => updateAdmin(me)}>
                                             <label htmlFor="adminChoise2" className={classes.radio}>
-                                                <input type="radio" name="admin" id="adminChoise2"/>
-                                                <p>You <span>(regenadjk..1kkk)</span></p>
+                                                <input type="radio" checked={admin === me} name="admin" id="adminChoise2"/>
+                                                <p>You <span>({truncateAddress(me)})</span></p>
                                                 <IconButton style={{ padding: '0px', marginLeft: "auto" }}><InfoOutlined style={{ width: '25px', height: '25px', color: '#3D7ACF' }}></InfoOutlined></IconButton>
                                             </label>
                                         </div>
-                                        <div className={classes.radioBox}>
+                                        <div className={classes.radioBox} onClick={() => {(!admin || admin === me) && updateAdmin('cosmos')}}>
                                             <label htmlFor="adminChoise3" className={classes.radio}>
-                                                <input type="radio" name="admin" id="adminChoise3"/>
+                                                <input type="radio" checked={admin && admin !== me} name="admin" id="adminChoise3"/>
                                                 <p>Another account</p>
                                                 <IconButton style={{ padding: '0px', marginLeft: "auto" }}><InfoOutlined style={{ width: '25px', height: '25px', color: '#3D7ACF' }}></InfoOutlined></IconButton>
                                             </label>
-                                            <label className={classes.label} style={{ padding: "0 20px", marginBottom: "20px"}}>
-                                                <p className={classes.inputTitle}>Admin address</p>
-                                                <TextField
-                                                    fullWidth
-                                                    value={editedGroup.info.admin}
-                                                    id="outlined-disabled"
-                                                    variant="outlined"
-                                                />
-                                            </label>
+                                            {admin && admin !== me &&
+                                                <label className={classes.label}
+                                                       style={{padding: "0 20px", marginBottom: "20px"}}>
+                                                    <p className={classes.inputTitle}>Admin address</p>
+                                                    <TextField
+                                                        fullWidth
+                                                        id="outlined-disabled"
+                                                        variant="outlined"
+                                                        value={admin}
+                                                        onChange={e => updateAdmin(e.target.value as unknown as string)}
+                                                    />
+                                                </label>
+                                            }
                                         </div>
                                     </form>
                                     {/* <FormControl component="fieldset" className={classes.radioBox}>
@@ -498,7 +521,7 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                     {/*    </FormControl>*/}
 
                                     {/*</div>*/}
-                                    <p className={classes.inputTitle}>Grouop policy admin</p>
+                                    <p className={classes.inputTitle}>Group policy admin</p>
                                     <form action="">
                                         <div className={classes.radioBox}>
                                             <label htmlFor="adminChoise1" className={classes.radio}>
@@ -510,7 +533,7 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                         <div className={classes.radioBox}>
                                             <label htmlFor="adminChoise2" className={classes.radio}>
                                                 <input type="radio" name="admin" id="adminChoise2"/>
-                                                <p>You <span>(regenadjk..1kkk)</span></p>
+                                                <p>You <span>({truncateAddress(me)})</span></p>
                                                 <IconButton style={{ padding: '0px', marginLeft: "auto" }}><InfoOutlined style={{ width: '25px', height: '25px', color: '#3D7ACF' }}></InfoOutlined></IconButton>
                                             </label>
                                         </div>
@@ -647,8 +670,9 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                                     setLoading(true)
                                                     try {
                                                         const broadcastRes = await saveGroup()
-                                                        alert(`BroadcastRes: 
-    ${JSON.stringify(broadcastRes, null, 2)}`)
+                                                        // alert(`BroadcastRes:
+    // ${JSON.stringify(broadcastRes, null, 2)}`)
+                                                        history.push(Routes.GROUPS_ADMIN_VIEW.replace(':id', editedGroup.info.id.toString()))
                                                     } finally {
                                                         setLoading(false)
                                                     }

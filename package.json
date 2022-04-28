@@ -5,9 +5,10 @@
   "dependencies": {
     "@babel/plugin-proposal-class-properties": "^7.16.5",
     "@babel/plugin-proposal-decorators": "^7.16.5",
-    "@cosmjs/launchpad": "^0.26.5",
-    "@cosmjs/proto-signing": "^0.26.5",
-    "@cosmjs/stargate": "^0.26.5",
+    "@cosmjs/launchpad": "^0.27.1",
+    "@cosmjs/proto-signing": "^0.28.4",
+    "@cosmjs/stargate": "^0.28.4",
+    "@cosmjs/tendermint-rpc": "^0.28.4",
     "@keplr-wallet/stores": "^0.9.10",
     "@keplr-wallet/types": "^0.9.10",
     "@material-ui/core": "4.12.3",

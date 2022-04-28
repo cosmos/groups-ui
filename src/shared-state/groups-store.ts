@@ -3,7 +3,7 @@ import { GroupsService } from '../protocol/groups-service'
 import { CosmosNodeService } from '../protocol/cosmos-node-service'
 import { coins } from '@cosmjs/launchpad'
 import { cloneDeep, isEqual } from 'lodash'
-import { BroadcastTxResponse } from '@cosmjs/stargate/build/stargateclient'
+import { DeliverTxResponse } from '@cosmjs/stargate/build/stargateclient'
 import {
     GroupInfo,
     GroupMember,
@@ -228,7 +228,7 @@ export class GroupsStore {
         this.editedGroup = null
     }
 
-    createGroup = async (): Promise<[number, BroadcastTxResponse[]]> => {
+    createGroup = async (): Promise<[number, DeliverTxResponse[]]> => {
         const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
         const me = key.bech32Address
 

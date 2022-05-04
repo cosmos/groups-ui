@@ -24,10 +24,10 @@ import { Link, useHistory, useParams } from 'react-router-dom'
 import { Page } from '../page'
 import { useStores } from '../../shared-state/repo'
 import { Routes } from '../../routes'
-import { GroupMember } from '../../generated/cosmos/group/v1beta1/types'
 import Pagination from '@material-ui/lab/Pagination'
 import {PrimaryButton} from "../../components/primary-button";
 import {truncateAddress} from "../../utils";
+import {Member} from "../../generated/cosmos/group/v1/types";
 
 const useStyles1 = makeStyles((theme) => ({
     root: {
@@ -260,7 +260,7 @@ export const GroupDetails: React.FC<{}> = observer(() => {
 
     const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked) {
-            const newSelecteds = editedGroup.members.map((n) => n.member.address);
+            const newSelecteds = editedGroup.members.map((n) => n.address);
             setSelected(newSelecteds);
             return;
         }
@@ -293,8 +293,8 @@ export const GroupDetails: React.FC<{}> = observer(() => {
         )
     }
 
-    const originalMembersMap = new Map<string, GroupMember>(originalEditedGroup.members.map(m => [m.member.address, m]))
-    const membersMap = new Map<string, GroupMember>(editedGroup.members.map(m => [m.member.address, m]))
+    const originalMembersMap = new Map<string, Member>(originalEditedGroup.members.map(m => [m.address, m]))
+    const membersMap = new Map<string, Member>(editedGroup.members.map(m => [m.address, m]))
 
     type memberStatus = 'unChanged' | 'changed' | 'newDeleted' | 'newAdded'
     const members: Array<{
@@ -306,12 +306,12 @@ export const GroupDetails: React.FC<{}> = observer(() => {
 
     editedGroup.members.forEach(m => {
         const status = ((): memberStatus => {
-            const original = originalMembersMap.get(m.member.address)
+            const original = originalMembersMap.get(m.address)
             if (!original) {
                 return  'newAdded'
             }
 
-            if (original.member.weight !== m.member.weight) {
+            if (original.weight !== m.weight) {
                 return 'changed'
             }
 
@@ -319,20 +319,20 @@ export const GroupDetails: React.FC<{}> = observer(() => {
 
         })()
         members.push({
-            address: m.member.address,
-            addedAt: m.member.added_at,
-            weight: Number(m.member.weight),
+            address: m.address,
+            addedAt: m.added_at,
+            weight: Number(m.weight),
             status
         })
     })
 
     originalEditedGroup.members.forEach(m => {
-        const member = membersMap.get(m.member.address)
+        const member = membersMap.get(m.address)
         if (!member) {
             members.push({
-                address: m.member.address,
-                addedAt: m.member.added_at,
-                weight: Number(m.member.weight),
+                address: m.address,
+                addedAt: m.added_at,
+                weight: Number(m.weight),
                 status: 'newDeleted'
             })
         }
@@ -420,15 +420,12 @@ export const GroupDetails: React.FC<{}> = observer(() => {
                                                 members: [
                                                     ...editedGroup.members,
                                                     {
-                                                        group_id: editedGroup.info.id,
-                                                        member: {
-                                                            address: newMember,
-                                                            weight: "1",
-                                                            added_at: new Date(),
-                                                            metadata: JSON.stringify({
-                                                                name: ''
-                                                            })
-                                                        }
+                                                        address: newMember,
+                                                        weight: "1",
+                                                        added_at: new Date(),
+                                                        metadata: JSON.stringify({
+                                                            name: ''
+                                                        })
                                                     }
                                                 ]
                                             })

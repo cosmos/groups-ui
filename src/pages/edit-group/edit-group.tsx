@@ -420,10 +420,10 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                                         id="outlined"
                                                         variant="outlined"
                                                         label="Group member address"
-                                                        value={m.member.address}
+                                                        value={m.address}
                                                         onChange={e => {
                                                             const newMembers = cloneDeep(toJS(editedGroup.members))
-                                                            newMembers[i].member.address = e.target.value
+                                                            newMembers[i].address = e.target.value
                                                             updateEditedGroup({
                                                                 ...editedGroup,
                                                                 members: newMembers
@@ -437,7 +437,7 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                                         onClick={() => {
                                                             updateEditedGroup({
                                                                 ...editedGroup,
-                                                                members: editedGroup.members.filter(i => m.member.address !== i.member.address)
+                                                                members: editedGroup.members.filter(i => m.address !== i.address)
                                                             })
                                                         }}
                                                     >
@@ -446,22 +446,19 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                                     {i === editedGroup.members.length - 1 && (
                                                         <Button
                                                             className={classes.cardBtn}
-                                                            disabled={editedGroup.members[editedGroup.members.length - 1].member.address.length === 0}
+                                                            disabled={editedGroup.members[editedGroup.members.length - 1].address.length === 0}
                                                             variant="outlined"
                                                             color="primary"
                                                             onClick={() => {
                                                                 updateEditedGroup({
                                                                     ...editedGroup,
                                                                     members: [...editedGroup.members, {
-                                                                        group_id: editedGroup.info.id,
-                                                                        member: {
-                                                                            address: '',
-                                                                            weight: '1',
-                                                                            added_at: new Date(),
-                                                                            metadata: JSON.stringify({
-                                                                                name: ''
-                                                                            })
-                                                                        }
+                                                                        address: '',
+                                                                        weight: '1',
+                                                                        added_at: new Date(),
+                                                                        metadata: JSON.stringify({
+                                                                            name: ''
+                                                                        })
                                                                     }]
                                                                 })
                                                             }}
@@ -521,30 +518,30 @@ export const EditGroup: React.FC<{}> = observer(() => {
                                     {/*    </FormControl>*/}
 
                                     {/*</div>*/}
-                                    <p className={classes.inputTitle}>Group policy admin</p>
-                                    <form action="">
-                                        <div className={classes.radioBox}>
-                                            <label htmlFor="adminChoise1" className={classes.radio}>
-                                                <input type="radio" name="admin" id="adminChoise1"/>
-                                                <p>Group policy</p>
-                                                <IconButton style={{ padding: '0px', marginLeft: "auto" }}><InfoOutlined style={{ width: '25px', height: '25px', color: '#3D7ACF' }}></InfoOutlined></IconButton>
-                                            </label>
-                                        </div>
-                                        <div className={classes.radioBox}>
-                                            <label htmlFor="adminChoise2" className={classes.radio}>
-                                                <input type="radio" name="admin" id="adminChoise2"/>
-                                                <p>You <span>({truncateAddress(me)})</span></p>
-                                                <IconButton style={{ padding: '0px', marginLeft: "auto" }}><InfoOutlined style={{ width: '25px', height: '25px', color: '#3D7ACF' }}></InfoOutlined></IconButton>
-                                            </label>
-                                        </div>
-                                        <div className={classes.radioBox}>
-                                            <label htmlFor="adminChoise3" className={classes.radio}>
-                                                <input type="radio" name="admin" id="adminChoise3"/>
-                                                <p>Another account</p>
-                                                <IconButton style={{ padding: '0px', marginLeft: "auto" }}><InfoOutlined style={{ width: '25px', height: '25px', color: '#3D7ACF' }}></InfoOutlined></IconButton>
-                                            </label>
-                                        </div>
-                                    </form>
+                                    {/*<p className={classes.inputTitle}>Group policy admin</p>*/}
+                                    {/*<form action="">*/}
+                                    {/*    <div className={classes.radioBox}>*/}
+                                    {/*        <label htmlFor="adminChoise1" className={classes.radio}>*/}
+                                    {/*            <input type="radio" name="admin" id="adminChoise1"/>*/}
+                                    {/*            <p>Group policy</p>*/}
+                                    {/*            <IconButton style={{ padding: '0px', marginLeft: "auto" }}><InfoOutlined style={{ width: '25px', height: '25px', color: '#3D7ACF' }}></InfoOutlined></IconButton>*/}
+                                    {/*        </label>*/}
+                                    {/*    </div>*/}
+                                    {/*    <div className={classes.radioBox}>*/}
+                                    {/*        <label htmlFor="adminChoise2" className={classes.radio}>*/}
+                                    {/*            <input type="radio" name="admin" id="adminChoise2"/>*/}
+                                    {/*            <p>You <span>({truncateAddress(me)})</span></p>*/}
+                                    {/*            <IconButton style={{ padding: '0px', marginLeft: "auto" }}><InfoOutlined style={{ width: '25px', height: '25px', color: '#3D7ACF' }}></InfoOutlined></IconButton>*/}
+                                    {/*        </label>*/}
+                                    {/*    </div>*/}
+                                    {/*    <div className={classes.radioBox}>*/}
+                                    {/*        <label htmlFor="adminChoise3" className={classes.radio}>*/}
+                                    {/*            <input type="radio" name="admin" id="adminChoise3"/>*/}
+                                    {/*            <p>Another account</p>*/}
+                                    {/*            <IconButton style={{ padding: '0px', marginLeft: "auto" }}><InfoOutlined style={{ width: '25px', height: '25px', color: '#3D7ACF' }}></InfoOutlined></IconButton>*/}
+                                    {/*        </label>*/}
+                                    {/*    </div>*/}
+                                    {/*</form>*/}
                                     <div className={classes.label} style={{marginTop: "40px"}}>
                                         <div className={classes.inputTitle}>
                                             Voting window

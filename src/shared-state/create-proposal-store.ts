@@ -15,6 +15,7 @@ import { VoteOption } from '../generated/cosmos/group/v1/types';
 import { Coin, coins } from '@cosmjs/proto-signing';
 import { DeliverTxResponse } from '@cosmjs/stargate';
 import { MsgSubmitProposal } from '../generated/gov/tx';
+import {GroupsService} from "../protocol/groups-service";
 
 interface NewProposal {
     actions: Action[]
@@ -141,11 +142,13 @@ export class CreateProposalStore {
         // TODO replace hardcode
         const exec = Exec.EXEC_TRY;
 
+        //const allMembers = await GroupsService.instance.allGroupMembers(group.info.id)
+
         const msg: MsgCreateProposal = MsgCreateProposal.fromPartial({
             // TODO replace with fetching group policy address
             // this is group policy address hardcoded for testing
             address: 'regen1m73npu5jn89syq23568a44ymrj7za9qa7mxgh0',
-            proposers: group.members.map((m) => m.member.address),
+            proposers: group.members.map((m) => m.address),
             messages: [mockMsgSubmitProposal],
             exec,
             metadata: toUint8Array(mockMetaData).toString(),

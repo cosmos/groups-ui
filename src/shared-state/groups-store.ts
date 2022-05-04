@@ -7,7 +7,7 @@ import { DeliverTxResponse } from '@cosmjs/stargate/build/stargateclient'
 import {
     GroupInfo,
     GroupMember,
-    GroupPolicyInfo,
+    GroupPolicyInfo, Member,
     PercentageDecisionPolicy,
     ThresholdDecisionPolicy
 } from '../generated/cosmos/group/v1/types'
@@ -43,7 +43,7 @@ interface GroupPolicy {
 
 export interface Group {
     info: Omit<GroupInfo, 'metadata'>
-    members: readonly GroupMember[]
+    members: readonly Member[]
     // groupAccounts: GroupAccountInfo[]
     policy?: GroupPolicy
     metadata: GroupMetadata
@@ -78,14 +78,14 @@ export class GroupsStore {
 
     fetchGroups = async (): Promise<Group[]> => {
         const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
-        const groupInfoItems = await GroupsService.instance.groupsByAdmin(key.bech32Address)
+        const groupInfoItems = await GroupsService.instance.allGroupsByAdmin(key.bech32Address)
 
         const groups: Group[] = []
 
         await Promise.all(groupInfoItems.map(g => {
             return (async () => {
                 const [members, policies] = await Promise.all([
-                    GroupsService.instance.groupMembers(g.id),
+                    GroupsService.instance.allGroupMembers(g.id),
                     GroupsService.instance.groupPolicies(g.id)
                 ])
 
@@ -115,10 +115,10 @@ export class GroupsStore {
         }
 
         const [members, policies] = await Promise.all([
-            GroupsService.instance.groupMembers(groupInfo.id),
+            GroupsService.instance.allGroupMembers(groupInfo.id),
             GroupsService.instance.groupPolicies(groupInfo.id)
         ])
-        const metadata = JSON.parse(atob(groupInfo.metadata as unknown as string))
+        const metadata = JSON.parse(atob(groupInfo.metadata as unknown as string)) // todo remove btoa
 
         const policy = toGroupPolicy(policies)
         return Object.freeze({
@@ -193,15 +193,12 @@ export class GroupsStore {
                     created_at: new Date()
                 },
                 members: [{
-                    group_id: -1,
-                    member: {
-                        address: me,
-                        weight: '1',
-                        metadata: JSON.stringify({
-                            name: 'me'
-                        }),
-                        added_at: new Date()
-                    }
+                    address: me,
+                    weight: '1',
+                    metadata: JSON.stringify({
+                        name: 'me'
+                    }),
+                    added_at: new Date()
                 }],
                 policy: {
                     address: '',
@@ -277,8 +274,8 @@ export class GroupsStore {
 
         const msg1: MsgCreateGroupWithPolicy = {
             admin: this.editedGroup.admin || me,
-            members: this.editedGroup.members.map(m => m.member),
-            group_metadata: btoa(JSON.stringify({
+            members: this.editedGroup.members as Member[],
+            group_metadata: btoa(JSON.stringify({ // todo remove btoa
                 ...this.editedGroup.metadata,
                 created: Date.now(),
                 lastEdited: Date.now()
@@ -327,7 +324,7 @@ export class GroupsStore {
             //  Error: Broadcasting transaction failed with code 9 (codespace: sdk). Log: fee payer address: cosmos1vekmuyzcufswtfkywkkgc9wkgypedn8wpvawn6 does not exist: unknown address
             if (e.message === 'Invalid string. Length must be a multiple of 4') {
                 // fixme: with groupsByAdmin we are getting just first page of groups
-                const groups = await GroupsService.instance.groupsByAdmin(me)
+                const groups = await GroupsService.instance.allGroupsByAdmin(me)
                 createdGroupId = Math.max(...groups.map(g => Number(g.id)), 0)
             } else {
                 // todo: show error
@@ -355,7 +352,7 @@ export class GroupsStore {
                 metadata: btoa(JSON.stringify({
                     ...this.editedGroup.metadata,
                     lastEdited: Date.now()
-                }))
+                })) // todo remove btoa
             }
             const msgAny = {
                 typeUrl: `/${protobufPackage}.MsgUpdateGroupMetadata`,
@@ -456,10 +453,10 @@ export class GroupsStore {
                 admin: this.editedGroup.info.admin,
                 group_id: this.editedGroup.info.id,
                 member_updates: this.editedGroup.members.map(m => ({ // TODO to delete member one should set its weight to 0
-                    address: m.member.address,
-                    weight: m.member.weight,
-                    added_at: m.member.added_at,
-                    metadata: m.member.metadata
+                    address: m.address,
+                    weight: m.weight,
+                    added_at: m.added_at,
+                    metadata: m.metadata
                 }))
             }
             const msgAny = {

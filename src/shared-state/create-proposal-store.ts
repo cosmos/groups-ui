@@ -13,7 +13,7 @@ import { Group, toUint8Array } from './groups-store';
 import { CosmosNodeService } from '../protocol/cosmos-node-service';
 import { VoteOption } from '../generated/cosmos/group/v1/types';
 import { Coin, coins } from '@cosmjs/proto-signing';
-import { BroadcastTxResponse } from '@cosmjs/stargate';
+import { DeliverTxResponse } from '@cosmjs/stargate';
 import { MsgSubmitProposal } from '../generated/gov/tx';
 
 interface NewProposal {
@@ -114,7 +114,7 @@ export class CreateProposalStore {
 
     createProposal = async (
         group: Group
-    ): Promise<BroadcastTxResponse | null> => {
+    ): Promise<DeliverTxResponse | null> => {
         // TODO remove mocks
         const mockMetaData = 'testing abc';
         const mockCoins: Coin[] = coins(

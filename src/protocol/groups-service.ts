@@ -3,9 +3,12 @@ import { ChainInfo } from '@keplr-wallet/types'
 import { CosmosClient } from './cosmos-client'
 import {
     MsgCreateGroup,
-    MsgCreateGroupPolicy, MsgCreateGroupWithPolicy,
+    MsgCreateGroupPolicy,
+    MsgCreateGroupWithPolicy,
+    MsgUpdateGroupAdmin,
     MsgUpdateGroupMembers,
     MsgUpdateGroupMetadata,
+    MsgUpdateGroupPolicyAdmin,
     MsgUpdateGroupPolicyDecisionPolicy,
     protobufPackage
 } from '../generated/cosmos/group/v1/tx'
@@ -14,12 +17,14 @@ import {
     QueryGroupInfoResponse,
     QueryGroupMembersResponse,
     QueryGroupPoliciesByGroupResponse,
+    QueryGroupsByAdminRequest,
     QueryGroupsByAdminResponse
 } from '../generated/cosmos/group/v1/query'
+import { PageRequest } from '../generated/cosmos/base/query/v1beta1/pagination'
 
 @service
 export class GroupsService implements Service {
-    static serviceName: string = "GroupsService"
+    static serviceName: string = 'GroupsService'
 
     static get instance(): GroupsService {
         return getService<GroupsService>(GroupsService.serviceName)
@@ -32,37 +37,39 @@ export class GroupsService implements Service {
     }
 
     applyChainInfo = async (chainInfo: ChainInfo): Promise<void> => {
-        this.cosmosClient.registry.register(
-            `/${protobufPackage}.MsgCreateGroup`,
-            MsgCreateGroup
-        )
-        this.cosmosClient.registry.register(
-            `/${protobufPackage}.MsgCreateGroupWithPolicy`,
-            MsgCreateGroupWithPolicy
-        )
-        this.cosmosClient.registry.register(
-            `/${protobufPackage}.MsgUpdateGroupMetadata`,
-            MsgUpdateGroupMetadata
-        )
-        this.cosmosClient.registry.register(
-            `/${protobufPackage}.MsgUpdateGroupMembers`,
-            MsgUpdateGroupMembers
-        )
-        this.cosmosClient.registry.register(
-            `/${protobufPackage}.MsgCreateGroupPolicy`,
-            MsgCreateGroupPolicy
-        )
-        this.cosmosClient.registry.register(
-            `/${protobufPackage}.MsgUpdateGroupPolicyDecisionPolicy`,
-            MsgUpdateGroupPolicyDecisionPolicy
-        )
+        this.cosmosClient.registry.register(`/${protobufPackage}.MsgCreateGroup`, MsgCreateGroup)
+        this.cosmosClient.registry.register(`/${protobufPackage}.MsgCreateGroupWithPolicy`, MsgCreateGroupWithPolicy)
+        this.cosmosClient.registry.register(`/${protobufPackage}.MsgUpdateGroupMetadata`, MsgUpdateGroupMetadata)
+        this.cosmosClient.registry.register(`/${protobufPackage}.MsgUpdateGroupMembers`, MsgUpdateGroupMembers)
+        this.cosmosClient.registry.register(`/${protobufPackage}.MsgUpdateGroupAdmin`, MsgUpdateGroupAdmin)
+        this.cosmosClient.registry.register(`/${protobufPackage}.MsgUpdateGroupPolicyAdmin`, MsgUpdateGroupPolicyAdmin)
+        this.cosmosClient.registry.register(`/${protobufPackage}.MsgCreateGroupPolicy`, MsgCreateGroupPolicy)
+        this.cosmosClient.registry.register(`/${protobufPackage}.MsgUpdateGroupPolicyDecisionPolicy`, MsgUpdateGroupPolicyDecisionPolicy)
     }
 
+    // groupsByAdmin = async (admin: string): Promise<GroupInfo[]> => {
+    //     const res = await this.cosmosClient.lcdClientGet(
+    //         `/cosmos/group/v1/groups_by_admin/${admin}`
+    //     ) as QueryGroupsByAdminResponse
+    //     return res.groups.map(normalizeBackendGroup)
+    // }
+
     groupsByAdmin = async (admin: string): Promise<GroupInfo[]> => {
-        const res = await this.cosmosClient.lcdClientGet(
-            `/cosmos/group/v1/groups_by_admin/${admin}`
-        ) as QueryGroupsByAdminResponse
-        return res.groups.map(normalizeBackendGroup)
+        const requestData = Uint8Array.from(
+            QueryGroupsByAdminRequest.encode({
+                admin,
+                pagination: PageRequest.fromPartial({
+                    offset: 0,
+                    limit: 50,  // TODO hardcoded pagination
+                    count_total: false,
+                    reverse: false
+                })
+            }).finish()
+        )
+        const data = await this.cosmosClient.queryClientGet(`/${protobufPackage}.Query/GroupsByAdmin`, requestData)
+        const response = QueryGroupsByAdminResponse.decode(data)
+
+        return response.groups.map(normalizeBackendGroup)
     }
 
     groupById = async (groupId: number): Promise<GroupInfo> => {

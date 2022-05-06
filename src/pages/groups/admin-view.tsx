@@ -488,7 +488,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                             <Description style={{ fontSize: '20px', marginRight: '5px' }} />
                             text proposal
                         </Button>
-                        <Button
+                        {/*<Button
                             variant="outlined"
                             color="primary"
                             className="btn"
@@ -496,7 +496,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                         >
                             <SettingsRounded style={{ fontSize: '20px', marginRight: '5px' }} />
                             custom proposal
-                        </Button>
+                        </Button>*/}
                     </div>
                 </Paper>
                 <Paper elevation={2} className={classes.proposedActions}>

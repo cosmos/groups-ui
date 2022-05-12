@@ -1,11 +1,12 @@
 import { getKeplrFromWindow } from '@keplr-wallet/stores'
 import { ChainInfo, Keplr } from '@keplr-wallet/types'
 import { EncodeObject, Registry } from '@cosmjs/proto-signing'
-import { defaultRegistryTypes, SigningStargateClient } from '@cosmjs/stargate'
+import { defaultRegistryTypes, QueryClient, SigningStargateClient } from '@cosmjs/stargate'
 import { LcdClient, setupAuthExtension, setupBankExtension } from '@cosmjs/launchpad'
 import { AuthExtension } from '@cosmjs/launchpad/build/lcdapi/auth'
 import { StdFee } from '@cosmjs/amino'
-import { BroadcastTxResponse } from '@cosmjs/stargate/build/stargateclient'
+import { DeliverTxResponse } from '@cosmjs/stargate/build/stargateclient'
+import { Tendermint34Client } from '@cosmjs/tendermint-rpc'
 
 export class CosmosClient {
     static _instance: CosmosClient = null
@@ -20,6 +21,7 @@ export class CosmosClient {
     private stargateClient: SigningStargateClient = null
     private lcdClient: LcdClient
         & AuthExtension = null
+    private queryClient: QueryClient = null
     keplr: Keplr = null
 
     lcdClientGet = async (path: string, params?: Record<string, any>): Promise<any> => {
@@ -30,10 +32,18 @@ export class CosmosClient {
         }
     }
 
-    signAndBroadcast = (signerAddress: string, messages: readonly EncodeObject[], fee: StdFee, memo?: string): Promise<BroadcastTxResponse> => {
+    queryClientGet = (path: string, request: Uint8Array): Promise<Uint8Array> => {
+        try {
+            return this.queryClient.queryUnverified(path, request)
+        } catch (e) {
+            console.error(`error when queryClient get`, e)
+        }
+    }
+
+    signAndBroadcast = (signerAddress: string, messages: readonly EncodeObject[], fee: StdFee, memo?: string): Promise<DeliverTxResponse> => {
         try {
             if (!this.stargateClient) {
-                throw new Error("NPE!")
+                throw new Error('NPE!')
             }
             return this.stargateClient.signAndBroadcast(signerAddress, messages, fee, memo)
         } catch (e) {
@@ -44,7 +54,7 @@ export class CosmosClient {
     applyChainInfo = async (chainInfo: ChainInfo): Promise<void> => {
         const keplr = await getKeplrFromWindow()
         if (!keplr) {
-            alert("Keplr extension not found")
+            alert('Keplr extension not found')
             return
         }
         this.keplr = keplr
@@ -70,14 +80,12 @@ export class CosmosClient {
                     registry: this.registry
                 }
             )
-
-            // console.log('this.stargateClient.getChainId()', await this.stargateClient.getChainId())
         }, 0)
 
         this.lcdClient = LcdClient.withExtensions(
             { apiUrl: chainInfo.rest },
             setupAuthExtension,
-            setupBankExtension,
+            setupBankExtension
             // setupDistributionExtension,
             // setupGovExtension,
             // setupMintExtension,
@@ -85,5 +93,8 @@ export class CosmosClient {
             // setupStakingExtension,
             // setupSupplyExtension
         )
+
+        const tmClient = await Tendermint34Client.connect(chainInfo.rpc)
+        this.queryClient = QueryClient.withExtensions(tmClient)
     }
 }

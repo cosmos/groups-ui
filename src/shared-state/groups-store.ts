@@ -3,7 +3,7 @@ import { GroupsService } from "../protocol/groups-service";
 import { CosmosNodeService } from "../protocol/cosmos-node-service";
 import { coins } from "@cosmjs/launchpad";
 import { cloneDeep, isEqual } from "lodash";
-import { BroadcastTxResponse,
+import { 
    DeliverTxResponse
    } from "@cosmjs/stargate/build/stargateclient";
 import {

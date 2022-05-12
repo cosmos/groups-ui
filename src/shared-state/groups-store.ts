@@ -3,7 +3,9 @@ import { GroupsService } from "../protocol/groups-service";
 import { CosmosNodeService } from "../protocol/cosmos-node-service";
 import { coins } from "@cosmjs/launchpad";
 import { cloneDeep, isEqual } from "lodash";
-import { BroadcastTxResponse } from "@cosmjs/stargate/build/stargateclient";
+import { BroadcastTxResponse,
+   DeliverTxResponse
+   } from "@cosmjs/stargate/build/stargateclient";
 import {
   GroupInfo,
   GroupMember,
@@ -13,28 +15,18 @@ import {
 } from "../generated/cosmos/group/v1/types";
 import {
   MsgCreateGroup,
-  MsgCreateGroupPolicy,
-  MsgCreateGroupWithPolicy,
+  MsgCreateGroupPolicy, MsgCreateGroupWithPolicy, MsgUpdateGroupAdmin,
   MsgUpdateGroupMembers,
-  MsgUpdateGroupMetadata,
-  MsgUpdateGroupPolicyDecisionPolicy,
-  protobufPackage,
-} from "../generated/cosmos/group/v1/tx";
+  MsgUpdateGroupMetadata, MsgUpdateGroupPolicyAdmin, MsgUpdateGroupPolicyDecisionPolicy,
+  protobufPackage
+} from '../generated/cosmos/group/v1/tx'
 import { Coin } from "../generated/cosmos/base/v1beta1/coin";
 import { BankService } from "../protocol/bank-service";
 import { fetchCoinPrices } from "../utils";
 import { IUpdatedList } from "../pages/groups/groups-type";
+import { trimDeleted } from "../pages/groups/utils";
 
-function trimDeleted({ target, cutList }: { target: {}; cutList: Array<any> }) {
-  if (!cutList.length) return target;
-  const output = { ...target };
-  for (let i of cutList) {
-    if (output.hasOwnProperty(i)) {
-      delete output[i];
-    }
-  }
-  return output;
-}
+
 // {"name": "bla", "description": "blabbl", "created": 1640599686655, "lastEdited": 1640599686655, "linkToForum": "", "other": "blabla"}
 interface GroupMetadata {
   name: string;
@@ -59,6 +51,7 @@ export interface Group {
   members: readonly GroupMember[];
   // groupAccounts: GroupAccountInfo[]
   metadata: GroupMetadata;
+  admin: string
   policy?: GroupPolicy;
   updateMembers?: any;
   deleteMembers?: [];
@@ -106,12 +99,17 @@ export class GroupsStore {
             GroupsService.instance.groupMembers(g.id),
             GroupsService.instance.groupPolicies(g.id),
           ]);
+          const policy = toGroupPolicy(policies);
+
+
 
           groups.push({
             info: g,
             members,
-            policy: toGroupPolicy(policies),
+            policy,
             metadata: JSON.parse(atob(g.metadata as unknown as string)),
+            admin: policy && policy.admin === g.admin ? '' : g.admin,
+
           });
         })();
       })
@@ -136,11 +134,14 @@ export class GroupsStore {
     ]);
     const metadata = JSON.parse(atob(groupInfo.metadata as unknown as string));
 
+    const policy = toGroupPolicy(policies)
+
     return Object.freeze({
       info: groupInfo,
       members,
-      policy: toGroupPolicy(policies),
+      policy,
       metadata, //: {...metadata, created: metadata.created * 100} // strange bug
+      admin: policy && policy.address === groupInfo.admin ? '' : groupInfo.admin,
     });
   };
 
@@ -207,7 +208,6 @@ export class GroupsStore {
 
   @action
   updateEditedGroup = (newGroup: Group) => {
-    console.log("updateEditedGroup", newGroup);
     this.editedGroup = newGroup;
   };
 
@@ -254,6 +254,7 @@ export class GroupsStore {
           linkToForum: "",
           other: "",
         },
+        admin: ''
       };
     });
   };
@@ -346,7 +347,7 @@ export class GroupsStore {
     return { status, error };
   };
 
-  createGroup = async (): Promise<[number, BroadcastTxResponse[]]> => {
+  createGroup = async (): Promise<[number, DeliverTxResponse[]]> => {
     const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(
       CosmosNodeService.instance.chainInfo.chainId
     );
@@ -465,6 +466,38 @@ export class GroupsStore {
         ),
         gas: "2000000",
       };
+      try {
+        results.push(await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny], fee))
+    } catch (e) {
+        console.warn(e)
+    }
+
+    let newAdmin = this.editedGroup.admin
+
+        if (!isEqual(newAdmin, this.originalEditedGroup.admin)) {
+            // if (this.editedGroup.policy.threshold !== this.originalEditedGroup.policy.threshold)
+            if (newAdmin === '') {
+                // admin is policy
+                newAdmin = this.originalEditedGroup.policy.address
+            }
+            const updateGroupAdminMsg: MsgUpdateGroupAdmin = {
+                admin: this.originalEditedGroup.admin,
+                new_admin: newAdmin,
+                group_id: this.originalEditedGroup.info.id
+            }
+            const updateGroupAdminMsgWrapped = {
+                typeUrl: `/${protobufPackage}.MsgUpdateGroupAdmin`,
+                value: updateGroupAdminMsg
+            }
+            const updateGroupPolicyAdminMsg: MsgUpdateGroupPolicyAdmin = {
+                admin: this.originalEditedGroup.policy.admin,
+                new_admin: newAdmin,
+                address: this.originalEditedGroup.policy.address
+            }
+            const updateGroupPolicyAdminMsgWrapped = {
+                typeUrl: `/${protobufPackage}.MsgUpdateGroupPolicyAdmin`,
+                value: updateGroupPolicyAdminMsg
+            }
 
       try {
         results.push(
@@ -573,9 +606,10 @@ export class GroupsStore {
     console.log(results);
     return results;
   };
+  }
 }
 
-export function toUint8Array(str: string): Uint8Array {
+ export function toUint8Array(str: string): Uint8Array {
   if (!("TextEncoder" in window))
     alert("Sorry, this browser does not support TextEncoder...");
 

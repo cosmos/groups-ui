@@ -2,6 +2,19 @@ import { Data, IMember, Order } from "./groups-type";
 import moment from "moment";
 import { ClassNameMap } from "@material-ui/core/styles/withStyles";
 
+
+export function trimDeleted({ target, cutList }: { target: {}; cutList: Array<any> }) {
+  if (!cutList.length) return target;
+  const output = { ...target };
+  for (let i of cutList) {
+    if (output.hasOwnProperty(i)) {
+      delete output[i];
+    }
+  }
+  return output;
+}
+
+
 export function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
     return -1;

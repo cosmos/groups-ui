@@ -1,3 +1,5 @@
+import {Vote} from "../../generated/cosmos/group/v1/types";
+
 export interface Data {
   calories: number
   carbs: number
@@ -19,7 +21,7 @@ export type Order = 'asc' | 'desc'
 
 export interface HeadCell {
   disablePadding: boolean
-  id: keyof Data
+  id: keyof Vote
   label: string
   numeric: boolean
 }
@@ -38,7 +40,7 @@ export interface EnhancedTableProps {
   numSelected: number
   onRequestSort: (
     event: React.MouseEvent<unknown>,
-    property: keyof Data
+    property: keyof Vote
   ) => void
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void
   order: Order

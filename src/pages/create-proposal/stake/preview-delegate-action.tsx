@@ -4,12 +4,12 @@ import {useStores} from "../../../shared-state/repo";
 import {truncateAddress} from "../../../utils";
 import {observer} from "mobx-react-lite";
 import {useStyles} from "../create-proposal-styles";
-import {StakeActionData} from "../../../shared-state/create-proposal-store";
+import {DelegateActionData} from "../../../shared-state/create-proposal-store";
 
 export const PreviewDelegateAction: React.FC<{id: symbol}> = observer(({id}) => {
     const classes = useStyles()
     const {newProposal} = useStores().createProposalStore
-    const data = newProposal.actions.find(a => a.id === id)?.data as StakeActionData
+    const data = newProposal.actions.find(a => a.id === id)?.data as DelegateActionData
 
     return (
         <Paper elevation={1} style={{ borderRadius: '10px', border: '1px solid #D2D5D9', marginBottom: '30px' }}>

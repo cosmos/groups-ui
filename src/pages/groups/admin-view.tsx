@@ -30,9 +30,15 @@ import { Page } from "../page";
 import { Routes } from "../../routes";
 import { useStores } from "../../shared-state/repo";
 import { Group, GroupPolicyBalances } from "../../shared-state/groups-store";
-import { Proposal } from "../../shared-state/proposals-store";
-import { ProposalsService } from "../../protocol/proposals-service";
-import { statusStyles } from "../create-proposal/proposal-style";
+import { statusStyles } from "../proposal/proposal-style";
+import {
+  Proposal,
+  ProposalExecutorResult,
+  ProposalResult,
+  ProposalStatus,
+  TallyResult
+} from "../../generated/cosmos/group/v1/types";
+import {Any} from "../../generated/google/protobuf/any";
 
 interface Data {
   date: string;
@@ -237,8 +243,8 @@ function getComparator<Key extends keyof any>(
   order: Order,
   orderBy: Key
 ): (
-  a: { [key in Key]: number | string },
-  b: { [key in Key]: number | string }
+  a: { [key in Key]: number | string | Date | string[] | TallyResult | ProposalStatus | ProposalResult | ProposalExecutorResult | Any[] },
+  b: { [key in Key]: number | string | Date | string[] | TallyResult | ProposalStatus | ProposalResult | ProposalExecutorResult | Any[] }
 ) => number {
   return order === "desc"
     ? (a, b) => descendingComparator(a, b, orderBy)
@@ -262,14 +268,14 @@ function stableSort<T>(
 
 interface HeadCell {
   disablePadding: boolean;
-  id: keyof Data;
+  id: keyof Proposal;
   label: string;
   numeric: boolean;
 }
 
 const headCells: readonly HeadCell[] = [
   {
-    id: "date",
+    id: "submit_time",
     numeric: false,
     disablePadding: true,
     label: "date",
@@ -281,13 +287,13 @@ const headCells: readonly HeadCell[] = [
     label: "name",
   },
   {
-    id: "number",
+    id: "id",
     numeric: true,
     disablePadding: false,
     label: "",
   },
   {
-    id: "desc",
+    id: "metadata",
     numeric: true,
     disablePadding: false,
     label: "",
@@ -298,7 +304,7 @@ interface EnhancedTableProps {
   numSelected: number;
   onRequestSort: (
     event: React.MouseEvent<unknown>,
-    property: keyof Data
+    property: keyof Proposal
   ) => void;
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
   order: Order;
@@ -316,7 +322,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
     onRequestSort,
   } = props;
   const createSortHandler =
-    (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
+    (property: keyof Proposal) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
     };
 
@@ -352,14 +358,6 @@ const StyledTableRow = withStyles((theme) => ({
   },
 }))(TableRow);
 
-const propositionRows = [
-  createData("62.12.2021", "unfinalized", `#1`, "sometext in description"),
-  createData("22.11.2021", "unfinalized", `#2`, "sometext in description"),
-  createData("52.15.2021", "unfinalized", `#3`, "sometext in description"),
-  createData("02.02.2021", "unfinalized", `#4`, "sometext in description"),
-  createData("21.11.2412", "unfinalized", `#5`, "sometext in description"),
-];
-
 const tableStyles = makeStyles({
   table: {
     borderTop: "1px solid #EFEFEF",
@@ -369,14 +367,14 @@ const tableStyles = makeStyles({
 
 export const GroupAdminView: React.FC<{}> = observer(() => {
   const [age, setAge] = React.useState("");
-  const history = useHistory();
+  const history = useHistory()
 
   const [order, setOrder] = React.useState<Order>("asc");
-  const [orderBy, setOrderBy] = React.useState<keyof Data>("date");
+  const [orderBy, setOrderBy] = React.useState<keyof Proposal>("submit_time");
   const [selected, setSelected] = React.useState<readonly string[]>([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(50);
   const [group, setGroup] = React.useState<Group>(undefined);
   const [balances, setBalances] =
     React.useState<GroupPolicyBalances>(undefined);
@@ -391,7 +389,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
-    property: keyof Data
+    property: keyof Proposal
   ) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
@@ -400,7 +398,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelecteds = propositionRows.map((n) => n.desc);
+      const newSelecteds = proposals.map((n) => n.metadata);
       setSelected(newSelecteds);
       return;
     }
@@ -430,7 +428,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
 
   const emptyRows =
     page > 0
-      ? Math.max(0, (1 + page) * rowsPerPage - propositionRows.length)
+      ? Math.max(0, (1 + page) * rowsPerPage - proposals.length)
       : 0;
 
   return (
@@ -530,7 +528,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
               <Description style={{ fontSize: "20px", marginRight: "5px" }} />
               text proposal
             </Button>
-            <Button
+            {/*<Button
               variant="outlined"
               color="primary"
               className="btn"
@@ -544,7 +542,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                 style={{ fontSize: "20px", marginRight: "5px" }}
               />
               custom proposal
-            </Button>
+            </Button>*/}
           </div>
         </Paper>
         <Paper elevation={2} className={classes.proposedActions}>
@@ -556,10 +554,10 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={propositionRows.length}
+              rowCount={proposals.length}
             />
             <TableBody>
-              {stableSort(propositionRows, getComparator(order, orderBy))
+              { stableSort(proposals, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
                   // const isItemSelected = isSelected(row.date);
@@ -570,7 +568,8 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                       hover
                       role="checkbox"
                       tabIndex={-1}
-                      key={row.date}
+                      key={row.id as number}
+                      onClick={() => history.push(Routes.PROPOSALS.replace(":group_id", groupId.toString()).replace(":id", row.id.toString()))}
                     >
                       <StyledTableCell
                         align="left"
@@ -580,7 +579,7 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                         scope="row"
                         padding="none"
                       >
-                        {row.date}
+                        {row.submit_time.toLocaleString()}
                       </StyledTableCell>
                       <StyledTableCell align="left">
                         <span className={`${status.marker} orange`}>
@@ -588,10 +587,10 @@ export const GroupAdminView: React.FC<{}> = observer(() => {
                         </span>
                       </StyledTableCell>
                       <StyledTableCell align="left">
-                        <span className="number">{row.number}</span>
+                        <span className="number">#{row.id}</span>
                       </StyledTableCell>
                       <StyledTableCell align="left">
-                        <span className="description">{row.desc}</span>
+                        <span className="description">{row.metadata}</span>
                       </StyledTableCell>
                     </StyledTableRow>
                   );

@@ -1,4 +1,5 @@
 import { Data, Order } from './proposal-types'
+import {VoteOption} from "../../generated/cosmos/group/v1/types";
 
 export function createData(
   name: string,
@@ -28,8 +29,8 @@ export function getComparator<Key extends keyof any>(
   order: Order,
   orderBy: Key
 ): (
-  a: { [key in Key]: number | string },
-  b: { [key in Key]: number | string }
+  a: { [key in Key]: number | string | VoteOption | Date },
+  b: { [key in Key]: number | string | VoteOption | Date }
 ) => number {
   return order === 'desc'
     ? (a, b) => descendingComparator(a, b, orderBy)

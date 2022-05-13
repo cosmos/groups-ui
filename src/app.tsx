@@ -8,7 +8,7 @@ import { Routes } from "./routes";
 import { Settings } from "./pages/settings/settings";
 import { GroupAdminView } from "./pages/groups/admin-view";
 import GroupDetails from "./pages/groups/group-details";
-import { ProposalPage } from "./pages/create-proposal/proposal";
+import { ProposalPage } from "./pages/proposal/proposal";
 import { CreateProposal } from "./pages/create-proposal/create-proposal";
 
 import "./app.css";
@@ -61,7 +61,7 @@ export const App: React.FC = () => {
             <Settings />
           </Page>
         </Route>
-        <Route exact path="/my/component">
+        <Route exact path={Routes.PROPOSALS}>
           <ProposalPage />
         </Route>
       </Switch>

@@ -9,6 +9,7 @@ import {
 import React from 'react'
 import { Data, EnhancedTableProps } from './proposal-types'
 import { headCells } from './constants'
+import {Vote} from "../../generated/cosmos/group/v1/types";
 
 export function EnhancedTableHead(props: EnhancedTableProps) {
   const {
@@ -21,7 +22,7 @@ export function EnhancedTableHead(props: EnhancedTableProps) {
   } = props
 
   const createSortHandler =
-    (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
+    (property: keyof Vote) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property)
     }
 

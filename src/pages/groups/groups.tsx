@@ -14,7 +14,7 @@ import {
 } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import { Routes } from "../../routes";
-import { statusStyles } from "../create-proposal/proposal-style";
+import { statusStyles } from "../proposal/proposal-style";
 
 const useStyles = makeStyles((theme) => ({
   paper: {

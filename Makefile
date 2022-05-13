@@ -95,15 +95,28 @@ create-group-policy:
 	simd tx group create-group-policy $(USER2) $$groupId '' --chain-id $(CHAIN_ID) \
     	'{"@type":"/cosmos.group.v1.ThresholdDecisionPolicy", "threshold":"1", "windows": {"voting_period": "120h"}}'
 
+.PHONY: query-group-proposals-by-group-policy
+query-group-proposals-by-group-policy:
+	@read -p "Group Policy Address:" address; \
+	simd q group proposals-by-group-policy $$address
+
 .PHONY: query-group-policies
 query-group-policies:
 	@read -p "Group ID:" groupId; \
 	simd q group group-policies-by-group $$groupId
 
-.PHONY: submit-proposal
- submit-proposal:
-	simd tx group submit-proposal ./testdata/proposal.json --chain-id $(CHAIN_ID)
+.PHONY: query-group-proposal
+query-group-proposal:
+	@read -p "Proposal ID:" proposalId; \
+	simd q group proposal $$proposalId
 
+.PHONY: submit-bank-send-proposal
+ submit-proposal:
+	simd tx group submit-proposal ./testdata/proposals/bank-send-proposal.json --chain-id $(CHAIN_ID)
+
+.PHONY: submit-text-proposal
+ submit-proposal:
+	simd tx group submit-proposal ./testdata/proposals/text-proposal.json --chain-id $(CHAIN_ID)
 
 .PHONY: update-group-metadata
 update-group-metadata:

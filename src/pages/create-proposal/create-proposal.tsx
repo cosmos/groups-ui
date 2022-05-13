@@ -24,7 +24,8 @@ import {ActionsComposer} from "./actions-composer";
 import {ActionType} from "../../shared-state/create-proposal-store";
 import CreateProposalNavPanel from "./create-proposal-nav-panel";
 import {PrimaryButton} from "../../components/primary-button";
-import {useParams} from "react-router-dom";
+import {useHistory, useParams} from "react-router-dom";
+import {Routes} from "../../routes";
 
 type Anchor = 'top' | 'left' | 'bottom' | 'right';
 
@@ -73,11 +74,13 @@ const drawerStyles = makeStyles((theme) => ({
 export const CreateProposal: React.FC<{initialProposerType: ActionType}> = observer(({initialProposerType}) => {
     const {addAction, createProposal} = useStores().createProposalStore
     const {fetchGroupById} = useStores().groupsStore
+    const [createdProposalId, setCreatedProposalId] = useState<number>()
     const params: any = useParams()
     const groupId = params.id
+    const history = useHistory()
 
     const saveProposal = async () => {
-        await createProposal(await fetchGroupById(groupId))
+        setCreatedProposalId(await createProposal(await fetchGroupById(groupId)))
         setActiveStep(activeStep + 1)
     }
 
@@ -212,7 +215,9 @@ export const CreateProposal: React.FC<{initialProposerType: ActionType}> = obser
                                     <div className={classes.description} style={{ margin: '30px 0', }}>
                                         <span>You have successfully created a proposal!</span>
                                     </div>
-                                    <PrimaryButton >view your proposal</PrimaryButton>
+                                    <PrimaryButton onClick={() => history.push(Routes.PROPOSALS.replace(":group_id", groupId.toString()).replace(":id", createdProposalId.toString()))}>
+                                        view your proposal
+                                    </PrimaryButton>
                                 </div>
                             </div>
                         </>

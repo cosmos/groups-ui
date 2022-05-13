@@ -4,7 +4,7 @@ import {useStores} from "../../../shared-state/repo";
 import {truncateAddress} from "../../../utils";
 import {observer} from "mobx-react-lite";
 import {useStyles} from "../create-proposal-styles";
-import {SpendActionData, StakeActionData} from "../../../shared-state/create-proposal-store";
+import {SpendActionData} from "../../../shared-state/create-proposal-store";
 
 export const PreviewSpendAction: React.FC<{id: symbol}> = observer(({id}) => {
     const classes = useStyles()
@@ -18,8 +18,8 @@ export const PreviewSpendAction: React.FC<{id: symbol}> = observer(({id}) => {
             </div>
             <div className={classes.paperBody}>
                 <div className="marginB">
-                    <p className={classes.previewTitle}>From validator</p>
-                    <p className={classes.description}>{truncateAddress(data.fromValidatorAddress)}</p>
+                    <p className={classes.previewTitle}>From Group Policy</p>
+                    {/*<p className={classes.description}>{truncateAddress(data.fromValidatorAddress)}</p>*/}
                 </div>
                 <div className="marginB">
                     <p className={classes.previewTitle}>To validator</p>

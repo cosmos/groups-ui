@@ -1,12 +1,15 @@
-import { Button } from '@material-ui/core'
-import { Check, Close, ThumbDown } from '@material-ui/icons'
+import {Button} from '@material-ui/core'
+import {Check, Close, ThumbDown} from '@material-ui/icons'
 import React from 'react'
-import { Doughnut } from 'react-chartjs-2'
-import { statusStyles, useStyles } from './proposal-style'
+import {Doughnut} from 'react-chartjs-2'
+import {statusStyles, useStyles} from './proposal-style'
+import {useStores} from "../../shared-state/repo";
+import {VoteOption} from "../../generated/cosmos/group/v1/types";
 
-const ProposalChart = () => {
+const ProposalChart = ({proposalId}) => {
   const classes = useStyles()
   const status = statusStyles()
+    const { fetchProposalById, voteProposal } = useStores().proposalsStore
 
   return (
     <div className={classes.voting}>
@@ -38,20 +41,24 @@ const ProposalChart = () => {
       </p>
       <div style={{ width: '100%' }}>
         <div className={classes.btnBox}>
-          <Button variant="outlined" className={`${status.button} green`}>
+          <Button onClick={() => voteProposal(proposalId, VoteOption.VOTE_OPTION_YES, '')}
+                  variant="outlined" className={`${status.button} green`}>
             <Check style={{ fontSize: '20px', marginRight: '5px' }} />
             Vote Yes
           </Button>
-          <Button variant="outlined" className={`${status.button} red`}>
+          <Button onClick={() => voteProposal(proposalId, VoteOption.VOTE_OPTION_NO, '')}
+                  variant="outlined" className={`${status.button} red`}>
             <Close style={{ fontSize: '20px', marginRight: '5px' }} />
             Vote No
           </Button>
         </div>
         <div className={classes.btnBox}>
-          <Button variant="outlined" className={`${status.button} yellow`}>
+          <Button onClick={() => voteProposal(proposalId, VoteOption.VOTE_OPTION_ABSTAIN, '')}
+                  variant="outlined" className={`${status.button} yellow`}>
             Abstain
           </Button>
-          <Button variant="outlined" className={`${status.button} orange`}>
+          <Button onClick={() => voteProposal(proposalId, VoteOption.VOTE_OPTION_NO_WITH_VETO, '')}
+                  variant="outlined" className={`${status.button} orange`}>
             <ThumbDown style={{ fontSize: '20px', marginRight: '5px' }} />
             veto
           </Button>

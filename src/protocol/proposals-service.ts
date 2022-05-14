@@ -46,16 +46,16 @@ export class ProposalsService implements Service {
 
     // fixme: implement paging
     allProposalsByGroupPolicy = async (policyAddress: string): Promise<Proposal[]> => {
-        /*const res = await this.cosmosClient.lcdClientGet(
+        const res = await this.cosmosClient.lcdClientGet(
             `/cosmos/group/v1/proposals_by_group_policy/${policyAddress}`
         ) as QueryProposalsByGroupPolicyResponse
 
         // TODO check pagination field later
         console.log("proposals pagination", res.pagination)
 
-        return res.proposals*/
+        return res.proposals
 
-        const requestData = Uint8Array.from(
+        /*const requestData = Uint8Array.from(
             QueryProposalsByGroupPolicyRequest.encode({
                 address: policyAddress,
                 pagination: PageRequest.fromPartial({
@@ -69,7 +69,7 @@ export class ProposalsService implements Service {
         const data = await this.cosmosClient.queryClientGet(`/${protobufPackage}.Query/ProposalsByGroupPolicy`, requestData)
         const response = QueryProposalsByGroupPolicyResponse.decode(data)
 
-        return response.proposals
+        return response.proposals*/
     }
 
     voteByProposalVoter = async (proposalId: number, voterAddress: string): Promise<Vote> => {

@@ -9,34 +9,21 @@ export const CreateSpendAction: React.FC<{id: symbol}> = ({id}) => {
     // todo: fee
     const classes = useStyles()
     const {updateAction, newProposal} = useStores().createProposalStore
-    const {allValidators, fetchAllValidators} = useStores().validatorsStore
     const {chainInfo} = useStores().chainInfoStore
 
     const initialData = newProposal.actions.find( a => a.id === id).data as SpendActionData
-    const [fromValidatorAddress, setFromValidatorAddress] = React.useState(initialData.fromValidatorAddress)
-    const [toValidatorAddress, setToValidatorAddress] = React.useState(initialData.toValidatorAddress)
+    const [toAddress, setToAddress] = React.useState(initialData.toAddress)
     const [currencyDenom, setCurrencyDenom] = React.useState(initialData.coinDenom || chainInfo.currencies[0].coinDenom)
     const [balance, setBalance] = React.useState<number>(0)
     const [amount, setAmount] = React.useState<number>(initialData.amount)
 
     useEffect(() => {
         updateAction(id, {
-            fromValidatorAddress,
-            toValidatorAddress,
+            toAddress,
             coinDenom: currencyDenom,
             amount
         } as SpendActionData)
-    }, [fromValidatorAddress, toValidatorAddress, currencyDenom, amount])
-
-    useEffect(() => {
-        fetchAllValidators()
-            .then( list => {
-                if (list.length === 1) {
-                    setFromValidatorAddress(list[0].operator_address)
-                    setToValidatorAddress(list[0].operator_address)
-                }
-            })
-    }, [fetchAllValidators])
+    }, [toAddress, currencyDenom, amount])
 
     useEffect(() => {
         BankService.instance.getAllUserBalances().then(balances => {
@@ -48,14 +35,8 @@ export const CreateSpendAction: React.FC<{id: symbol}> = ({id}) => {
         })
     }, [currencyDenom, chainInfo])
 
-    const handleFromValidatorChange = (event) => {
-        const validator = allValidators.find(v => v.operator_address === event.target.value);
-        setFromValidatorAddress(validator?.operator_address)
-    }
-
-    const handleToValidatorChange = (event) => {
-        const validator = allValidators.find(v => v.operator_address === event.target.value);
-        setToValidatorAddress(validator?.operator_address)
+    const handleToAddress = (event) => {
+        setToAddress(event.target.value)
     }
 
     const handleCurrencyChange = (event) => {
@@ -90,18 +71,15 @@ export const CreateSpendAction: React.FC<{id: symbol}> = ({id}) => {
                   </FormControl>*/}
               </div>
               <div className="marginB">
-                  <p className={classes.paperTitle}>To validator</p>
+                  <p className={classes.paperTitle}>To address</p>
                   <FormControl variant="outlined" fullWidth>
-                      <Select
+                      <TextField
                           fullWidth
-                          placeholder="Select validator"
-                          value={toValidatorAddress}
-                          onChange={handleToValidatorChange}
-                      >
-                          { !allValidators ? (<MenuItem value={''}>Loading...</MenuItem>) : allValidators.map( validator => (
-                              <MenuItem key={validator.operator_address} value={validator.operator_address}>{validator.description.moniker}</MenuItem>
-                          ))}
-                      </Select>
+                          value={toAddress}
+                          id="outlined-disabled"
+                          variant="outlined"
+                          onChange={handleToAddress}
+                      />
                   </FormControl>
               </div>
 

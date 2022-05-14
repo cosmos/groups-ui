@@ -53,6 +53,7 @@ export enum ActionType {
 // export type StakeProposalType = ProposalType.STAKE_DELEGATE|ProposalType.STAKE_REDELEGATE|ProposalType.STAKE_UNDELEGATE|ProposalType.STAKE_CLAIM_REWARD
 
 export type ActionData = RedelegateActionData | DelegateActionData | SpendActionData | TextActionData | ParameterChangeActionData
+export type HasActionStateType = { type: ActionStateType }
 
 export interface UndelegateActionData {
     type: ActionStateType
@@ -60,6 +61,8 @@ export interface UndelegateActionData {
     coinDenom: string
     amount: number
 }
+export const isUndelegateActionData = (data: HasActionStateType): data is UndelegateActionData =>
+    data.type === ActionStateType.UNDELEGATE
 
 export interface DelegateActionData {
     type: ActionStateType
@@ -67,6 +70,8 @@ export interface DelegateActionData {
     coinDenom: string
     amount: number
 }
+export const isDelegateActionData = (data: HasActionStateType): data is DelegateActionData =>
+    data.type === ActionStateType.DELEGATE
 
 export interface RedelegateActionData {
     type: ActionStateType
@@ -75,10 +80,14 @@ export interface RedelegateActionData {
     coinDenom: string
     amount: number
 }
+export const isRedelegateActionData = (data: HasActionStateType): data is RedelegateActionData =>
+    data.type === ActionStateType.REDELEGATE
 
 export interface ClaimRewardActionData {
     type: ActionStateType
 }
+export const isClaimRewardActionData = (data: HasActionStateType): data is ClaimRewardActionData =>
+    data.type === ActionStateType.CLAIM_REWARD
 
 export interface ParameterChangeActionData {
     module: string
@@ -87,8 +96,7 @@ export interface ParameterChangeActionData {
 }
 
 export interface SpendActionData {
-    fromValidatorAddress: string
-    toValidatorAddress: string
+    toAddress: string
     coinDenom: string
     amount: number
 }
@@ -125,7 +133,7 @@ async function createClaimRewardProposalMsgs(groupPolicyAddress) {
 function createSpendProposalMsg(data: SpendActionData, groupPolicyAddress) {
     let message: MsgSend = {
         from_address: groupPolicyAddress,
-        to_address: data.toValidatorAddress,
+        to_address: data.toAddress,
         amount: [{
             amount: data.amount.toString(),
             denom: CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom
@@ -231,16 +239,16 @@ export class CreateProposalStore {
         const proposals = (await Promise.all(this.newProposal.actions.map( async (action) => {
             switch (action.id.description) {
                 case ActionType.STAKE:
-                    // const data = action.data as StakeActionData;
-                    switch (action.data['type']) {
+                    const data = action.data as { type: ActionStateType }
+                    switch (data.type) {
                         case ActionStateType.DELEGATE:
-                            return createDelegateProposalMsg(action.data as DelegateActionData, groupPolicyAddress)
+                            return isDelegateActionData(data) && createDelegateProposalMsg(data, groupPolicyAddress)
                         case ActionStateType.REDELEGATE:
-                            return createRedelegateProposalMsg(action.data as RedelegateActionData, groupPolicyAddress)
+                            return isRedelegateActionData(data) && createRedelegateProposalMsg(data, groupPolicyAddress)
                         case ActionStateType.UNDELEGATE:
-                            return createUndelegateProposalMsg(action.data as UndelegateActionData, groupPolicyAddress)
+                            return isUndelegateActionData(data) && createUndelegateProposalMsg(data, groupPolicyAddress)
                         case ActionStateType.CLAIM_REWARD:
-                            return await createClaimRewardProposalMsgs(groupPolicyAddress)
+                            return isClaimRewardActionData(data) && await createClaimRewardProposalMsgs(groupPolicyAddress)
                     }
                     break
                 case ActionType.TEXT:
@@ -267,6 +275,11 @@ export class CreateProposalStore {
             }).finish(),
         }*/
 
+        if (proposals.length === 0) {
+            // todo: show some message
+            return
+        }
+
         const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(
             CosmosNodeService.instance.chainInfo.chainId
         );
@@ -277,7 +290,7 @@ export class CreateProposalStore {
 
         const msg: MsgSubmitProposal = MsgSubmitProposal.fromPartial({
             address: groupPolicyAddress,
-            proposers: group.members.map( m => m.member.address ),
+            proposers: [me], //group.members.map( m => m.member.address ),
             messages: proposals,
             // exec,
             // metadata: toUint8Array(mockMetaData).toString(),
@@ -307,13 +320,13 @@ export class CreateProposalStore {
             createdProposalId = Number(JSON.parse(res.rawLog)[0].events.find(e => e.type === 'cosmos.group.v1.EventCreateProposal').attributes[0].value.replaceAll('"', ''))
         } catch (e) {
             console.warn(e)
-            if (e.message === 'Invalid string. Length must be a multiple of 4') {
+            // if (e.message === 'Invalid string. Length must be a multiple of 4') {
                 const proposals = await ProposalsService.instance.allProposalsByGroupPolicy(groupPolicyAddress)
                 createdProposalId = Math.max(...proposals.map( p => Number(p.id)), 0)
-            } else {
+            // } else {
                 // todo: show error
-                throw e
-            }
+                // throw e
+            // }
         }
         console.log(`Created Proposal Id: ${createdProposalId}`)
         this.newProposal = {

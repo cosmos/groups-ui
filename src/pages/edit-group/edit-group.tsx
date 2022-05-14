@@ -191,7 +191,7 @@ export const EditGroup: React.FC<{}> = observer(() => {
                         </IconButton>
                       </label>
                     </div>
-                    <div className={classes.radioBox}>
+                    {/*<div className={classes.radioBox}>
                       <label htmlFor="adminChoise3" className={classes.radio}>
                         <input type="radio" name="admin" id="adminChoise3" />
                         <p>Another account</p>
@@ -219,7 +219,7 @@ export const EditGroup: React.FC<{}> = observer(() => {
                           variant="outlined"
                         />
                       </label>
-                    </div>
+                    </div>*/}
                   </form>
                   {/* <FormControl component="fieldset" className={classes.radioBox}>
                                         <FormLabel component="legend" className={classes.inputTitle} style={{color: "#000000"}}>Group admin</FormLabel>

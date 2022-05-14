@@ -22,8 +22,8 @@ export const PreviewSpendAction: React.FC<{id: symbol}> = observer(({id}) => {
                     {/*<p className={classes.description}>{truncateAddress(data.fromValidatorAddress)}</p>*/}
                 </div>
                 <div className="marginB">
-                    <p className={classes.previewTitle}>To validator</p>
-                    <p className={classes.description}>{truncateAddress(data.toValidatorAddress)}</p>
+                    <p className={classes.previewTitle}>To Address</p>
+                    <p className={classes.description}>{truncateAddress(data.toAddress)}</p>
                 </div>
                 <div className="marginB">
                     <div>

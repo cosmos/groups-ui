@@ -7,7 +7,7 @@ import { QueryAllBalancesResponse } from '../generated/cosmos/bank/v1beta1/query
 
 @service
 export class BankService {
-    static serviceName = BankService.name
+    static serviceName = 'BankService'
 
     static get instance(): BankService {
         return getService<BankService>(BankService.serviceName)

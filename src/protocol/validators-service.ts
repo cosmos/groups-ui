@@ -6,7 +6,7 @@ import { Validator } from '../generated/cosmos/staking/v1beta1/staking'
 
 @service
 export class ValidatorsService {
-    static serviceName = ValidatorsService.name
+    static serviceName = 'ValidatorsService'
 
     static get instance(): ValidatorsService {
         return getService<ValidatorsService>(ValidatorsService.serviceName)

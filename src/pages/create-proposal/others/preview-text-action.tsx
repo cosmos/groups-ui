@@ -4,7 +4,7 @@ import {useStores} from "../../../shared-state/repo";
 import {truncateAddress} from "../../../utils";
 import {observer} from "mobx-react-lite";
 import {useStyles} from "../create-proposal-styles";
-import {StakeActionData, TextActionData} from "../../../shared-state/create-proposal-store";
+import {TextActionData} from "../../../shared-state/create-proposal-store";
 
 export const PreviewTextAction: React.FC<{id: symbol}> = observer(({id}) => {
     const classes = useStyles()

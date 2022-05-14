@@ -3,7 +3,7 @@ import {Button, FormControl, FormGroup, MenuItem, Select, TextField} from "@mate
 import {useStores} from "../../../shared-state/repo";
 import {BankService} from "../../../protocol/bank-service";
 import {useStyles} from "../create-proposal-styles";
-import {ActionStateType, StakeActionData} from "../../../shared-state/create-proposal-store";
+import {ActionStateType, DelegateActionData} from "../../../shared-state/create-proposal-store";
 
 export const CreateDelegateAction: React.FC<{id: symbol, type: ActionStateType}> = ({id, type}) => {
     // todo: fee
@@ -11,7 +11,7 @@ export const CreateDelegateAction: React.FC<{id: symbol, type: ActionStateType}>
     // const [id] = useState(Symbol(ProposalType.STAKE_DELEGATE))
     const {updateAction, newProposal} = useStores().createProposalStore
     // in case of editing
-    const initialData = newProposal.actions.find( a => a.id === id).data as StakeActionData
+    const initialData = newProposal.actions.find( a => a.id === id).data as DelegateActionData
     const {allValidators, fetchAllValidators} = useStores().validatorsStore
     const {chainInfo} = useStores().chainInfoStore
     const [validatorAddress, setValidatorAddress] = React.useState(initialData.validatorAddress)

@@ -3,7 +3,7 @@ import {Button, FormControl, FormGroup, MenuItem, Select, TextField} from "@mate
 import {useStores} from "../../../shared-state/repo";
 import {BankService} from "../../../protocol/bank-service";
 import {useStyles} from "../create-proposal-styles";
-import {ActionStateType, StakeActionData} from "../../../shared-state/create-proposal-store";
+import {ActionStateType, RedelegateActionData} from "../../../shared-state/create-proposal-store";
 
 export const CreateRedelegateAction: React.FC<{id: symbol}> = ({id}) => {
     // todo: fee
@@ -12,7 +12,7 @@ export const CreateRedelegateAction: React.FC<{id: symbol}> = ({id}) => {
     const {allValidators, fetchAllValidators} = useStores().validatorsStore
     const {chainInfo} = useStores().chainInfoStore
 
-    const initialData = newProposal.actions.find( a => a.id === id).data as StakeActionData
+    const initialData = newProposal.actions.find( a => a.id === id).data as RedelegateActionData
     const [fromValidatorAddress, setFromValidatorAddress] = React.useState(initialData.fromValidatorAddress)
     const [toValidatorAddress, setToValidatorAddress] = React.useState(initialData.toValidatorAddress)
     const [currencyDenom, setCurrencyDenom] = React.useState(initialData.coinDenom || chainInfo.currencies[0].coinDenom)

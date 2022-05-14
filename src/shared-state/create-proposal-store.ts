@@ -4,17 +4,25 @@ import {
     Exec,
     MsgExec,
     MsgVote,
-    protobufPackage,
-    MsgSubmitProposal as MsgCreateProposal
+    protobufPackage as groupProtobufPackage,
+    MsgSubmitProposal
 } from '../generated/cosmos/group/v1/tx';
-import { TextProposal } from '../generated/gov/gov';
+import {
+    MsgBeginRedelegate,
+    MsgDelegate, MsgUndelegate,
+    protobufPackage as stakingProtobufPackage
+} from '../generated/cosmos/staking/v1beta1/tx';
+import {protobufPackage as distributionProtobufPackage} from '../generated/cosmos/distribution/v1beta1/tx';
+import {protobufPackage as bankProtobufPackage} from '../generated/cosmos/bank/v1beta1/tx';
 import { ParameterChangeProposal } from '../generated/params/params';
 import { Group, toUint8Array } from './groups-store';
 import { CosmosNodeService } from '../protocol/cosmos-node-service';
 import { VoteOption } from '../generated/cosmos/group/v1/types';
 import { Coin, coins } from '@cosmjs/proto-signing';
-import { DeliverTxResponse } from '@cosmjs/stargate';
-import { MsgSubmitProposal } from '../generated/gov/tx';
+import {ProposalsService} from "../protocol/proposals-service";
+import {MsgWithdrawDelegatorReward} from "../generated/cosmos/distribution/v1beta1/tx";
+import {MsgSend} from "../generated/cosmos/bank/v1beta1/tx";
+import {ValidatorsService} from "../protocol/validators-service";
 
 interface NewProposal {
     actions: Action[]
@@ -44,15 +52,32 @@ export enum ActionType {
 
 // export type StakeProposalType = ProposalType.STAKE_DELEGATE|ProposalType.STAKE_REDELEGATE|ProposalType.STAKE_UNDELEGATE|ProposalType.STAKE_CLAIM_REWARD
 
-export type ActionData = StakeActionData | SpendActionData | TextActionData | ParameterChangeActionData
+export type ActionData = RedelegateActionData | DelegateActionData | SpendActionData | TextActionData | ParameterChangeActionData
 
-export interface StakeActionData {
+export interface UndelegateActionData {
     type: ActionStateType
-    fromValidatorAddress: string
-    toValidatorAddress: string
     validatorAddress: string
     coinDenom: string
     amount: number
+}
+
+export interface DelegateActionData {
+    type: ActionStateType
+    validatorAddress: string
+    coinDenom: string
+    amount: number
+}
+
+export interface RedelegateActionData {
+    type: ActionStateType
+    fromValidatorAddress: string
+    toValidatorAddress: string
+    coinDenom: string
+    amount: number
+}
+
+export interface ClaimRewardActionData {
+    type: ActionStateType
 }
 
 export interface ParameterChangeActionData {
@@ -78,8 +103,94 @@ interface Action {
 }
 
 enum ProposalTypeUrls {
-    TextProposal = '/cosmos.gov.v1.TextProposal',
+    TextProposal = '/cosmos.gov.v1beta1.TextProposal',
     ParameterChangeProposal = '/cosmos.params.v1.ParameterChangeProposal',
+}
+
+async function createClaimRewardProposalMsgs(groupPolicyAddress) {
+    const allValidators = await ValidatorsService.instance.allValidators()
+
+    return allValidators.map( validator => {
+        let message: MsgWithdrawDelegatorReward = {
+            validator_address: validator.operator_address,
+            delegator_address: groupPolicyAddress
+        }
+        return {
+            type_url: `/${distributionProtobufPackage}.MsgWithdrawDelegatorReward`,
+            value: MsgWithdrawDelegatorReward.encode(message).finish()
+        }
+    })
+}
+
+function createSpendProposalMsg(data: SpendActionData, groupPolicyAddress) {
+    let message: MsgSend = {
+        from_address: groupPolicyAddress,
+        to_address: data.toValidatorAddress,
+        amount: [{
+            amount: data.amount.toString(),
+            denom: CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom
+        }]
+    }
+    // console.log(message)
+    return {
+        type_url: `/${bankProtobufPackage}.MsgSend`,
+        value: MsgSend.encode(message).finish()
+    }
+}
+
+function createDelegateProposalMsg(data: DelegateActionData, groupPolicyAddress) {
+    console.assert(data.type === ActionStateType.DELEGATE)
+
+    let message: MsgDelegate = {
+        validator_address: data.validatorAddress,
+        delegator_address: groupPolicyAddress,
+        amount: {
+            amount: data.amount.toString(),
+            denom: CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom
+        }
+    }
+    // console.log(message)
+    return {
+        type_url: `/${stakingProtobufPackage}.MsgDelegate`,
+        value: MsgDelegate.encode(message).finish()
+    }
+}
+
+function createUndelegateProposalMsg(data: UndelegateActionData, groupPolicyAddress) {
+    console.assert(data.type === ActionStateType.UNDELEGATE)
+
+    let message: MsgUndelegate = {
+        validator_address: data.validatorAddress,
+        delegator_address: groupPolicyAddress,
+        amount: {
+            amount: data.amount.toString(),
+            denom: CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom
+        }
+    }
+    // console.log(message)
+    return {
+        type_url: `/${stakingProtobufPackage}.MsgUndelegate`,
+        value: MsgUndelegate.encode(message).finish()
+    }
+}
+
+function createRedelegateProposalMsg(data: RedelegateActionData, groupPolicyAddress) {
+    console.assert(data.type === ActionStateType.REDELEGATE)
+
+    let message: MsgBeginRedelegate = {
+        delegator_address: groupPolicyAddress,
+        validator_src_address: data.fromValidatorAddress,
+        validator_dst_address: data.toValidatorAddress,
+        amount: {
+            amount: data.amount.toString(),
+            denom: CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom
+        }
+    }
+    // console.log(message)
+    return {
+        type_url: `/${stakingProtobufPackage}.MsgBeginRedelegate`,
+        value: MsgBeginRedelegate.encode(message).finish()
+    }
 }
 
 export class CreateProposalStore {
@@ -114,47 +225,69 @@ export class CreateProposalStore {
 
     createProposal = async (
         group: Group
-    ): Promise<DeliverTxResponse | null> => {
-        // TODO remove mocks
-        const mockMetaData = 'testing abc';
-        const mockCoins: Coin[] = coins(
+    ): Promise<number> => {
+
+        const groupPolicyAddress = group.policy.address;
+        const proposals = (await Promise.all(this.newProposal.actions.map( async (action) => {
+            switch (action.id.description) {
+                case ActionType.STAKE:
+                    // const data = action.data as StakeActionData;
+                    switch (action.data['type']) {
+                        case ActionStateType.DELEGATE:
+                            return createDelegateProposalMsg(action.data as DelegateActionData, groupPolicyAddress)
+                        case ActionStateType.REDELEGATE:
+                            return createRedelegateProposalMsg(action.data as RedelegateActionData, groupPolicyAddress)
+                        case ActionStateType.UNDELEGATE:
+                            return createUndelegateProposalMsg(action.data as UndelegateActionData, groupPolicyAddress)
+                        case ActionStateType.CLAIM_REWARD:
+                            return await createClaimRewardProposalMsgs(groupPolicyAddress)
+                    }
+                    break
+                case ActionType.TEXT:
+                    return undefined
+                case ActionType.SPEND:
+                    return createSpendProposalMsg(action.data as SpendActionData, groupPolicyAddress)
+                case ActionType.PARAMETER_CHANGE:
+                    return undefined
+            }
+            return undefined
+        }))).flat().filter( m => !!m)
+
+
+        // const mockMetaData = 'testing abc';
+        /*const mockCoins: Coin[] = coins(
             5,
             CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom
         );
-        const mockTextProposal = this.encodeTextProposal({
-            title: 'Testing',
-            description: 'Test desc',
-        });
+        const mockTextProposal = {
+            type_url: ProposalTypeUrls.TextProposal,
+            value: TextProposal.encode({
+                title: 'Testing',
+                description: 'Test desc',
+            }).finish(),
+        }*/
 
         const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(
             CosmosNodeService.instance.chainInfo.chainId
         );
         const me = key.bech32Address;
 
-        // TODO remove these mocks too
-        const mockMsgSubmitProposal = this.createMsgSubmitProposal(
-            mockTextProposal,
-            me,
-            mockCoins
-        );
-
         // TODO replace hardcode
-        const exec = Exec.EXEC_TRY;
+        // const exec = Exec.EXEC_TRY;
 
-        const msg: MsgCreateProposal = MsgCreateProposal.fromPartial({
-            // TODO replace with fetching group policy address
-            // this is group policy address hardcoded for testing
-            address: 'regen1m73npu5jn89syq23568a44ymrj7za9qa7mxgh0',
-            proposers: group.members.map((m) => m.member.address),
-            messages: [mockMsgSubmitProposal],
-            exec,
-            metadata: toUint8Array(mockMetaData).toString(),
+        const msg: MsgSubmitProposal = MsgSubmitProposal.fromPartial({
+            address: groupPolicyAddress,
+            proposers: group.members.map( m => m.member.address ),
+            messages: proposals,
+            // exec,
+            // metadata: toUint8Array(mockMetaData).toString(),
+            metadata: this.newProposal.name
         });
 
         console.log('msg', msg);
 
         const msgAny = {
-            typeUrl: `/${protobufPackage}.MsgCreateProposal`,
+            typeUrl: `/${groupProtobufPackage}.MsgSubmitProposal`,
             value: msg,
         };
 
@@ -164,142 +297,32 @@ export class CreateProposalStore {
                 CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom
             ),
             gas: '2000000',
-        };
+        }
+
+        let createdProposalId
 
         try {
-            CosmosNodeService.instance.cosmosClient.registry.register(
-                `/${protobufPackage}.MsgCreateProposal`,
-                MsgCreateProposal
-            )
-            const res =
-                await CosmosNodeService.instance.cosmosClient.signAndBroadcast(
-                    me,
-                    [msgAny],
-                    fee
-                );
-
-            console.log('proposal creation', res);
-            return res;
-        } catch (error) {
-            console.log('error creating proposal', error);
+            const res = await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny], fee)
+            console.log('proposal creation', res)
+            createdProposalId = Number(JSON.parse(res.rawLog)[0].events.find(e => e.type === 'cosmos.group.v1.EventCreateProposal').attributes[0].value.replaceAll('"', ''))
+        } catch (e) {
+            console.warn(e)
+            if (e.message === 'Invalid string. Length must be a multiple of 4') {
+                const proposals = await ProposalsService.instance.allProposalsByGroupPolicy(groupPolicyAddress)
+                createdProposalId = Math.max(...proposals.map( p => Number(p.id)), 0)
+            } else {
+                // todo: show error
+                throw e
+            }
         }
-    };
-
-    // Later may add choice and metadata to store, if needed for multiple components
-    voteProposal = async (
-        proposalId: number,
-        voteOption: VoteOption,
-        metadata: string
-    ) => {
-        const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(
-            CosmosNodeService.instance.chainInfo.chainId
-        );
-        const me = key.bech32Address;
-
-        // TODO replace hardcode
-        const exec = Exec.EXEC_TRY;
-
-        const msg: MsgVote = {
-            proposal_id: proposalId,
-            option: voteOption,
-            voter: me,
-            metadata: metadata,
-            exec,
-        };
-
-        const msgAny = {
-            typeUrl: `/${protobufPackage}.MsgVote`,
-            value: MsgVote.encode(msg).finish(),
-        };
-
-        const fee = {
-            amount: coins(
-                0,
-                CosmosNodeService.instance.chainInfo.stakeCurrency
-                    .coinMinimalDenom
-            ),
-            gas: '2000000',
-        };
-
-        try {
-            const res =
-                await CosmosNodeService.instance.cosmosClient.signAndBroadcast(
-                    me,
-                    [msgAny],
-                    fee
-                );
-
-            console.log('proposal vote', res);
-            return res;
-        } catch (error) {
-            console.log('error voting proposal', error);
+        console.log(`Created Proposal Id: ${createdProposalId}`)
+        this.newProposal = {
+            actions: [],
+            name: '',
+            description: ''
         }
-    };
-
-    executeProposal = async (proposalId: number) => {
-        const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(
-            CosmosNodeService.instance.chainInfo.chainId
-        );
-        const me = key.bech32Address;
-
-        const msg: MsgExec = {
-            proposal_id: proposalId,
-            signer: me,
-        };
-
-        const msgAny = {
-            typeUrl: `/${protobufPackage}.MsgExec`,
-            value: MsgExec.encode(msg).finish(),
-        };
-
-        const fee = {
-            amount: coins(
-                0,
-                CosmosNodeService.instance.chainInfo.stakeCurrency
-                    .coinMinimalDenom
-            ),
-            gas: '2000000',
-        };
-
-        try {
-            const res =
-                await CosmosNodeService.instance.cosmosClient.signAndBroadcast(
-                    me,
-                    [msgAny],
-                    fee
-                );
-
-            console.log('proposal exec', res);
-            return res;
-        } catch (error) {
-            console.log('error exec proposal', error);
-        }
-    };
-
-    createMsgSubmitProposal = (
-        anyProposal: Any,
-        proposer: string,
-        deposit: Coin[]
-    ): Any => {
-        const msg = {
-            type_url: '/cosmos.gov.v1.MsgSubmitProposal',
-            value: MsgSubmitProposal.encode({
-                content: anyProposal,
-                proposer,
-                initialDeposit: deposit,
-            }).finish(),
-        };
-        return msg;
-    };
-
-    // for usage in components, encode before adding to proposal state
-    encodeTextProposal = (proposalValue: TextProposal): Any => {
-        const encodedProposal = {
-            type_url: ProposalTypeUrls.TextProposal,
-            value: TextProposal.encode(proposalValue).finish(),
-        };
-        return encodedProposal;
-    };
+        return createdProposalId
+    }
 
     encodeParameterChangeProposal = (
         proposalValue: ParameterChangeProposal

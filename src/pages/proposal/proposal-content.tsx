@@ -1,14 +1,28 @@
 import { Paper, TextField } from '@material-ui/core'
 import { ArrowBack, ChatBubbleOutline } from '@material-ui/icons'
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, {useEffect} from 'react'
+import {Link, useHistory} from 'react-router-dom'
 import { statusStyles, useStyles } from './proposal-style'
 import ProposalChart from './proposal-chart'
+import {useStores} from "../../shared-state/repo";
+import {Proposal} from "../../generated/cosmos/group/v1/types";
+import {Group} from "../../shared-state/groups-store";
+import moment from "moment";
+import {Routes} from "../../routes";
 
-const ProposalContent = () => {
-  const classes = useStyles()
-  const status = statusStyles()
+const ProposalContent = ({proposalId, groupId}) => {
+    const classes = useStyles()
+    const status = statusStyles()
+    const [proposal, setProposal] = React.useState<Proposal>()
+    const [group, setGroup] = React.useState<Group>()
+    const { fetchProposalById } = useStores().proposalsStore
+    const { fetchGroupById } = useStores().groupsStore
+    const history = useHistory()
 
+    useEffect(() => {
+        fetchProposalById(proposalId).then( proposal => setProposal(proposal))
+        fetchGroupById(groupId).then( g => setGroup(g))
+    }, [])
   return (
     <>
       <Link
@@ -19,10 +33,10 @@ const ProposalContent = () => {
           fontWeight: 800,
         }}
         className={classes.link}
-        onClick={() => console.log('click')}
+        onClick={() => history.push(Routes.GROUPS_ADMIN_VIEW.replace(':id', groupId.toString()))}
       >
         <ArrowBack style={{ fontSize: '18px', marginRight: '8px' }} />
-        Foo dev team
+          {group?.metadata?.name}
       </Link>
       <Paper
         style={{
@@ -33,17 +47,17 @@ const ProposalContent = () => {
       >
         <div className={classes.parChange}>
           <div className={classes.info}>
-            <p>#5</p>
+            <p>#{proposal?.id}</p>
             <span
               className={`${status.marker} green`}
               style={{ margin: '0 22px' }}
             >
-              Submited
+              {proposal?.status}
             </span>
             <span className={`${status.marker} orange`}>Unfinilized</span>
           </div>
           <div>
-            <h1 style={{ marginBottom: '25px' }}>Parameter Change Proposal</h1>
+            <h1 style={{ marginBottom: '25px' }}>{proposal?.metadata}</h1>
             <p className="text" style={{ fontSize: '18px' }}>
               MaxValidators=50 to MaxValidators=75 / This proposal will increase
               the number of active validator to 75 in the regen network. <br />{' '}
@@ -103,7 +117,7 @@ const ProposalContent = () => {
             View discussion on group forum»
           </Link>
         </div>
-        <ProposalChart />
+        <ProposalChart proposalId={proposalId}/>
       </Paper>
       <Paper
         style={{
@@ -117,16 +131,21 @@ const ProposalContent = () => {
           <div className={classes.propDetails}>
             <h4>Proposer</h4>
             <p className="text">
-              regen1gjvu75cq6qxyrtdv66lx9xe92jw9gqdeh64c6g...
+                {proposal?.proposers.join(", ")}
             </p>
             <h4>height</h4>
-            <p className="text">1,361,617</p>
+            <p className="text">{'?'}</p>
             <h4>Submit Time</h4>
-            <p className="text">14 days ago (Oct 29th 2021 11:43:32 AM )</p>
+            <p className="text">{proposal && `${moment(proposal.submit_time).fromNow()} (${proposal.submit_time})`}</p>
             <h4>Voting Start Time</h4>
-            <p className="text">12 days ago (Oct 29th 2021 12:00:35 AM )</p>
-            <h4>Voting End Time</h4>
-            <p className="text">in 2 days (Nov 29th 2021 12:00:35 AM )</p>
+            <p className="text">?</p>
+              { proposal && proposal.voting_period_end &&
+              <>
+                  <h4>Voting End Time</h4>
+                  <p className="text">{proposal && `${moment(proposal.voting_period_end).fromNow()} (${proposal.voting_period_end})`}</p>
+              </>
+              }
+
           </div>
           <div className={classes.content}>
             <h4>content</h4>
@@ -138,11 +157,12 @@ const ProposalContent = () => {
               fullWidth
               multiline
               rows={15}
+              value={proposal && JSON.stringify(proposal.messages, null, 2)}
             />
           </div>
         </div>
       </Paper>
-    </>
+</>
   )
 }
 

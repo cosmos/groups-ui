@@ -3,12 +3,19 @@ import { ChainInfo } from '@keplr-wallet/types'
 import { CosmosClient } from './cosmos-client'
 import { Proposal, Vote } from '../generated/cosmos/group/v1/types'
 import {
-    QueryProposalResponse,
+    QueryGroupsByAdminRequest, QueryGroupsByAdminResponse,
+    QueryProposalResponse, QueryProposalsByGroupPolicyRequest,
     QueryProposalsByGroupPolicyResponse,
     QueryVoteByProposalVoterResponse,
     QueryVotesByProposalResponse
 } from '../generated/cosmos/group/v1/query'
-import { MsgExec, MsgSubmitProposal, MsgVote, protobufPackage } from '../generated/cosmos/group/v1/tx'
+import {
+    MsgExec,
+    MsgSubmitProposal,
+    MsgVote,
+    protobufPackage
+} from '../generated/cosmos/group/v1/tx'
+import {PageRequest} from "../generated/cosmos/base/query/v1beta1/pagination";
 
 @service
 export class ProposalsService implements Service {
@@ -25,18 +32,9 @@ export class ProposalsService implements Service {
     }
 
     applyChainInfo = async (chainInfo: ChainInfo): Promise<void> => {
-        this.cosmosClient.registry.register(
-            `/${protobufPackage}.MsgSubmitProposal`,
-            MsgSubmitProposal
-        )
-        this.cosmosClient.registry.register(
-            `/${protobufPackage}.MsgVote`,
-            MsgVote,
-        )
-        this.cosmosClient.registry.register(
-            `/${protobufPackage}.MsgExec`,
-            MsgExec,
-        )
+        this.cosmosClient.registry.register(`/${protobufPackage}.MsgSubmitProposal`, MsgSubmitProposal)
+        this.cosmosClient.registry.register(`/${protobufPackage}.MsgVote`, MsgVote)
+        this.cosmosClient.registry.register(`/${protobufPackage}.MsgExec`, MsgExec)
     }
 
     proposalById = async (proposalId: number): Promise<Proposal> => {
@@ -46,15 +44,32 @@ export class ProposalsService implements Service {
         return res.proposal
     }
 
-    proposalsByGroupPolicy = async (policyAddress: string): Promise<Proposal[]> => {
-        const res = await this.cosmosClient.lcdClientGet(
+    // fixme: implement paging
+    allProposalsByGroupPolicy = async (policyAddress: string): Promise<Proposal[]> => {
+        /*const res = await this.cosmosClient.lcdClientGet(
             `/cosmos/group/v1/proposals_by_group_policy/${policyAddress}`
         ) as QueryProposalsByGroupPolicyResponse
 
         // TODO check pagination field later
         console.log("proposals pagination", res.pagination)
 
-        return res.proposals
+        return res.proposals*/
+
+        const requestData = Uint8Array.from(
+            QueryProposalsByGroupPolicyRequest.encode({
+                address: policyAddress,
+                pagination: PageRequest.fromPartial({
+                    offset: 0,
+                    limit: 50,  // TODO hardcoded pagination
+                    count_total: false,
+                    reverse: false
+                })
+            }).finish()
+        )
+        const data = await this.cosmosClient.queryClientGet(`/${protobufPackage}.Query/ProposalsByGroupPolicy`, requestData)
+        const response = QueryProposalsByGroupPolicyResponse.decode(data)
+
+        return response.proposals
     }
 
     voteByProposalVoter = async (proposalId: number, voterAddress: string): Promise<Vote> => {

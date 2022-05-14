@@ -3,7 +3,7 @@ import {Button, FormControl, FormGroup, MenuItem, Paper, Select, TextField} from
 import {useStores} from "../../../shared-state/repo";
 import {BankService} from "../../../protocol/bank-service";
 import {useStyles} from "../create-proposal-styles";
-import {ActionStateType, SpendActionData, StakeActionData} from "../../../shared-state/create-proposal-store";
+import {SpendActionData} from "../../../shared-state/create-proposal-store";
 
 export const CreateSpendAction: React.FC<{id: symbol}> = ({id}) => {
     // todo: fee
@@ -75,8 +75,8 @@ export const CreateSpendAction: React.FC<{id: symbol}> = ({id}) => {
             </div>
             <div className={classes.paperBody}>
               <div className="marginB">
-                  <p className={classes.paperTitle}>From validator</p>
-                  <FormControl variant="outlined" fullWidth>
+                  <p className={classes.paperTitle}>From Group Policy</p>
+                  {/*<FormControl variant="outlined" fullWidth>
                       <Select
                           fullWidth
                           placeholder="Select validator"
@@ -87,7 +87,7 @@ export const CreateSpendAction: React.FC<{id: symbol}> = ({id}) => {
                               <MenuItem key={validator.operator_address} value={validator.operator_address}>{validator.description.moniker}</MenuItem>
                           ))}
                       </Select>
-                  </FormControl>
+                  </FormControl>*/}
               </div>
               <div className="marginB">
                   <p className={classes.paperTitle}>To validator</p>

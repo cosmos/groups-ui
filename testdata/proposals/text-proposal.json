@@ -1,0 +1,11 @@
+{
+  "group_policy_address": "cosmos1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsfwkgpd",
+  "messages": [
+    {
+      "@type": "/cosmos.gov.v1beta1.MsgTextProposal",
+      "title": "Test Title",
+      "description": "Test Description"
+    }
+  ],
+  "proposers": ["cosmos106ljn6kds9vegaux0w4jnend97fdm50yec59vq"]
+}

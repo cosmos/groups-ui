@@ -2,8 +2,8 @@ import React, { createContext } from 'react'
 import { GroupsStore } from './groups-store'
 import { ChainInfoStore } from './chain-info-store'
 import { CreateProposalStore } from './create-proposal-store'
-import {ValidatorsStore} from "./validators-store";
-import {ProposalsStore} from "./proposals-store";
+import { ValidatorsStore } from './validators-store'
+import { ProposalsStore } from './proposals-store'
 
 // import { configure } from "mobx"
 // configure({

@@ -18,7 +18,8 @@ export class ValidatorsService {
         this.cosmosClient = cosmosClient
     }
 
-    applyChainInfo = async (chainInfo: ChainInfo): Promise<void> => {}
+    applyChainInfo = async (chainInfo: ChainInfo): Promise<void> => {
+    }
 
     allValidators = async (): Promise<readonly Validator[]> => {
         // fixme: maybe only BondStatus.BOND_STATUS_BONDED and not jailed

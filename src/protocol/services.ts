@@ -23,7 +23,7 @@ export function service(ServiceClassRef) {
     return ServiceClassRef
 }
 
-export async function applyChainInfo (chainInfo: ChainInfo): Promise<unknown[]> {
+export async function applyChainInfo(chainInfo: ChainInfo): Promise<unknown[]> {
     await CosmosClient.instance.applyChainInfo(chainInfo)
     return Promise.all(Array.from(servicesMap.values()).map(s => s.applyChainInfo(chainInfo)))
 }

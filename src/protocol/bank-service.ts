@@ -19,10 +19,11 @@ export class BankService {
         this.cosmosClient = cosmosClient
     }
 
-    applyChainInfo = async (chainInfo: ChainInfo): Promise<void> => {}
+    applyChainInfo = async (chainInfo: ChainInfo): Promise<void> => {
+    }
 
     getAllUserBalances = async (): Promise<readonly Coin[]> => {
-        const {bech32Address} = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
+        const { bech32Address } = await CosmosNodeService.instance.cosmosClient.keplr.getKey(CosmosNodeService.instance.chainInfo.chainId)
 
         // fixme: load all pages
         const res = await this.cosmosClient.lcdClientGet(

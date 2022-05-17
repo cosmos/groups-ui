@@ -1,13 +1,13 @@
-import {ProposalsService} from "../protocol/proposals-service";
-import {Proposal, Vote, VoteOption} from "../generated/cosmos/group/v1/types";
-import {CosmosNodeService} from "../protocol/cosmos-node-service";
-import {Exec, MsgExec, MsgVote} from "../generated/cosmos/group/v1/tx";
-import {coins} from "@cosmjs/proto-signing";
-import {protobufPackage} from "../generated/cosmos/group/v1/tx";
+import { ProposalsService } from '../protocol/proposals-service'
+import { Proposal, Vote, VoteOption } from '../generated/cosmos/group/v1/types'
+import { CosmosNodeService } from '../protocol/cosmos-node-service'
+import { Exec, MsgExec, MsgVote, protobufPackage } from '../generated/cosmos/group/v1/tx'
+import { coins } from '@cosmjs/proto-signing'
+import { makeObservable } from 'mobx'
 
 export class ProposalsStore {
     constructor() {
-        // makeObservable(this)
+        makeObservable(this)
     }
 
     fetchProposalById = async (id: number): Promise<Proposal> => {
@@ -32,24 +32,24 @@ export class ProposalsStore {
     ) => {
         const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(
             CosmosNodeService.instance.chainInfo.chainId
-        );
-        const me = key.bech32Address;
+        )
+        const me = key.bech32Address
 
         // TODO replace hardcode
-        const exec = Exec.EXEC_TRY;
+        const exec = Exec.EXEC_TRY
 
         const msg: MsgVote = {
             proposal_id: proposalId,
             option: voteOption,
             voter: me,
             metadata: metadata,
-            exec,
-        };
+            exec
+        }
 
         const msgAny = {
             typeUrl: `/${protobufPackage}.MsgVote`,
-            value: MsgVote.encode(msg).finish(),
-        };
+            value: MsgVote.encode(msg).finish()
+        }
 
         const fee = {
             amount: coins(
@@ -57,8 +57,8 @@ export class ProposalsStore {
                 CosmosNodeService.instance.chainInfo.stakeCurrency
                     .coinMinimalDenom
             ),
-            gas: '2000000',
-        };
+            gas: '2000000'
+        }
 
         try {
             const res =
@@ -66,30 +66,30 @@ export class ProposalsStore {
                     me,
                     [msgAny],
                     fee
-                );
+                )
 
-            console.log('proposal vote', res);
-            return res;
+            console.log('proposal vote', res)
+            return res
         } catch (error) {
-            console.log('error voting proposal', error);
+            console.log('error voting proposal', error)
         }
-    };
+    }
 
     executeProposal = async (proposalId: number) => {
         const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(
             CosmosNodeService.instance.chainInfo.chainId
-        );
-        const me = key.bech32Address;
+        )
+        const me = key.bech32Address
 
         const msg: MsgExec = {
             proposal_id: proposalId,
-            signer: me,
-        };
+            signer: me
+        }
 
         const msgAny = {
             typeUrl: `/${protobufPackage}.MsgExec`,
-            value: MsgExec.encode(msg).finish(),
-        };
+            value: MsgExec.encode(msg).finish()
+        }
 
         const fee = {
             amount: coins(
@@ -97,8 +97,8 @@ export class ProposalsStore {
                 CosmosNodeService.instance.chainInfo.stakeCurrency
                     .coinMinimalDenom
             ),
-            gas: '2000000',
-        };
+            gas: '2000000'
+        }
 
         try {
             const res =
@@ -106,12 +106,12 @@ export class ProposalsStore {
                     me,
                     [msgAny],
                     fee
-                );
+                )
 
-            console.log('proposal exec', res);
-            return res;
+            console.log('proposal exec', res)
+            return res
         } catch (error) {
-            console.log('error exec proposal', error);
+            console.log('error exec proposal', error)
         }
     }
 }

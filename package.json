@@ -17,6 +17,7 @@
         "axios": "^0.19.0",
         "chart.js": "^3.7.0",
         "classnames": "^2.2.6",
+        "cross-env": "^7.0.3",
         "lodash": "^4.17.15",
         "mobx": "^6.3.10",
         "mobx-react-lite": "^3.2.2",
@@ -37,11 +38,11 @@
         "react-error-overlay": "6.0.9"
     },
     "scripts": {
-        "start": "PORT=3001 react-scripts start",
-        "start-win": "set PORT=3001 && react-scripts start",
+        "start": "cross-env PORT=3001 react-scripts start",
+        "start-win": "npm run start",
         "start-light": "PORT=3001 DISABLE_ESLINT_PLUGIN=true TSC_COMPILE_ON_ERROR=false FAST_REFRESH=false GENERATE_SOURCEMAP=false CHOKIDAR_USEPOLLING=false react-scripts start",
         "generate": "sh ./protocgen.sh",
-        "build": "react-scripts build",
+        "build": "cross-env NODE_OPTIONS=--max-old-space-size=4096 react-scripts build",
         "test": "react-scripts test",
         "eject": "react-scripts eject",
         "serve": "serve -s -p 3001 build/"

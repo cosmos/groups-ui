@@ -1,6 +1,6 @@
-import {makeObservable, observable, runInAction} from "mobx";
-import {ValidatorsService} from "../protocol/validators-service";
-import {Validator} from "../generated/cosmos/staking/v1beta1/staking";
+import { makeObservable, observable, runInAction } from 'mobx'
+import { ValidatorsService } from '../protocol/validators-service'
+import { Validator } from '../generated/cosmos/staking/v1beta1/staking'
 
 
 export class ValidatorsStore {

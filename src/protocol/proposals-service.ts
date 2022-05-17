@@ -3,23 +3,16 @@ import { ChainInfo } from '@keplr-wallet/types'
 import { CosmosClient } from './cosmos-client'
 import { Proposal, Vote } from '../generated/cosmos/group/v1/types'
 import {
-    QueryGroupsByAdminRequest, QueryGroupsByAdminResponse,
-    QueryProposalResponse, QueryProposalsByGroupPolicyRequest,
+    QueryProposalResponse,
     QueryProposalsByGroupPolicyResponse,
     QueryVoteByProposalVoterResponse,
     QueryVotesByProposalResponse
 } from '../generated/cosmos/group/v1/query'
-import {
-    MsgExec,
-    MsgSubmitProposal,
-    MsgVote,
-    protobufPackage
-} from '../generated/cosmos/group/v1/tx'
-import {PageRequest} from "../generated/cosmos/base/query/v1beta1/pagination";
+import { MsgExec, MsgSubmitProposal, MsgVote, protobufPackage } from '../generated/cosmos/group/v1/tx'
 
 @service
 export class ProposalsService implements Service {
-    static serviceName: string = "ProposalsService"
+    static serviceName: string = 'ProposalsService'
 
     static get instance(): ProposalsService {
         return getService<ProposalsService>(ProposalsService.serviceName)
@@ -51,7 +44,7 @@ export class ProposalsService implements Service {
         ) as QueryProposalsByGroupPolicyResponse
 
         // TODO check pagination field later
-        console.log("proposals pagination", res.pagination)
+        console.log('proposals pagination', res.pagination)
 
         return res.proposals
 

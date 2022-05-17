@@ -6,9 +6,11 @@ import { coins } from '@cosmjs/proto-signing'
 import { makeObservable } from 'mobx'
 
 export class ProposalsStore {
-    constructor() {
-        makeObservable(this)
-    }
+    // With constructor we have an error:
+    // Uncaught Error: [MobX] No annotations were passed to makeObservable, but no decorated members have been found either
+    // constructor() {
+    //     makeObservable(this)
+    // }
 
     fetchProposalById = async (id: number): Promise<Proposal> => {
         return await ProposalsService.instance.proposalById(id)

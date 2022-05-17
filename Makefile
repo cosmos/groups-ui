@@ -125,3 +125,17 @@ update-group-metadata:
 .PHONY: query-groups
 query-groups:
 	simd q group groups-by-admin $(USER2)
+
+.PHONY: vote
+vote:
+	@read -p "Proposal ID:" proposalId; \
+	read -p "Voter Address:" voter; \
+	read -p "Vote Option (VOTE_OPTION_UNSPECIFIED|VOTE_OPTION_NO|VOTE_OPTION_YES|VOTE_OPTION_ABSTAIN|VOTE_OPTION_NO_WITH_VETO):" option; \
+	read -p "Metadata" metadata; \
+	simd tx group vote $$proposalId $$voter $$option $$metadata --chain-id $(CHAIN_ID)
+
+.PHONY: query-votes
+query-votes:
+	@read -p "Proposal ID:" proposalId; \
+	read -p "Voter Address:" voter; \
+	simd q group vote $$proposalId $$voter

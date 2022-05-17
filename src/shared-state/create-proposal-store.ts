@@ -1,28 +1,23 @@
-import { makeObservable, observable } from 'mobx';
-import { Any } from '../generated/google/protobuf/any';
-import {
-    Exec,
-    MsgExec,
-    MsgVote,
-    protobufPackage as groupProtobufPackage,
-    MsgSubmitProposal
-} from '../generated/cosmos/group/v1/tx';
+import { makeObservable, observable } from 'mobx'
+import { Any } from '../generated/google/protobuf/any'
+import { MsgSubmitProposal, protobufPackage as groupProtobufPackage } from '../generated/cosmos/group/v1/tx'
 import {
     MsgBeginRedelegate,
-    MsgDelegate, MsgUndelegate,
+    MsgDelegate,
+    MsgUndelegate,
     protobufPackage as stakingProtobufPackage
-} from '../generated/cosmos/staking/v1beta1/tx';
-import {protobufPackage as distributionProtobufPackage} from '../generated/cosmos/distribution/v1beta1/tx';
-import {protobufPackage as bankProtobufPackage} from '../generated/cosmos/bank/v1beta1/tx';
-import { ParameterChangeProposal } from '../generated/params/params';
-import { Group, toUint8Array } from './groups-store';
-import { CosmosNodeService } from '../protocol/cosmos-node-service';
-import { VoteOption } from '../generated/cosmos/group/v1/types';
-import { Coin, coins } from '@cosmjs/proto-signing';
-import {ProposalsService} from "../protocol/proposals-service";
-import {MsgWithdrawDelegatorReward} from "../generated/cosmos/distribution/v1beta1/tx";
-import {MsgSend} from "../generated/cosmos/bank/v1beta1/tx";
-import {ValidatorsService} from "../protocol/validators-service";
+} from '../generated/cosmos/staking/v1beta1/tx'
+import {
+    MsgWithdrawDelegatorReward,
+    protobufPackage as distributionProtobufPackage
+} from '../generated/cosmos/distribution/v1beta1/tx'
+import { MsgSend, protobufPackage as bankProtobufPackage } from '../generated/cosmos/bank/v1beta1/tx'
+import { ParameterChangeProposal } from '../generated/params/params'
+import { Group } from './groups-store'
+import { CosmosNodeService } from '../protocol/cosmos-node-service'
+import { coins } from '@cosmjs/proto-signing'
+import { ProposalsService } from '../protocol/proposals-service'
+import { ValidatorsService } from '../protocol/validators-service'
 
 interface NewProposal {
     actions: Action[]
@@ -52,7 +47,12 @@ export enum ActionType {
 
 // export type StakeProposalType = ProposalType.STAKE_DELEGATE|ProposalType.STAKE_REDELEGATE|ProposalType.STAKE_UNDELEGATE|ProposalType.STAKE_CLAIM_REWARD
 
-export type ActionData = RedelegateActionData | DelegateActionData | SpendActionData | TextActionData | ParameterChangeActionData
+export type ActionData =
+    RedelegateActionData
+    | DelegateActionData
+    | SpendActionData
+    | TextActionData
+    | ParameterChangeActionData
 export type HasActionStateType = { type: ActionStateType }
 
 export interface UndelegateActionData {
@@ -61,6 +61,7 @@ export interface UndelegateActionData {
     coinDenom: string
     amount: number
 }
+
 export const isUndelegateActionData = (data: HasActionStateType): data is UndelegateActionData =>
     data.type === ActionStateType.UNDELEGATE
 
@@ -70,6 +71,7 @@ export interface DelegateActionData {
     coinDenom: string
     amount: number
 }
+
 export const isDelegateActionData = (data: HasActionStateType): data is DelegateActionData =>
     data.type === ActionStateType.DELEGATE
 
@@ -80,12 +82,14 @@ export interface RedelegateActionData {
     coinDenom: string
     amount: number
 }
+
 export const isRedelegateActionData = (data: HasActionStateType): data is RedelegateActionData =>
     data.type === ActionStateType.REDELEGATE
 
 export interface ClaimRewardActionData {
     type: ActionStateType
 }
+
 export const isClaimRewardActionData = (data: HasActionStateType): data is ClaimRewardActionData =>
     data.type === ActionStateType.CLAIM_REWARD
 
@@ -118,7 +122,7 @@ enum ProposalTypeUrls {
 async function createClaimRewardProposalMsgs(groupPolicyAddress) {
     const allValidators = await ValidatorsService.instance.allValidators()
 
-    return allValidators.map( validator => {
+    return allValidators.map(validator => {
         let message: MsgWithdrawDelegatorReward = {
             validator_address: validator.operator_address,
             delegator_address: groupPolicyAddress
@@ -210,7 +214,7 @@ export class CreateProposalStore {
     }
 
     constructor() {
-        makeObservable(this);
+        makeObservable(this)
     }
 
     addAction = (type: ActionType) => {
@@ -219,10 +223,10 @@ export class CreateProposalStore {
 
     // @action
     updateAction = (id: symbol, data: Partial<ActionData>) => {
-        const action = this.newProposal.actions.find( action => action.id === id)
+        const action = this.newProposal.actions.find(action => action.id === id)
 
         if (action) {
-            action.data = {...action.data, ...data}
+            action.data = { ...action.data, ...data }
         } else {
             this.newProposal.actions.push({
                 id,
@@ -235,8 +239,8 @@ export class CreateProposalStore {
         group: Group
     ): Promise<number> => {
 
-        const groupPolicyAddress = group.policy.address;
-        const proposals = (await Promise.all(this.newProposal.actions.map( async (action) => {
+        const groupPolicyAddress = group.policy.address
+        const proposals = (await Promise.all(this.newProposal.actions.map(async (action) => {
             switch (action.id.description) {
                 case ActionType.STAKE:
                     const data = action.data as { type: ActionStateType }
@@ -259,7 +263,7 @@ export class CreateProposalStore {
                     return undefined
             }
             return undefined
-        }))).flat().filter( m => !!m)
+        }))).flat().filter(m => !!m)
 
 
         // const mockMetaData = 'testing abc';
@@ -282,8 +286,8 @@ export class CreateProposalStore {
 
         const key = await CosmosNodeService.instance.cosmosClient.keplr.getKey(
             CosmosNodeService.instance.chainInfo.chainId
-        );
-        const me = key.bech32Address;
+        )
+        const me = key.bech32Address
 
         // TODO replace hardcode
         // const exec = Exec.EXEC_TRY;
@@ -295,21 +299,21 @@ export class CreateProposalStore {
             // exec,
             // metadata: toUint8Array(mockMetaData).toString(),
             metadata: this.newProposal.name
-        });
+        })
 
-        console.log('msg', msg);
+        console.log('msg', msg)
 
         const msgAny = {
             typeUrl: `/${groupProtobufPackage}.MsgSubmitProposal`,
-            value: msg,
-        };
+            value: msg
+        }
 
         const fee = {
             amount: coins(
                 0,
                 CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom
             ),
-            gas: '2000000',
+            gas: '2000000'
         }
 
         let createdProposalId
@@ -321,11 +325,11 @@ export class CreateProposalStore {
         } catch (e) {
             console.warn(e)
             // if (e.message === 'Invalid string. Length must be a multiple of 4') {
-                const proposals = await ProposalsService.instance.allProposalsByGroupPolicy(groupPolicyAddress)
-                createdProposalId = Math.max(...proposals.map( p => Number(p.id)), 0)
+            const proposals = await ProposalsService.instance.allProposalsByGroupPolicy(groupPolicyAddress)
+            createdProposalId = Math.max(...proposals.map(p => Number(p.id)), 0)
             // } else {
-                // todo: show error
-                // throw e
+            // todo: show error
+            // throw e
             // }
         }
         console.log(`Created Proposal Id: ${createdProposalId}`)
@@ -342,47 +346,47 @@ export class CreateProposalStore {
     ): Any => {
         const encodedProposal = {
             type_url: ProposalTypeUrls.ParameterChangeProposal,
-            value: ParameterChangeProposal.encode(proposalValue).finish(),
-        };
-        return encodedProposal;
-    };
+            value: ParameterChangeProposal.encode(proposalValue).finish()
+        }
+        return encodedProposal
+    }
 
     // copied from https://github.com/cosmos/composer/blob/475a98e03f3111aff03903f7d29e102c76875491/react/src/components/AdminModule/SubmitProposal/ParameterChangeProposal/ParamChange/ChangeForm.tsx
     parameters = {
         auth: [
-            "MaxMemoCharacters",
-            "TxSigLimit",
-            "TxSizeCostPerByte",
-            "SigVerifyCostED25519",
-            "SigVerifyCostSecp256k1"
+            'MaxMemoCharacters',
+            'TxSigLimit',
+            'TxSizeCostPerByte',
+            'SigVerifyCostED25519',
+            'SigVerifyCostSecp256k1'
         ],
-        bank: ["sendenabled"],
-        gov: ["depositparams", "votingparams", "tallyparams"],
-        staking: ["UnbondingTime", "MaxValidators", "KeyMaxEntries", "HistoricalEntries", "BondDenom"],
+        bank: ['sendenabled'],
+        gov: ['depositparams', 'votingparams', 'tallyparams'],
+        staking: ['UnbondingTime', 'MaxValidators', 'KeyMaxEntries', 'HistoricalEntries', 'BondDenom'],
         slashing: [
-            "SignedBlocksWindow",
-            "MinSignedPerWindow",
-            "DowntimeJailDuration",
-            "SlashFractionDoubleSign",
-            "SlashFractionDowntime"
+            'SignedBlocksWindow',
+            'MinSignedPerWindow',
+            'DowntimeJailDuration',
+            'SlashFractionDoubleSign',
+            'SlashFractionDowntime'
         ],
         distribution: [
-            "communitytax",
-            "secretfoundationtax",
-            "secretfoundationaddress",
-            "baseproposerreward",
-            "bonusproposerreward",
-            "withdrawaddrenabled"
+            'communitytax',
+            'secretfoundationtax',
+            'secretfoundationaddress',
+            'baseproposerreward',
+            'bonusproposerreward',
+            'withdrawaddrenabled'
         ],
-        crisis: ["ConstantFee"],
+        crisis: ['ConstantFee'],
         mint: [
-            "MintDenom",
-            "InflationRateChange",
-            "InflationMax",
-            "InflationMin",
-            "GoalBonded",
-            "BlocksPerYear"
+            'MintDenom',
+            'InflationRateChange',
+            'InflationMax',
+            'InflationMin',
+            'GoalBonded',
+            'BlocksPerYear'
         ],
-        evidence: ["MaxEvidenceAge"]
+        evidence: ['MaxEvidenceAge']
     }
 }

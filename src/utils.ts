@@ -5,7 +5,7 @@
  */
 export function truncateAddress(address: string) {
     if (address !== undefined && address !== null && address !== '')
-        return address.substring(0, 9) + "…" + address.substring(address.length - 4)
+        return address.substring(0, 9) + '…' + address.substring(address.length - 4)
     else
         return address
 }
@@ -20,7 +20,7 @@ export function truncateAddress(address: string) {
  * }
  * @param coins regen,atom for example
  */
-export function fetchCoinPrices(coins: string[]): Promise<{ [key: string]: { usd: number } }|undefined> {
+export function fetchCoinPrices(coins: string[]): Promise<{ [key: string]: { usd: number } } | undefined> {
     return fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coins.join(',')}&vs_currencies=usd`)
         .then(result => result.json())
         .catch(e => {

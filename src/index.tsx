@@ -8,5 +8,5 @@ import { applyChainInfo } from './protocol/services'
     await applyChainInfo(stores.chainInfoStore.chainInfo)
     document.title = window.location.host  // TODO hardcode
 
-    ReactDOM.render(<App />, document.getElementById('root'))
+    ReactDOM.render(<App/>, document.getElementById('root'))
 })()

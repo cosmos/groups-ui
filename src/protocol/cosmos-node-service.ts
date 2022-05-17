@@ -4,7 +4,7 @@ import { CosmosClient } from './cosmos-client'
 
 @service
 export class CosmosNodeService implements Service {
-    static serviceName: string = "CosmosNodeService"
+    static serviceName: string = 'CosmosNodeService'
 
     static get instance(): CosmosNodeService {
         return getService<CosmosNodeService>(CosmosNodeService.serviceName)

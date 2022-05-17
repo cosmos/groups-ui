@@ -19,8 +19,8 @@ export interface Chain {
 // fixme: some networks data not correct, osmosis for example
 const list: Chain[] = [
     {
-        rpc: `http://44.200.220.236:26657`,
-        rest: `http://44.200.220.236:1317`,
+        rpc: `http://cosmos-test-2.adoriasoft.link:26657`,
+        rest: `http://cosmos-test-2.adoriasoft.link:1317`,
         chainId: "cosmoswithgroups",
         chainName: "GROUPS-UI-TEST",
         coinDenom: "STAKE",

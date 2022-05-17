@@ -71,7 +71,7 @@ query-balance:
 keys-list:
 	simd keys list --home $(CHAIN_HOME) --keyring-backend test --keyring-dir $(CHAIN_HOME)
 
-.PHONY: bank-send-from-alice-to-user2
+.PHONY: bank-send
 bank-send:
 	simd tx bank send $(ALICE) $(USER2) 1000000000000000stake --chain-id $(CHAIN_ID) --home $(CHAIN_HOME) --keyring-backend test --keyring-dir $(CHAIN_HOME)
 
@@ -111,11 +111,11 @@ query-group-proposal:
 	simd q group proposal $$proposalId
 
 .PHONY: submit-bank-send-proposal
- submit-proposal:
+submit-bank-send-proposal:
 	simd tx group submit-proposal ./testdata/proposals/bank-send-proposal.json --chain-id $(CHAIN_ID)
 
 .PHONY: submit-text-proposal
- submit-proposal:
+submit-text-proposal:
 	simd tx group submit-proposal ./testdata/proposals/text-proposal.json --chain-id $(CHAIN_ID)
 
 .PHONY: update-group-metadata

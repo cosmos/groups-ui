@@ -3,9 +3,7 @@ import { GroupsService } from "../protocol/groups-service";
 import { CosmosNodeService } from "../protocol/cosmos-node-service";
 import { coins } from "@cosmjs/launchpad";
 import { cloneDeep, isEqual } from "lodash";
-import { 
-   DeliverTxResponse
-   } from "@cosmjs/stargate/build/stargateclient";
+import { DeliverTxResponse } from "@cosmjs/stargate/build/stargateclient";
 import {
   GroupInfo,
   GroupMember,
@@ -15,17 +13,20 @@ import {
 } from "../generated/cosmos/group/v1/types";
 import {
   MsgCreateGroup,
-  MsgCreateGroupPolicy, MsgCreateGroupWithPolicy, MsgUpdateGroupAdmin,
+  MsgCreateGroupPolicy,
+  MsgCreateGroupWithPolicy,
+  MsgUpdateGroupAdmin,
   MsgUpdateGroupMembers,
-  MsgUpdateGroupMetadata, MsgUpdateGroupPolicyAdmin, MsgUpdateGroupPolicyDecisionPolicy,
-  protobufPackage
-} from '../generated/cosmos/group/v1/tx'
+  MsgUpdateGroupMetadata,
+  MsgUpdateGroupPolicyAdmin,
+  MsgUpdateGroupPolicyDecisionPolicy,
+  protobufPackage,
+} from "../generated/cosmos/group/v1/tx";
 import { Coin } from "../generated/cosmos/base/v1beta1/coin";
 import { BankService } from "../protocol/bank-service";
 import { fetchCoinPrices } from "../utils";
 import { IUpdatedList } from "../pages/groups/groups-type";
 import { trimDeleted } from "../pages/groups/utils";
-
 
 // {"name": "bla", "description": "blabbl", "created": 1640599686655, "lastEdited": 1640599686655, "linkToForum": "", "other": "blabla"}
 interface GroupMetadata {
@@ -51,7 +52,7 @@ export interface Group {
   members: readonly GroupMember[];
   // groupAccounts: GroupAccountInfo[]
   metadata: GroupMetadata;
-  admin: string
+  admin: string;
   policy?: GroupPolicy;
   updateMembers?: any;
   deleteMembers?: [];
@@ -101,15 +102,12 @@ export class GroupsStore {
           ]);
           const policy = toGroupPolicy(policies);
 
-
-
           groups.push({
             info: g,
             members,
             policy,
             metadata: JSON.parse(atob(g.metadata as unknown as string)),
-            admin: policy && policy.admin === g.admin ? '' : g.admin,
-
+            admin: policy && policy.admin === g.admin ? "" : g.admin,
           });
         })();
       })
@@ -134,14 +132,15 @@ export class GroupsStore {
     ]);
     const metadata = JSON.parse(atob(groupInfo.metadata as unknown as string));
 
-    const policy = toGroupPolicy(policies)
+    const policy = toGroupPolicy(policies);
 
     return Object.freeze({
       info: groupInfo,
       members,
       policy,
       metadata, //: {...metadata, created: metadata.created * 100} // strange bug
-      admin: policy && policy.address === groupInfo.admin ? '' : groupInfo.admin,
+      admin:
+        policy && policy.address === groupInfo.admin ? "" : groupInfo.admin,
     });
   };
 
@@ -254,7 +253,7 @@ export class GroupsStore {
           linkToForum: "",
           other: "",
         },
-        admin: ''
+        admin: "",
       };
     });
   };
@@ -277,12 +276,14 @@ export class GroupsStore {
   @action
   saveChanges = async () => {
     const output = [...toJS(this.editedGroup.members)];
-    const toDel = toJS(this.editedGroup.deleteMembers);
+    const toDelete = toJS(this.editedGroup.deleteMembers);
     const toUpdate = toJS(this.editedGroup.updateMembers);
+
     for (let i in output) {
       let { address } = output[i].member;
-      for (let j in toDel) {
-        if (address === toDel[j]) {
+      for (let j in toDelete) {
+        if (address === toDelete[j]) {
+          output[`${i}`].member.weight = "0";
           output.splice(+i, 1);
         }
       }
@@ -467,39 +468,6 @@ export class GroupsStore {
         gas: "2000000",
       };
       try {
-        results.push(await CosmosNodeService.instance.cosmosClient.signAndBroadcast(me, [msgAny], fee))
-    } catch (e) {
-        console.warn(e)
-    }
-
-    let newAdmin = this.editedGroup.admin
-
-        if (!isEqual(newAdmin, this.originalEditedGroup.admin)) {
-            // if (this.editedGroup.policy.threshold !== this.originalEditedGroup.policy.threshold)
-            if (newAdmin === '') {
-                // admin is policy
-                newAdmin = this.originalEditedGroup.policy.address
-            }
-            const updateGroupAdminMsg: MsgUpdateGroupAdmin = {
-                admin: this.originalEditedGroup.admin,
-                new_admin: newAdmin,
-                group_id: this.originalEditedGroup.info.id
-            }
-            const updateGroupAdminMsgWrapped = {
-                typeUrl: `/${protobufPackage}.MsgUpdateGroupAdmin`,
-                value: updateGroupAdminMsg
-            }
-            const updateGroupPolicyAdminMsg: MsgUpdateGroupPolicyAdmin = {
-                admin: this.originalEditedGroup.policy.admin,
-                new_admin: newAdmin,
-                address: this.originalEditedGroup.policy.address
-            }
-            const updateGroupPolicyAdminMsgWrapped = {
-                typeUrl: `/${protobufPackage}.MsgUpdateGroupPolicyAdmin`,
-                value: updateGroupPolicyAdminMsg
-            }
-
-      try {
         results.push(
           await CosmosNodeService.instance.cosmosClient.signAndBroadcast(
             me,
@@ -510,106 +478,148 @@ export class GroupsStore {
       } catch (e) {
         console.warn(e);
       }
-    }
 
-    if (
-      !isEqual(toJS(this.editedGroup.policy), this.originalEditedGroup.policy)
-    ) {
-      // if (this.editedGroup.policy.threshold !== this.originalEditedGroup.policy.threshold)
-      const msg: MsgUpdateGroupPolicyDecisionPolicy = {
-        admin: this.editedGroup.policy.admin,
-        address: this.editedGroup.policy.address,
-        decision_policy: {
-          type_url: "/cosmos.group.v1.PercentageDecisionPolicy",
-          value: PercentageDecisionPolicy.encode({
-            percentage: (this.editedGroup.policy.threshold / 100).toString(),
-            windows: {
-              voting_period: {
-                seconds: this.editedGroup.policy.timeoutInDays * 24 * 360,
-                nanos: 0,
+      let newAdmin = this.editedGroup.admin;
+
+      if (!isEqual(newAdmin, this.originalEditedGroup.admin)) {
+        // if (this.editedGroup.policy.threshold !== this.originalEditedGroup.policy.threshold)
+        if (newAdmin === "") {
+          // admin is policy
+          newAdmin = this.originalEditedGroup.policy.address;
+        }
+        const updateGroupAdminMsg: MsgUpdateGroupAdmin = {
+          admin: this.originalEditedGroup.admin,
+          new_admin: newAdmin,
+          group_id: this.originalEditedGroup.info.id,
+        };
+        const updateGroupAdminMsgWrapped = {
+          typeUrl: `/${protobufPackage}.MsgUpdateGroupAdmin`,
+          value: updateGroupAdminMsg,
+        };
+        const updateGroupPolicyAdminMsg: MsgUpdateGroupPolicyAdmin = {
+          admin: this.originalEditedGroup.policy.admin,
+          new_admin: newAdmin,
+          address: this.originalEditedGroup.policy.address,
+        };
+        const updateGroupPolicyAdminMsgWrapped = {
+          typeUrl: `/${protobufPackage}.MsgUpdateGroupPolicyAdmin`,
+          value: updateGroupPolicyAdminMsg,
+        };
+
+        try {
+          results.push(
+            await CosmosNodeService.instance.cosmosClient.signAndBroadcast(
+              me,
+              [msgAny],
+              fee
+            )
+          );
+        } catch (e) {
+          console.warn(e);
+        }
+      }
+
+      if (
+        !isEqual(toJS(this.editedGroup.policy), this.originalEditedGroup.policy)
+      ) {
+        // if (this.editedGroup.policy.threshold !== this.originalEditedGroup.policy.threshold)
+        const msg: MsgUpdateGroupPolicyDecisionPolicy = {
+          admin: this.editedGroup.policy.admin,
+          address: this.editedGroup.policy.address,
+          decision_policy: {
+            type_url: "/cosmos.group.v1.PercentageDecisionPolicy",
+            value: PercentageDecisionPolicy.encode({
+              percentage: (this.editedGroup.policy.threshold / 100).toString(),
+              windows: {
+                voting_period: {
+                  seconds: this.editedGroup.policy.timeoutInDays * 24 * 360,
+                  nanos: 0,
+                },
+                min_execution_period: {
+                  seconds: 1,
+                  nanos: 0,
+                },
               },
-              min_execution_period: {
-                seconds: 1,
-                nanos: 0,
-              },
-            },
-          }).finish(),
-        },
-      };
-      const msgAny = {
-        typeUrl: `/${protobufPackage}.MsgUpdateGroupPolicyDecisionPolicy`,
-        value: msg,
-      };
+            }).finish(),
+          },
+        };
+        const msgAny = {
+          typeUrl: `/${protobufPackage}.MsgUpdateGroupPolicyDecisionPolicy`,
+          value: msg,
+        };
 
-      const fee = {
-        amount: coins(
-          0,
-          CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom
-        ),
-        gas: "2000000",
-      };
+        const fee = {
+          amount: coins(
+            0,
+            CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom
+          ),
+          gas: "2000000",
+        };
 
-      try {
-        results.push(
-          await CosmosNodeService.instance.cosmosClient.signAndBroadcast(
-            me,
-            [msgAny],
-            fee
-          )
-        );
-      } catch (e) {
-        console.warn(e);
+        try {
+          results.push(
+            await CosmosNodeService.instance.cosmosClient.signAndBroadcast(
+              me,
+              [msgAny],
+              fee
+            )
+          );
+        } catch (e) {
+          console.warn(e);
+        }
       }
-    }
 
-    if (
-      !isEqual(toJS(this.editedGroup.members), this.originalEditedGroup.members)
-    ) {
-      const msg: MsgUpdateGroupMembers = {
-        admin: this.editedGroup.info.admin,
-        group_id: this.editedGroup.info.id,
-        member_updates: this.editedGroup.members.map((m) => ({
-          // TODO to delete member one should set its weight to 0
-          address: m.member.address,
-          weight: m.member.weight,
-          added_at: m.member.added_at,
-          metadata: m.member.metadata,
-        })),
-      };
-      const msgAny = {
-        typeUrl: `/${protobufPackage}.MsgUpdateGroupMembers`,
-        value: msg,
-      };
+      if (
+        !isEqual(
+          toJS(this.editedGroup.members),
+          this.originalEditedGroup.members
+        )
+      ) {
+        const msg: MsgUpdateGroupMembers = {
+          admin: this.editedGroup.info.admin,
+          group_id: this.editedGroup.info.id,
+          member_updates: this.editedGroup.members.map((m) => ({
+            // TODO to delete member one should set its weight to 0
+            address: m.member.address,
+            weight: m.member.weight,
+            added_at: m.member.added_at,
+            metadata: m.member.metadata,
+          })),
+        };
+        const msgAny = {
+          typeUrl: `/${protobufPackage}.MsgUpdateGroupMembers`,
+          value: msg,
+        };
 
-      console.log("msgAny", msgAny);
+        console.log("msgAny", msgAny);
 
-      const fee = {
-        amount: coins(
-          0,
-          CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom
-        ),
-        gas: "2000000",
-      };
-      try {
-        results.push(
-          await CosmosNodeService.instance.cosmosClient.signAndBroadcast(
-            me,
-            [msgAny],
-            fee
-          )
-        );
-      } catch (e) {
-        console.warn(e);
+        const fee = {
+          amount: coins(
+            0,
+            CosmosNodeService.instance.chainInfo.stakeCurrency.coinMinimalDenom
+          ),
+          gas: "2000000",
+        };
+        try {
+          results.push(
+            await CosmosNodeService.instance.cosmosClient.signAndBroadcast(
+              me,
+              [msgAny],
+              fee
+            )
+          );
+        } catch (e) {
+          console.warn(e);
+        }
       }
-    }
 
-    console.log(results);
-    return results;
+      console.log(results);
+      return results;
+    }
   };
-  }
 }
 
- export function toUint8Array(str: string): Uint8Array {
+export function toUint8Array(str: string): Uint8Array {
   if (!("TextEncoder" in window))
     alert("Sorry, this browser does not support TextEncoder...");
 
